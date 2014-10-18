@@ -2,9 +2,6 @@
 
 ## Basic set
 
-* Check working directory
-* Check target directory
-    * May not exist, be empty, or contain an empty `.magisto-export` file.
 * Create a list of files to update
     * Get all files in the working directory
     * Get all files from the target directory
