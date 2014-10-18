@@ -149,6 +149,21 @@ public class RealFileSystemAccessorTest {
         });
     }
 
+    @Test(expected = IOException.class)
+    public void testTargetDirectoryContainsDirectory() throws Exception {
+        runFileSystemTest(new FileSystemTestWithPreparedDirectory() {
+            @Override
+            public void prepareTempDirectory(Path path) throws IOException {
+                Files.createDirectory(path.resolve("foo"));
+            }
+
+            @Override
+            public void runTest(Path path) throws IOException {
+                assertNotNull(accessor.prepareTargetDirectory(path.toString()));
+            }
+        });
+    }
+
     @Test
     public void testSourceAndTargetDoNotOverlap() throws Exception {
         final Path source = WORKING_DIRECTORY.resolve("foo");

@@ -19,6 +19,7 @@ package nl.ulso.magisto.io;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Collections;
 
 import static java.util.Objects.requireNonNull;
 
@@ -55,7 +56,7 @@ public class RealFileSystemAccessor implements FileSystemAccessor {
             throw new IOException("Directory not writable: " + path);
         }
         final TargetStatus status = new TargetStatus();
-        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(path, Collections.<FileVisitOption>emptySet(), 1, new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 if (MAGISTO_EXPORT_MARKER_FILE.equals(file.getFileName().toString())) {
@@ -100,7 +101,7 @@ public class RealFileSystemAccessor implements FileSystemAccessor {
         }
     }
 
-    private class TargetStatus {
+    private static class TargetStatus {
         boolean isExport = false;
         boolean hasFiles = false;
     }
