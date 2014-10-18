@@ -10,8 +10,8 @@
 * Execute all commands
     * If a custom template is present, apply that one
     * Otherwise: apply built-in template
-* Write a new `.magisto-export` file.
 * Copy over the static content, if any.
+* Correctly setup logging (java.util.logging)
 
 ## Improvements
 
@@ -27,4 +27,4 @@ In arbitrary order, all not yet clear:
         * Links to siblings, parents and children
 * Built-in macro's and/or directives for the FreeMarker template
 * Configurable prefix for Magisto files (e.g. "_" instead of ".")
-* ...
+* Implement Magisto as a Maven plugin that can run without pom.xml
