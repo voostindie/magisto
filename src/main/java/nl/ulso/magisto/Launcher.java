@@ -16,11 +16,12 @@
 
 package nl.ulso.magisto;
 
+import com.lexicalscope.jewel.cli.ArgumentValidationException;
+import com.lexicalscope.jewel.cli.CliFactory;
+import com.lexicalscope.jewel.cli.ValidationFailure;
 import nl.ulso.magisto.io.RealFileSystemAccessor;
 
 import java.io.IOException;
-
-import static java.lang.System.currentTimeMillis;
 
 /**
  * Launches the Magisto application.
@@ -30,6 +31,7 @@ import static java.lang.System.currentTimeMillis;
  * <li>Program arguments are parsed</li>
  * <li>Output is generated directly to System.out</li>
  * <li>Output is generated directly to System.err</li>
+ * <li>The {@link Magisto} class is instantiated/configured and run</li>
  * </ul>
  * </p>
  */
@@ -37,26 +39,61 @@ public class Launcher {
 
     private static final String WORKING_DIRECTORY = System.getProperty("user.dir");
 
+    private static Magisto DUMMY_MAGISTO = null; // For testing
+
     public static void main(String[] arguments) {
-        if (arguments.length != 1) {
-            System.err.println("Sorry, I can't run with these specific program arguments.");
-            System.err.println("I expect exactly one: the directory to export to.");
+        try {
+            final Options options = parseProgramOptions(arguments);
+            final Magisto magisto = createMagisto();
+            run(magisto, resolveSourceDirectory(options), options.getTargetDirectory());
+        } catch (RuntimeException e) {
             System.exit(-1);
         }
-        final Magisto magisto = new Magisto(new RealFileSystemAccessor());
-        run(magisto, WORKING_DIRECTORY, arguments[0]);
+    }
+
+    static Options parseProgramOptions(String[] arguments) {
+        try {
+            return CliFactory.parseArguments(Options.class, arguments);
+        } catch (ArgumentValidationException e) {
+            System.err.println("You gave me one or more invalid arguments: ");
+            for (ValidationFailure failure : e.getValidationFailures()) {
+                System.err.println(failure);
+            }
+            throw new RuntimeException();
+        }
+    }
+
+    static Magisto createMagisto() {
+        if (DUMMY_MAGISTO != null) {
+            return DUMMY_MAGISTO;
+        }
+        return new Magisto(new RealFileSystemAccessor());
     }
 
     private static void run(Magisto magisto, String sourceDirectory, String targetDirectory) {
-        final long start = currentTimeMillis();
+        final Statistics statistics;
         try {
-            magisto.run(sourceDirectory, targetDirectory);
+            statistics = magisto.run(sourceDirectory, targetDirectory);
         } catch (IOException e) {
-            System.err.println("Oops! An IO exception occurred. This one: " + e.getMessage());
-            System.exit(-1);
-        } finally {
-            final long end = currentTimeMillis();
-            System.out.println("Done! This run took me about " + (end - start) + " milliseconds");
+            System.err.println("Oops! An IO exception occurred...");
+            System.err.println();
+            System.err.println("Deliver the following to your friendly neighbourhood geek to help you out:");
+            System.err.println();
+            e.printStackTrace(System.err);
+            throw new RuntimeException();
         }
+        statistics.print(System.out);
+    }
+
+    static String resolveSourceDirectory(Options options) {
+        final String sourceOption = options.getSourceDirectory();
+        if (sourceOption != null) {
+            return sourceOption;
+        }
+        return WORKING_DIRECTORY;
+    }
+
+    static void setDummyMagistoForTesting(Magisto dummyMagisto) {
+        DUMMY_MAGISTO = dummyMagisto;
     }
 }

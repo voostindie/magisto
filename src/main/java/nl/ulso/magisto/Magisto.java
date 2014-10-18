@@ -24,7 +24,7 @@ import java.nio.file.Path;
 /**
  * Knits all the components in the Magisto system together (like a module) and runs it.
  */
-class Magisto {
+public class Magisto {
 
     private final FileSystemAccessor fileSystemAccessor;
 
@@ -32,13 +32,20 @@ class Magisto {
         this.fileSystemAccessor = fileSystemAccessor;
     }
 
-    public void run(final String sourceDirectory, final String targetDirectory) throws IOException {
-        final Path source = fileSystemAccessor.resolveSourceDirectory(sourceDirectory);
-        final Path target = fileSystemAccessor.prepareTargetDirectory(targetDirectory);
-        fileSystemAccessor.requireDistinct(source, target);
+    public Statistics run(final String sourceDirectory, final String targetDirectory) throws IOException {
+        final Statistics statistics = new Statistics();
+        try {
+            statistics.begin();
+            final Path source = fileSystemAccessor.resolveSourceDirectory(sourceDirectory);
+            final Path target = fileSystemAccessor.prepareTargetDirectory(targetDirectory);
+            fileSystemAccessor.requireDistinct(source, target);
 
-        // TODO: invoke the actual work here!
+            // TODO: invoke the actual work here!
 
-        fileSystemAccessor.writeTouchFile(target);
+            fileSystemAccessor.writeTouchFile(target);
+        } finally {
+            statistics.end();
+        }
+        return statistics;
     }
 }
