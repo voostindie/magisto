@@ -90,7 +90,7 @@ public class LauncherTest {
 
     private static final class DummyMagisto extends Magisto {
         private DummyMagisto() {
-            super(null);
+            super(null, null);
         }
 
         @Override
@@ -101,7 +101,7 @@ public class LauncherTest {
 
     private static final class DummyMagistoWithIOException extends Magisto {
         private DummyMagistoWithIOException() {
-            super(null);
+            super(null, null);
         }
 
         @Override

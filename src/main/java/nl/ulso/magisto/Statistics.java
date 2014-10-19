@@ -16,7 +16,12 @@
 
 package nl.ulso.magisto;
 
+import nl.ulso.magisto.action.Action;
+import nl.ulso.magisto.action.ActionType;
+
 import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Keeps tracks of what Magisto is doing.
@@ -25,6 +30,7 @@ public class Statistics {
 
     private long start = -1;
     private long end = -1;
+    private Map<ActionType, Integer> actionsPerformed = new HashMap<>();
 
     public Statistics begin() {
         if (start != -1) {
@@ -45,12 +51,36 @@ public class Statistics {
         return this;
     }
 
+    public Statistics registerActionPerformed(Action action) {
+        if (start == -1 || end != -1) {
+            throw new IllegalStateException("registerActionPerformed() must be called after begin() and before end()!");
+        }
+        final ActionType actionType = action.getActionType();
+        if (!actionsPerformed.containsKey(actionType)) {
+            actionsPerformed.put(actionType, 1);
+        } else {
+            final Integer count = actionsPerformed.get(actionType);
+            actionsPerformed.put(actionType, count + 1);
+        }
+        return this;
+    }
+
     public void print(PrintStream out) {
         if (end == -1) {
             throw new IllegalStateException("end() must be called before print() is called!");
         }
         final long duration = end - start;
         out.println("Done! This run took me about " + duration + " milliseconds. Here's what I did:");
-        // TODO: keep track of and print the amount of files matched, processed, copied, and so on.
+        for (Map.Entry<ActionType, Integer> entry : actionsPerformed.entrySet()) {
+            out.format("- %s %d files", entry.getKey().getPastTenseVerb(), entry.getValue());
+            out.println();
+        }
+    }
+
+    public int countFor(ActionType actionType) {
+        if (actionsPerformed.containsKey(actionType)) {
+            return actionsPerformed.get(actionType);
+        }
+        return 0;
     }
 }

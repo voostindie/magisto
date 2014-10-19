@@ -16,12 +16,15 @@
 
 package nl.ulso.magisto;
 
+import nl.ulso.magisto.action.DummyAction;
 import org.apache.commons.io.output.WriterOutputStream;
 import org.junit.Test;
 
 import java.io.PrintStream;
 import java.io.StringWriter;
 
+import static nl.ulso.magisto.action.ActionType.COPY;
+import static nl.ulso.magisto.action.DummyAction.*;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
@@ -42,13 +45,35 @@ public class StatisticsTest {
         new Statistics().begin().print(System.out);
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void testActionPerformedCannotBeCalledBeforeStart() throws Exception {
+        new Statistics().registerActionPerformed(new DummyAction(COPY));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testActionPerformedCannotBeCalledAfterEnd() throws Exception {
+        new Statistics().begin().end().registerActionPerformed(new DummyAction(COPY));
+    }
+
     @Test
     public void testSuccessfulRun() throws Exception {
         final StringWriter writer = new StringWriter();
         final PrintStream stream = new PrintStream(new WriterOutputStream(writer));
-        new Statistics().begin().end().print(stream);
+        new Statistics()
+                .begin()
+                .registerActionPerformed(COPY_ACTION)
+                .registerActionPerformed(DELETE_ACTION)
+                .registerActionPerformed(CONVERT_ACTION)
+                .registerActionPerformed(CONVERT_ACTION)
+                .registerActionPerformed(COPY_ACTION)
+                .registerActionPerformed(COPY_ACTION)
+                .end()
+                .print(stream);
         stream.flush();
         stream.close();
         assertThat(writer.toString(), containsString("Done!"));
+        assertThat(writer.toString(), containsString("Copied 3"));
+        assertThat(writer.toString(), containsString("Converted 2"));
+        assertThat(writer.toString(), containsString("Deleted 1"));
     }
 }

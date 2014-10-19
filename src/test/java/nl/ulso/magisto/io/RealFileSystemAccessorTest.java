@@ -19,17 +19,18 @@ package nl.ulso.magisto.io;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.Collections;
+import java.util.SortedSet;
+import java.util.concurrent.TimeUnit;
 
 import static nl.ulso.magisto.io.FileSystemTestRunner.WORKING_DIRECTORY;
 import static nl.ulso.magisto.io.FileSystemTestRunner.runFileSystemTest;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class RealFileSystemAccessorTest {
 
@@ -165,6 +166,28 @@ public class RealFileSystemAccessorTest {
     }
 
     @Test
+    public void testFindAllPaths() throws Exception {
+        runFileSystemTest(new FileSystemTestWithPreparedDirectory() {
+            @Override
+            public void prepareTempDirectory(Path path) throws IOException {
+                Files.createFile(path.resolve("foo"));
+                Files.createDirectory(path.resolve("bar"));
+                Files.createFile(path.resolve("bar").resolve("baz"));
+            }
+
+            @Override
+            public void runTest(Path path) throws IOException {
+                final SortedSet<Path> paths = accessor.findAllPaths(path);
+                assertEquals(3, paths.size());
+                assertArrayEquals(new Path[]{
+                        FileSystems.getDefault().getPath("bar"),
+                        FileSystems.getDefault().getPath("bar", "baz"),
+                        FileSystems.getDefault().getPath("foo")}, paths.toArray());
+            }
+        });
+    }
+
+    @Test
     public void testSourceAndTargetDoNotOverlap() throws Exception {
         final Path source = WORKING_DIRECTORY.resolve("foo");
         final Path target = WORKING_DIRECTORY.resolve("bar");
@@ -208,6 +231,29 @@ public class RealFileSystemAccessorTest {
             public void runTest(Path path) throws IOException {
                 accessor.writeTouchFile(path);
                 assertTrue(Files.exists(resolveTouchFile(path)));
+            }
+        });
+    }
+
+    @Test
+    public void testSourceNewerThanTarget() throws Exception {
+        runFileSystemTest(new FileSystemTestWithPreparedDirectory() {
+            @Override
+            public void prepareTempDirectory(Path path) throws IOException {
+                Files.createFile(path.resolve("target"));
+                try {
+                    TimeUnit.SECONDS.sleep(2); // Make sure the next file is newer
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                Files.createFile(path.resolve("source"));
+            }
+
+            @Override
+            public void runTest(Path path) throws IOException {
+                assertTrue(accessor.isSourceNewerThanTarget(path.resolve("source"), path.resolve("target")));
+                assertFalse(accessor.isSourceNewerThanTarget(path.resolve("target"), path.resolve("source")));
+                assertFalse(accessor.isSourceNewerThanTarget(path.resolve("source"), path.resolve("source")));
             }
         });
     }

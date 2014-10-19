@@ -18,9 +18,16 @@ package nl.ulso.magisto.io;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.SortedSet;
 
 /**
  * Handles all file system access done by Magisto.
+ *
+ * Yet another filesystem abstraction? Really?
+ *
+ * Magisto is doing a lot of file system access: reading files, loading template files, copying files, reading and
+ * writing directories... All file system access is here, nicely isolated, so that it can easily be swapped out
+ * in unit tests.
  */
 public interface FileSystemAccessor {
 
@@ -88,4 +95,20 @@ public interface FileSystemAccessor {
      * @param directory Directory, must be a real path.
      */
     void writeTouchFile(Path directory) throws IOException;
+
+    /**
+     * @param root Directory to find all paths in.
+     * @return All paths in a directory, all relative to the directory itself.
+     * @throws IOException If an exception occurred while finding all paths.
+     */
+    SortedSet<Path> findAllPaths(Path root) throws IOException;
+
+    /**
+     * Checks whether the source path is newer than the target path.
+     * @param source Source path, must be absolute.
+     * @param target Target path, must be absolute.
+     * @return {@code true} if source is newer, {@code false} otherwise.
+     * @throws IOException If an exception occurred while accessing the file system.
+     */
+    boolean isSourceNewerThanTarget(Path source, Path target) throws IOException;
 }

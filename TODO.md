@@ -2,14 +2,11 @@
 
 ## Basic set
 
-* Create a list of files to update
-    * Get all files in the working directory
-    * Get all files from the target directory
-    * Compare the two lists
-    * Create a command for each mismatch -> copy, convert, or delete
-* Execute all commands
-    * If a custom template is present, apply that one
-    * Otherwise: apply built-in template
+* Implement each of the supported Actions
+    * Copy
+    * Convert
+    * Delete
+* Use a custom template if available
 * Copy over the static content, if any.
 * Correctly setup logging (java.util.logging)
 

@@ -14,13 +14,31 @@
  * limitations under the License
  */
 
-/**
- * Another filesystem abstraction? Really?
- */
+package nl.ulso.magisto.action;
 
-/**
- * Magisto is doing a lot of file system access: reading files, loading template files, copying files, reading and
- * writing directories... All that file system access is here, nicely isolated, so that it can easily be swapped out
- * in unit tests.
- */
-package nl.ulso.magisto.io;
+import java.nio.file.Path;
+
+import static nl.ulso.magisto.action.DummyAction.*;
+
+public class DummyActionFactory implements ActionFactory {
+    @Override
+    public Action copy(Path path) {
+        return COPY_ACTION;
+    }
+
+    @Override
+    public Action convert(Path path) {
+        return CONVERT_ACTION;
+    }
+
+    @Override
+    public Action delete(Path path) {
+        return DELETE_ACTION;
+    }
+
+    public void clearCounts() {
+        COPY_ACTION.clear();
+        CONVERT_ACTION.clear();
+        DELETE_ACTION.clear();
+    }
+}

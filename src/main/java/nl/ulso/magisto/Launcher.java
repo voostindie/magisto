@@ -19,6 +19,7 @@ package nl.ulso.magisto;
 import com.lexicalscope.jewel.cli.ArgumentValidationException;
 import com.lexicalscope.jewel.cli.CliFactory;
 import com.lexicalscope.jewel.cli.ValidationFailure;
+import nl.ulso.magisto.action.RealActionFactory;
 import nl.ulso.magisto.io.RealFileSystemAccessor;
 
 import java.io.IOException;
@@ -67,7 +68,7 @@ public class Launcher {
         if (DUMMY_MAGISTO != null) {
             return DUMMY_MAGISTO;
         }
-        return new Magisto(new RealFileSystemAccessor());
+        return new Magisto(new RealFileSystemAccessor(), new RealActionFactory());
     }
 
     private static void run(Magisto magisto, String sourceDirectory, String targetDirectory) {

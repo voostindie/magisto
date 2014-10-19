@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import static java.util.Objects.requireNonNull;
 
@@ -58,7 +60,7 @@ public class RealFileSystemAccessor implements FileSystemAccessor {
         final TargetStatus status = new TargetStatus();
         Files.walkFileTree(path, Collections.<FileVisitOption>emptySet(), 1, new SimpleFileVisitor<Path>() {
             @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
                 if (MAGISTO_EXPORT_MARKER_FILE.equals(file.getFileName().toString())) {
                     status.isExport = true;
                     return FileVisitResult.TERMINATE;
@@ -93,6 +95,35 @@ public class RealFileSystemAccessor implements FileSystemAccessor {
             Files.delete(touchFile);
         }
         Files.createFile(touchFile);
+    }
+
+    @Override
+    public SortedSet<Path> findAllPaths(final Path root) throws IOException {
+        requireAbsolutePath(root);
+        final SortedSet<Path> paths = new TreeSet<>();
+        Files.walkFileTree(root, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes attributes) throws IOException {
+                if (root != path) {
+                    paths.add(root.relativize(path));
+                }
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path path, BasicFileAttributes attributes) throws IOException {
+                paths.add(root.relativize(path));
+                return FileVisitResult.CONTINUE;
+            }
+        });
+        return paths;
+    }
+
+    @Override
+    public boolean isSourceNewerThanTarget(Path source, Path target) throws IOException {
+        requireAbsolutePath(source);
+        requireAbsolutePath(target);
+        return Files.getLastModifiedTime(source).toMillis() > Files.getLastModifiedTime(target).toMillis();
     }
 
     private void requireAbsolutePath(Path path) {
