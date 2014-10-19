@@ -24,7 +24,7 @@ import java.nio.file.Path;
 abstract class AbstractAction implements Action {
     private final Path path;
 
-    public AbstractAction(Path path) {
+    AbstractAction(Path path) {
         this.path = path;
     }
 

@@ -25,9 +25,9 @@ import java.nio.file.Path;
 public class DummyPathEntry {
 
     private final Path path;
-    private long timestamp;
+    private final long timestamp;
 
-    DummyPathEntry(Path path, long timestamp) {
+    private DummyPathEntry(Path path, long timestamp) {
         this.path = path;
         this.timestamp = timestamp;
     }

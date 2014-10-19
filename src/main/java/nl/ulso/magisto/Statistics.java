@@ -28,9 +28,9 @@ import java.util.Map;
  */
 public class Statistics {
 
+    private final Map<ActionType, Integer> actionsPerformed = new HashMap<>();
     private long start = -1;
     private long end = -1;
-    private Map<ActionType, Integer> actionsPerformed = new HashMap<>();
 
     public Statistics begin() {
         if (start != -1) {

@@ -10,7 +10,7 @@ If your ambitions reach beyond these plain goals, then Magisto is not the tool f
 
 ## Background
 
-At the company I work for there are a lot of Git repositories containing documentation in Markdown format. Although our Git repository manager ([Stash](http://www.atlassian.com/stash)) has a webbased viewer that nicely renders Markdown as HTML, that interface is too complex for most audiences. Most users want to view the documentation without distractions (commits, branches, tags, diffs... WTF?!).
+At the company I work for there are a lot of Git repositories containing documentation in Markdown format. Although our Git repository manager ([Stash](http://www.atlassian.com/stash)) has a web-based viewer that nicely renders Markdown as HTML, that interface is too complex for most audiences. Most users want to view the documentation without distractions (commits, branches, tags, diffs... WTF?!).
 
 ## Installation
 

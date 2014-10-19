@@ -24,7 +24,7 @@ import java.util.Comparator;
  */
 public class ActionComparator implements Comparator<Action> {
 
-    final Class[] actionClasses = new Class[]{
+    private final Class[] actionClasses = new Class[]{
             SkipAction.class, DeleteAction.class, ConvertAction.class, CopyAction.class};
 
     @Override

@@ -28,7 +28,7 @@ import java.util.*;
 /**
  * Knits all the components in the Magisto system together (like a module) and runs it.
  */
-public class Magisto {
+class Magisto {
 
     private final Set<String> MARKDOWN_EXTENSIONS = new HashSet<>(Arrays.asList("md", "markdown", "mdown"));
 

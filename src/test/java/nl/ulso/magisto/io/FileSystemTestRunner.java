@@ -61,14 +61,14 @@ class FileSystemTestRunner {
             try {
                 Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
                     @Override
-                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
                         Files.delete(file);
                         return FileVisitResult.CONTINUE;
                     }
 
                     @Override
-                    public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                        Files.delete(dir);
+                    public FileVisitResult postVisitDirectory(Path directory, IOException exc) throws IOException {
+                        Files.delete(directory);
                         return FileVisitResult.CONTINUE;
                     }
                 });

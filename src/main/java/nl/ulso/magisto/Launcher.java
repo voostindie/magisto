@@ -54,7 +54,7 @@ public class Launcher {
         }
     }
 
-    static void configureLoggingSystem() {
+    private static void configureLoggingSystem() {
         final Logger rootLogger = Logger.getLogger("");
         rootLogger.setLevel(Level.INFO);
         final Handler handler = rootLogger.getHandlers()[0];
