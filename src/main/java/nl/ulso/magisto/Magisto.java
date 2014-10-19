@@ -41,11 +41,13 @@ class Magisto {
     }
 
     /*
-    Runs Magisto by first determining a list of actions to perform, and then actually performing them, keeping
+    Runs Magisto by first determining a set of actions to perform, and then actually performing them, keeping
     statistics along the way.
 
-    Actions can of course also be performed as soon as they are created. That will consume less memory. Still I like
-    this better, having two distinct steps. Feels cleaner. Easier to test.
+    The actions are collected and sorted in a specific manner, so that they are performed in the right order. For
+    example: deletions from the target for, in reverse order (first files in directories, then the directories
+    themselves). Copies go later, in lexicographical order. That's one reasons why collecting actions and performing
+    them are two distinct steps. Also, I like this better.
      */
     public Statistics run(final String sourceDirectory, final String targetDirectory) throws IOException {
         final Statistics statistics = new Statistics();
