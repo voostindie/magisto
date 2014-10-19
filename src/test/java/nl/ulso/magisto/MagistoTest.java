@@ -37,7 +37,7 @@ public class MagistoTest {
 
     @Before
     public void setUp() throws Exception {
-        accessor.clearPaths();
+        accessor.clearRecordings();
         actionFactory.clearCounts();
     }
 

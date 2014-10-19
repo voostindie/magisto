@@ -121,6 +121,7 @@ public class RealFileSystemAccessor implements FileSystemAccessor {
                 return FileVisitResult.CONTINUE;
             }
         });
+        // TODO: evict all paths that are directories and that no do have files in it?
         return paths;
     }
 
@@ -131,9 +132,36 @@ public class RealFileSystemAccessor implements FileSystemAccessor {
         return Files.getLastModifiedTime(source).toMillis() > Files.getLastModifiedTime(target).toMillis();
     }
 
+    @Override
+    public void copy(Path sourceRoot, Path targetRoot, Path path) throws IOException {
+        requireAbsolutePath(sourceRoot);
+        requireAbsolutePath(targetRoot);
+        requireRelativePath(path);
+        final Path source = sourceRoot.resolve(path);
+        final Path target = targetRoot.resolve(path);
+        if (Files.isDirectory(source)) {
+            Files.createDirectories(target);
+        } else {
+            Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
+        }
+    }
+
+    @Override
+    public void delete(Path root, Path path) throws IOException {
+        requireAbsolutePath(root);
+        requireRelativePath(path);
+        Files.delete(root.resolve(path));
+    }
+
     private void requireAbsolutePath(Path path) {
         if (!requireNonNull(path).isAbsolute()) {
-            throw new IllegalStateException("Not a real path: " + path);
+            throw new IllegalStateException("Not an absolute path: " + path);
+        }
+    }
+
+    private void requireRelativePath(Path path) {
+        if (requireNonNull(path).isAbsolute()) {
+            throw new IllegalStateException("Not a relative path: " + path);
         }
     }
 

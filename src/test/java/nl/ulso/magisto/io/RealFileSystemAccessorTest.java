@@ -275,6 +275,58 @@ public class RealFileSystemAccessorTest {
         });
     }
 
+    @Test
+    public void testPathCopy() throws Exception {
+        runFileSystemTest(new FileSystemTestWithPreparedDirectory() {
+
+            private Path source;
+            private Path target;
+
+            @Override
+            public void prepareTempDirectory(Path path) throws IOException {
+                this.source = path.resolve("source");
+                this.target = path.resolve("target");
+                Files.createDirectory(source);
+                Files.createFile(source.resolve("file"));
+                Files.createDirectory(source.resolve("directory"));
+                Files.createFile(source.resolve("directory").resolve("file"));
+                Files.createDirectory(target);
+            }
+
+            @Override
+            public void runTest(Path path) throws IOException {
+                accessor.copy(source, target, relativePath("file"));
+                accessor.copy(source, target, relativePath("directory"));
+                accessor.copy(source, target, relativePath("directory").resolve("file"));
+                // Bad test, it depends on code that's under test itself:
+                assertEquals(3, accessor.findAllPaths(path.resolve("target")).size());
+            }
+        });
+    }
+
+    @Test
+    public void testPathDelete() throws Exception {
+        runFileSystemTest(new FileSystemTestWithPreparedDirectory() {
+            @Override
+            public void prepareTempDirectory(Path path) throws IOException {
+                Files.createFile(path.resolve("file"));
+                Files.createDirectory(path.resolve("directory"));
+            }
+
+            @Override
+            public void runTest(Path path) throws IOException {
+                accessor.delete(path, relativePath("file"));
+                accessor.delete(path, relativePath("directory"));
+                // Bad test, it depends on code that's under test itself:
+                assertEquals(0, accessor.findAllPaths(path).size());
+            }
+        });
+    }
+
+    private Path relativePath(String name) {
+        return FileSystems.getDefault().getPath(name);
+    }
+
     private Path resolveTouchFile(Path path) {
         return path.resolve(FileSystemAccessor.MAGISTO_EXPORT_MARKER_FILE);
     }

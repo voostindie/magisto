@@ -54,6 +54,7 @@ public class Magisto {
             final Path targetRoot = fileSystemAccessor.prepareTargetDirectory(targetDirectory);
             fileSystemAccessor.requireDistinct(sourceRoot, targetRoot);
 
+            // TODO: Use a SortedSet for the actions, putting deletions at the end, in reverse lexical ordering...
             for (Action action : createActionList(sourceRoot, targetRoot)) {
                 action.perform(fileSystemAccessor, sourceRoot, targetRoot);
                 statistics.registerActionPerformed(action);

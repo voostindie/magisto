@@ -16,24 +16,26 @@
 
 package nl.ulso.magisto.action;
 
-import java.nio.file.Path;
+import org.junit.Test;
 
-/**
- * Real implementation of the {@link ActionFactory}.
- */
-public class RealActionFactory implements ActionFactory {
-    @Override
-    public Action copy(Path path) {
-        return new CopyAction(path);
+import static org.junit.Assert.*;
+
+public class RealActionFactoryTest {
+
+    private final ActionFactory factory = new RealActionFactory();
+
+    @Test
+    public void testCopyAction() throws Exception {
+        assertNotNull(factory.copy(null));
     }
 
-    @Override
-    public Action convert(Path path) {
-        throw new IllegalStateException("Not implemented yet!");
+    @Test
+    public void testDeleteAction() throws Exception {
+        assertNotNull(factory.copy(null));
     }
 
-    @Override
-    public Action delete(Path path) {
-        return new DeleteAction(path);
+    @Test(expected = IllegalStateException.class)
+    public void testConvertAction() throws Exception {
+        assertNotNull(factory.convert(null));
     }
 }

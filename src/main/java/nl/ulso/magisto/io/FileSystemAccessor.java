@@ -111,4 +111,22 @@ public interface FileSystemAccessor {
      * @throws IOException If an exception occurred while accessing the file system.
      */
     boolean isSourceNewerThanTarget(Path source, Path target) throws IOException;
+
+    /**
+     * Copies {@code path} in {@code sourceRoot} to {@code targetRoot}, overwriting the same path in the target
+     * directory if it already exists.
+     *
+     * @param sourceRoot Absolute path to the source directory.
+     * @param targetRoot Absolute path to the target directory.
+     * @param path Relative path to the file or directory to copy within the source directory.
+     */
+    void copy(Path sourceRoot, Path targetRoot, Path path) throws IOException;
+
+    /**
+     * Deletes a path from the root.
+     *
+     * @param root Absolute path to the directory.
+     * @param path Relative path to the file or directory to delete within the root directory.
+     */
+    void delete(Path root, Path path) throws IOException;
 }

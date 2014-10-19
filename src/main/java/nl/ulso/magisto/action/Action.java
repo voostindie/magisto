@@ -18,6 +18,7 @@ package nl.ulso.magisto.action;
 
 import nl.ulso.magisto.io.FileSystemAccessor;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 /**
@@ -27,5 +28,5 @@ public interface Action {
 
     ActionType getActionType();
 
-    void perform(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot);
+    void perform(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot) throws IOException;
 }

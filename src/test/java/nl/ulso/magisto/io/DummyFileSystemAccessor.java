@@ -25,6 +25,8 @@ public class DummyFileSystemAccessor implements FileSystemAccessor {
 
     private Path sourceRoot;
     private Path targetRoot;
+    private String loggedCopies = "";
+    private String loggedDeletions = "";
     private final Set<DummyPathEntry> sourcePaths = new HashSet<>();
     private final Set<DummyPathEntry> targetPaths = new HashSet<>();
 
@@ -72,6 +74,16 @@ public class DummyFileSystemAccessor implements FileSystemAccessor {
         return sourceEntry.getTimestamp() > targetEntry.getTimestamp();
     }
 
+    @Override
+    public void copy(Path sourceRoot, Path targetRoot, Path path) throws IOException {
+        loggedCopies += String.format("%s:%s -> %s%n", sourceRoot, path, targetRoot);
+    }
+
+    @Override
+    public void delete(Path root, Path path) throws IOException {
+        loggedDeletions += String.format("%s:%s%n", root, path);
+    }
+
     private DummyPathEntry findEntry(Path source, Set<DummyPathEntry> entries) {
         for (DummyPathEntry entry : entries) {
             if (entry.getPath().equals(source)) {
@@ -81,9 +93,11 @@ public class DummyFileSystemAccessor implements FileSystemAccessor {
         throw new IllegalStateException("Should not get here!");
     }
 
-    public void clearPaths() {
+    public void clearRecordings() {
         sourcePaths.clear();
         targetPaths.clear();
+        loggedCopies = "";
+        loggedDeletions = "";
     }
 
     public void addSourcePaths(DummyPathEntry... paths) {
@@ -92,5 +106,13 @@ public class DummyFileSystemAccessor implements FileSystemAccessor {
 
     public void addTargetPaths(DummyPathEntry... paths) {
         targetPaths.addAll(Arrays.asList(paths));
+    }
+
+    public String getLoggedCopies() {
+        return loggedCopies.trim();
+    }
+
+    public String getLoggedDeletions() {
+        return loggedDeletions.trim();
     }
 }
