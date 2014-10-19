@@ -21,6 +21,7 @@ package nl.ulso.magisto.action;
  */
 public enum ActionType {
 
+    SKIP("Skipped"),
     COPY("Copied"),
     DELETE("Deleted"),
     CONVERT("Converted");

@@ -22,16 +22,19 @@ import java.nio.file.Path;
 
 public class DummyAction implements Action {
 
-    public static final DummyAction COPY_ACTION = new DummyAction(ActionType.COPY);
-    public static final DummyAction DELETE_ACTION = new DummyAction(ActionType.DELETE);
-    public static final DummyAction CONVERT_ACTION = new DummyAction(ActionType.CONVERT);
-
+    private final DummyActionFactory factory;
+    private final Path path;
     private final ActionType type;
-    private int count;
 
-    public DummyAction(ActionType type) {
+    public DummyAction(DummyActionFactory factory, Path path, ActionType type) {
+        this.factory = factory;
+        this.path = path;
         this.type = type;
-        this.count = 0;
+    }
+
+    @Override
+    public Path getPath() {
+        return path;
     }
 
     @Override
@@ -39,16 +42,13 @@ public class DummyAction implements Action {
         return type;
     }
 
-    public int getCount() {
-        return count;
+    @Override
+    public void perform(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot) {
+        factory.registerActionPerformed(this);
     }
 
     @Override
-    public void perform(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot) {
-        count++;
-    }
-
-    void clear() {
-        count = 0;
+    public String toString() {
+        return String.format("%s: %s", type, path);
     }
 }

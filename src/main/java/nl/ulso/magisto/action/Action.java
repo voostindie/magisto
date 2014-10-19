@@ -26,6 +26,8 @@ import java.nio.file.Path;
  */
 public interface Action {
 
+    Path getPath();
+
     ActionType getActionType();
 
     void perform(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot) throws IOException;

@@ -20,31 +20,18 @@ import nl.ulso.magisto.io.FileSystemAccessor;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static nl.ulso.magisto.action.ActionType.COPY;
 
 /**
  * Copies a file from the source root to the target root.
  */
-class CopyAction implements Action {
-
-    private final Path path;
+class CopyAction extends AbstractAction {
 
     CopyAction(Path path) {
-        this.path = path;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        final CopyAction that = (CopyAction) o;
-        return path.equals(that.path);
-    }
-
-    @Override
-    public int hashCode() {
-        return path.hashCode();
+        super(path);
     }
 
     @Override
@@ -54,6 +41,8 @@ class CopyAction implements Action {
 
     @Override
     public void perform(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot) throws IOException {
-        fileSystemAccessor.copy(sourceRoot, targetRoot, path);
+        Logger.getGlobal().log(Level.INFO,
+                String.format("Copying '%s' from '%s' to '%s'.", getPath(), sourceRoot, targetRoot));
+        fileSystemAccessor.copy(sourceRoot, targetRoot, getPath());
     }
 }

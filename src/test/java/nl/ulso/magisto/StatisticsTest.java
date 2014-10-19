@@ -16,6 +16,7 @@
 
 package nl.ulso.magisto;
 
+import nl.ulso.magisto.action.ActionType;
 import nl.ulso.magisto.action.DummyAction;
 import org.apache.commons.io.output.WriterOutputStream;
 import org.junit.Test;
@@ -23,8 +24,7 @@ import org.junit.Test;
 import java.io.PrintStream;
 import java.io.StringWriter;
 
-import static nl.ulso.magisto.action.ActionType.COPY;
-import static nl.ulso.magisto.action.DummyAction.*;
+import static nl.ulso.magisto.action.ActionType.*;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
@@ -47,12 +47,12 @@ public class StatisticsTest {
 
     @Test(expected = IllegalStateException.class)
     public void testActionPerformedCannotBeCalledBeforeStart() throws Exception {
-        new Statistics().registerActionPerformed(new DummyAction(COPY));
+        new Statistics().registerActionPerformed(createAction(COPY));
     }
 
     @Test(expected = IllegalStateException.class)
     public void testActionPerformedCannotBeCalledAfterEnd() throws Exception {
-        new Statistics().begin().end().registerActionPerformed(new DummyAction(COPY));
+        new Statistics().begin().end().registerActionPerformed(createAction(COPY));
     }
 
     @Test
@@ -61,12 +61,14 @@ public class StatisticsTest {
         final PrintStream stream = new PrintStream(new WriterOutputStream(writer));
         new Statistics()
                 .begin()
-                .registerActionPerformed(COPY_ACTION)
-                .registerActionPerformed(DELETE_ACTION)
-                .registerActionPerformed(CONVERT_ACTION)
-                .registerActionPerformed(CONVERT_ACTION)
-                .registerActionPerformed(COPY_ACTION)
-                .registerActionPerformed(COPY_ACTION)
+                .registerActionPerformed(createAction(COPY))
+                .registerActionPerformed(createAction(DELETE))
+                .registerActionPerformed(createAction(SKIP))
+                .registerActionPerformed(createAction(CONVERT))
+                .registerActionPerformed(createAction(CONVERT))
+                .registerActionPerformed(createAction(SKIP))
+                .registerActionPerformed(createAction(COPY))
+                .registerActionPerformed(createAction(COPY))
                 .end()
                 .print(stream);
         stream.flush();
@@ -75,5 +77,10 @@ public class StatisticsTest {
         assertThat(writer.toString(), containsString("Copied 3"));
         assertThat(writer.toString(), containsString("Converted 2"));
         assertThat(writer.toString(), containsString("Deleted 1"));
+        assertThat(writer.toString(), containsString("Skipped 2"));
+    }
+
+    private DummyAction createAction(ActionType type) {
+        return new DummyAction(null, null, type);
     }
 }

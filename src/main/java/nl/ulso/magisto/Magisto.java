@@ -17,6 +17,7 @@
 package nl.ulso.magisto;
 
 import nl.ulso.magisto.action.Action;
+import nl.ulso.magisto.action.ActionComparator;
 import nl.ulso.magisto.action.ActionFactory;
 import nl.ulso.magisto.io.FileSystemAccessor;
 
@@ -54,8 +55,7 @@ public class Magisto {
             final Path targetRoot = fileSystemAccessor.prepareTargetDirectory(targetDirectory);
             fileSystemAccessor.requireDistinct(sourceRoot, targetRoot);
 
-            // TODO: Use a SortedSet for the actions, putting deletions at the end, in reverse lexical ordering...
-            for (Action action : createActionList(sourceRoot, targetRoot)) {
+            for (Action action : createActions(sourceRoot, targetRoot)) {
                 action.perform(fileSystemAccessor, sourceRoot, targetRoot);
                 statistics.registerActionPerformed(action);
             }
@@ -74,8 +74,8 @@ public class Magisto {
     actions on the source files, to detect all files in the target directory that weren't updated. This balanced line
     algorithm is simpler. It's a bit faster too.
      */
-    private List<Action> createActionList(Path sourceRoot, Path targetRoot) throws IOException {
-        final List<Action> actions = new ArrayList<>();
+    private SortedSet<Action> createActions(Path sourceRoot, Path targetRoot) throws IOException {
+        final SortedSet<Action> actions = new TreeSet<>(new ActionComparator());
         final Iterator<Path> sources = fileSystemAccessor.findAllPaths(sourceRoot).iterator();
         final Iterator<Path> targets = fileSystemAccessor.findAllPaths(targetRoot).iterator();
 
@@ -87,6 +87,8 @@ public class Magisto {
             if (comparison == 0) { // Corresponding source and target
                 if (fileSystemAccessor.isSourceNewerThanTarget(sourceRoot.resolve(source), targetRoot.resolve(target))) {
                     actions.add(determineActionOnSource(source)); // Source is newer, so replace target
+                } else {
+                    actions.add(actionFactory.skip(source));
                 }
                 source = nullableNext(sources);
                 target = nullableNext(targets);
@@ -114,6 +116,7 @@ public class Magisto {
         if (target == null) {
             return -1;
         }
+        // TODO: take into account the rename performed by the conversion process.
         return source.compareTo(target);
     }
 

@@ -16,31 +16,32 @@
 
 package nl.ulso.magisto.action;
 
-import org.junit.Test;
+import java.nio.file.Path;
 
-import static org.junit.Assert.*;
+/**
+ * Abstract base class for {@link Action}s.
+ */
+abstract class AbstractAction implements Action {
+    private final Path path;
 
-public class RealActionFactoryTest {
-
-    private final ActionFactory factory = new RealActionFactory();
-
-    @Test
-    public void testSkipAction() throws Exception {
-        assertNotNull(factory.skip(null));
+    public AbstractAction(Path path) {
+        this.path = path;
     }
 
-    @Test
-    public void testCopyAction() throws Exception {
-        assertNotNull(factory.copy(null));
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final AbstractAction that = (AbstractAction) o;
+        return path.equals(that.path);
     }
 
-    @Test
-    public void testDeleteAction() throws Exception {
-        assertNotNull(factory.copy(null));
+    @Override
+    public int hashCode() {
+        return path.hashCode();
     }
 
-    @Test
-    public void testConvertAction() throws Exception {
-        assertNotNull(factory.convert(null));
+    public Path getPath() {
+        return path;
     }
 }

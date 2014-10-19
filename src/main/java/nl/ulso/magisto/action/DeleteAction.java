@@ -20,30 +20,18 @@ import nl.ulso.magisto.io.FileSystemAccessor;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static nl.ulso.magisto.action.ActionType.DELETE;
 
 /**
  * Deletes a file or directory from the target root
  */
-class DeleteAction implements Action {
-    private final Path path;
+class DeleteAction extends AbstractAction {
 
     DeleteAction(Path path) {
-        this.path = path;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        final DeleteAction that = (DeleteAction) o;
-        return path.equals(that.path);
-    }
-
-    @Override
-    public int hashCode() {
-        return path.hashCode();
+        super(path);
     }
 
     @Override
@@ -53,6 +41,7 @@ class DeleteAction implements Action {
 
     @Override
     public void perform(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot) throws IOException {
-        fileSystemAccessor.delete(targetRoot, path);
+        Logger.getGlobal().log(Level.INFO, String.format("Deleting '%s' from '%s'.", getPath(), targetRoot));
+        fileSystemAccessor.delete(targetRoot, getPath());
     }
 }

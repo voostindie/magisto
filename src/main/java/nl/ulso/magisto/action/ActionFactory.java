@@ -23,6 +23,8 @@ import java.nio.file.Path;
  */
 public interface ActionFactory {
 
+    Action skip(Path path);
+
     Action copy(Path path);
 
     Action convert(Path path);

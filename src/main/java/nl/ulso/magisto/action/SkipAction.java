@@ -16,29 +16,30 @@
 
 package nl.ulso.magisto.action;
 
+import nl.ulso.magisto.io.FileSystemAccessor;
+
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static nl.ulso.magisto.action.ActionType.SKIP;
 
 /**
- * Real implementation of the {@link ActionFactory}.
+ * Represents a no-op action, for a path that is skipped.
  */
-public class RealActionFactory implements ActionFactory {
-    @Override
-    public Action skip(Path path) {
-        return new SkipAction(path);
+class SkipAction extends AbstractAction {
+    SkipAction(Path path) {
+        super(path);
     }
 
     @Override
-    public Action copy(Path path) {
-        return new CopyAction(path);
+    public ActionType getActionType() {
+        return SKIP;
     }
 
     @Override
-    public Action convert(Path path) {
-        return new ConvertAction(path);
-    }
-
-    @Override
-    public Action delete(Path path) {
-        return new DeleteAction(path);
+    public void perform(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot) throws IOException {
+        Logger.getGlobal().log(Level.INFO, String.format("Skipping '%s'. No changes detected.", getPath()));
     }
 }

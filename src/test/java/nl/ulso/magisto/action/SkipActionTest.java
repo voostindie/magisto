@@ -18,29 +18,12 @@ package nl.ulso.magisto.action;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-public class RealActionFactoryTest {
-
-    private final ActionFactory factory = new RealActionFactory();
+public class SkipActionTest {
 
     @Test
-    public void testSkipAction() throws Exception {
-        assertNotNull(factory.skip(null));
-    }
-
-    @Test
-    public void testCopyAction() throws Exception {
-        assertNotNull(factory.copy(null));
-    }
-
-    @Test
-    public void testDeleteAction() throws Exception {
-        assertNotNull(factory.copy(null));
-    }
-
-    @Test
-    public void testConvertAction() throws Exception {
-        assertNotNull(factory.convert(null));
+    public void testActionType() throws Exception {
+        assertEquals(ActionType.SKIP, new SkipAction(null).getActionType());
     }
 }

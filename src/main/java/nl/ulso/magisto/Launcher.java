@@ -23,6 +23,7 @@ import nl.ulso.magisto.action.RealActionFactory;
 import nl.ulso.magisto.io.RealFileSystemAccessor;
 
 import java.io.IOException;
+import java.util.logging.*;
 
 /**
  * Launches the Magisto application.
@@ -43,6 +44,7 @@ public class Launcher {
     private static Magisto DUMMY_MAGISTO = null; // For testing
 
     public static void main(String[] arguments) {
+        configureLoggingSystem();
         try {
             final Options options = parseProgramOptions(arguments);
             final Magisto magisto = createMagisto();
@@ -50,6 +52,18 @@ public class Launcher {
         } catch (RuntimeException e) {
             System.exit(-1);
         }
+    }
+
+    static void configureLoggingSystem() {
+        final Logger rootLogger = Logger.getLogger("");
+        rootLogger.setLevel(Level.INFO);
+        final Handler handler = rootLogger.getHandlers()[0];
+        handler.setFormatter(new Formatter() {
+            @Override
+            public String format(LogRecord record) {
+                return String.format("%s%n", record.getMessage());
+            }
+        });
     }
 
     static Options parseProgramOptions(String[] arguments) {

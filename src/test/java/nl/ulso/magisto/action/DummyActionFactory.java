@@ -17,28 +17,50 @@
 package nl.ulso.magisto.action;
 
 import java.nio.file.Path;
+import java.util.*;
 
-import static nl.ulso.magisto.action.DummyAction.*;
+import static nl.ulso.magisto.action.ActionType.*;
 
 public class DummyActionFactory implements ActionFactory {
+    private final Map<ActionType, Integer> counts = new HashMap<>();
+
+    @Override
+    public Action skip(Path path) {
+        return new DummyAction(this, path, SKIP);
+    }
+
     @Override
     public Action copy(Path path) {
-        return COPY_ACTION;
+        return new DummyAction(this, path, COPY);
     }
 
     @Override
     public Action convert(Path path) {
-        return CONVERT_ACTION;
+        return new DummyAction(this, path, CONVERT);
     }
 
     @Override
     public Action delete(Path path) {
-        return DELETE_ACTION;
+        return new DummyAction(this, path, DELETE);
     }
 
-    public void clearCounts() {
-        COPY_ACTION.clear();
-        CONVERT_ACTION.clear();
-        DELETE_ACTION.clear();
+    public void clearRecordings() {
+        counts.clear();
+    }
+
+    public void registerActionPerformed(DummyAction action) {
+        final ActionType type = action.getActionType();
+        if (!counts.containsKey(type)) {
+            counts.put(type, 1);
+        } else {
+            counts.put(type, 1 + counts.get(type));
+        }
+    }
+
+    public int countFor(ActionType type) {
+        if (counts.containsKey(type)) {
+            return counts.get(type);
+        }
+        return 0;
     }
 }

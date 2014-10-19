@@ -16,29 +16,30 @@
 
 package nl.ulso.magisto.action;
 
+import nl.ulso.magisto.io.FileSystemAccessor;
+
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * Real implementation of the {@link ActionFactory}.
+ * Converts a Markdown file in the source root to an HTML file and writes it to the target root.
  */
-public class RealActionFactory implements ActionFactory {
-    @Override
-    public Action skip(Path path) {
-        return new SkipAction(path);
+class ConvertAction extends AbstractAction {
+
+    ConvertAction(Path path) {
+        super(path);
     }
 
     @Override
-    public Action copy(Path path) {
-        return new CopyAction(path);
+    public ActionType getActionType() {
+        return null;
     }
 
     @Override
-    public Action convert(Path path) {
-        return new ConvertAction(path);
-    }
+    public void perform(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot) throws IOException {
+        Logger.getGlobal().log(Level.INFO, String.format("Converting '%s' from Markdown to HTML.", getPath()));
 
-    @Override
-    public Action delete(Path path) {
-        return new DeleteAction(path);
     }
 }
