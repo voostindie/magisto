@@ -104,6 +104,9 @@ public class RealFileSystemAccessor implements FileSystemAccessor {
         Files.walkFileTree(root, new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes attributes) throws IOException {
+                if (Files.isHidden(path)) {
+                    return FileVisitResult.SKIP_SUBTREE;
+                }
                 if (root != path) {
                     paths.add(root.relativize(path));
                 }
@@ -112,7 +115,9 @@ public class RealFileSystemAccessor implements FileSystemAccessor {
 
             @Override
             public FileVisitResult visitFile(Path path, BasicFileAttributes attributes) throws IOException {
-                paths.add(root.relativize(path));
+                if (!Files.isHidden(path)) {
+                    paths.add(root.relativize(path));
+                }
                 return FileVisitResult.CONTINUE;
             }
         });

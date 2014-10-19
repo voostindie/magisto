@@ -258,6 +258,23 @@ public class RealFileSystemAccessorTest {
         });
     }
 
+    @Test
+    public void testHiddenFilesAreSkipped() throws Exception {
+        runFileSystemTest(new FileSystemTestWithPreparedDirectory() {
+            @Override
+            public void prepareTempDirectory(Path path) throws IOException {
+                Files.createDirectory(path.resolve(".tmpdir"));
+                Files.createFile(path.resolve(".tmpdir").resolve("file"));
+                Files.createFile(path.resolve(".tmpfile"));
+            }
+
+            @Override
+            public void runTest(Path path) throws IOException {
+                assertEquals(0, accessor.findAllPaths(path).size());
+            }
+        });
+    }
+
     private Path resolveTouchFile(Path path) {
         return path.resolve(FileSystemAccessor.MAGISTO_EXPORT_MARKER_FILE);
     }
