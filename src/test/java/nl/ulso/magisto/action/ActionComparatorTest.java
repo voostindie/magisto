@@ -18,9 +18,7 @@ package nl.ulso.magisto.action;
 
 import org.junit.Test;
 
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-
+import static nl.ulso.magisto.io.Paths.createPath;
 import static org.junit.Assert.assertEquals;
 
 public class ActionComparatorTest {
@@ -29,85 +27,81 @@ public class ActionComparatorTest {
 
     @Test
     public void testSkipBeforeDelete() throws Exception {
-        final SkipAction skip = new SkipAction(relativePath("a"));
-        final DeleteAction delete = new DeleteAction(relativePath("a"));
+        final SkipAction skip = new SkipAction(createPath("a"));
+        final DeleteAction delete = new DeleteAction(createPath("a"));
         assertEquals(-1, comparator.compare(skip, delete));
         assertEquals(1, comparator.compare(delete, skip));
     }
 
     @Test
     public void testSkipBeforeCopy() throws Exception {
-        final SkipAction skip = new SkipAction(relativePath("a"));
-        final CopyAction copy = new CopyAction(relativePath("a"));
+        final SkipAction skip = new SkipAction(createPath("a"));
+        final CopyAction copy = new CopyAction(createPath("a"));
         assertEquals(-1, comparator.compare(skip, copy));
         assertEquals(1, comparator.compare(copy, skip));
     }
 
     @Test
     public void testSkipBeforeConvert() throws Exception {
-        final SkipAction skip = new SkipAction(relativePath("a"));
-        final ConvertAction convert = new ConvertAction(relativePath("a"));
+        final SkipAction skip = new SkipAction(createPath("a"));
+        final ConvertAction convert = new ConvertAction(createPath("a"), null);
         assertEquals(-1, comparator.compare(skip, convert));
         assertEquals(1, comparator.compare(convert, skip));
     }
 
     @Test
     public void testDeleteBeforeCopy() throws Exception {
-        final DeleteAction delete = new DeleteAction(relativePath("a"));
-        final CopyAction copy = new CopyAction(relativePath("a"));
+        final DeleteAction delete = new DeleteAction(createPath("a"));
+        final CopyAction copy = new CopyAction(createPath("a"));
         assertEquals(-1, comparator.compare(delete, copy));
         assertEquals(1, comparator.compare(copy, delete));
     }
 
     @Test
     public void testDeleteBeforeConvert() throws Exception {
-        final DeleteAction delete = new DeleteAction(relativePath("a"));
-        final ConvertAction convert = new ConvertAction(relativePath("a"));
+        final DeleteAction delete = new DeleteAction(createPath("a"));
+        final ConvertAction convert = new ConvertAction(createPath("a"), null);
         assertEquals(-1, comparator.compare(delete, convert));
         assertEquals(1, comparator.compare(convert, delete));
     }
 
     @Test
     public void testConvertBeforeCopy() throws Exception {
-        final ConvertAction convert = new ConvertAction(relativePath("a"));
-        final CopyAction copy = new CopyAction(relativePath("a"));
+        final ConvertAction convert = new ConvertAction(createPath("a"), null);
+        final CopyAction copy = new CopyAction(createPath("a"));
         assertEquals(-1, comparator.compare(convert, copy));
         assertEquals(1, comparator.compare(copy, convert));
     }
 
     @Test
     public void testSkipOrderedLexicographically() throws Exception {
-        final SkipAction skip1 = new SkipAction(relativePath("a"));
-        final SkipAction skip2 = new SkipAction(relativePath("b"));
+        final SkipAction skip1 = new SkipAction(createPath("a"));
+        final SkipAction skip2 = new SkipAction(createPath("b"));
         assertEquals(-1, comparator.compare(skip1, skip2));
         assertEquals(1, comparator.compare(skip2, skip1));
     }
 
     @Test
     public void testCopyOrderedLexicographically() throws Exception {
-        final CopyAction copy1 = new CopyAction(relativePath("a"));
-        final CopyAction copy2 = new CopyAction(relativePath("b"));
+        final CopyAction copy1 = new CopyAction(createPath("a"));
+        final CopyAction copy2 = new CopyAction(createPath("b"));
         assertEquals(-1, comparator.compare(copy1, copy2));
         assertEquals(1, comparator.compare(copy2, copy1));
     }
 
     @Test
     public void testDeleteOrderedLexicographicallyReversed() throws Exception {
-        final DeleteAction delete1 = new DeleteAction(relativePath("a"));
-        final DeleteAction delete2 = new DeleteAction(relativePath("b"));
+        final DeleteAction delete1 = new DeleteAction(createPath("a"));
+        final DeleteAction delete2 = new DeleteAction(createPath("b"));
         assertEquals(1, comparator.compare(delete1, delete2));
         assertEquals(-1, comparator.compare(delete2, delete1));
     }
 
     @Test
     public void testConvertOrderedLexicographically() throws Exception {
-        final ConvertAction convert1 = new ConvertAction(relativePath("a"));
-        final ConvertAction convert2 = new ConvertAction(relativePath("b"));
+        final ConvertAction convert1 = new ConvertAction(createPath("a"), null);
+        final ConvertAction convert2 = new ConvertAction(createPath("b"), null);
         assertEquals(-1, comparator.compare(convert1, convert2));
         assertEquals(1, comparator.compare(convert2, convert1));
-    }
-
-    private Path relativePath(String fileName) {
-        return FileSystems.getDefault().getPath(fileName);
     }
 }

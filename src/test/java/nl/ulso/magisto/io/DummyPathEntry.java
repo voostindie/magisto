@@ -16,8 +16,9 @@
 
 package nl.ulso.magisto.io;
 
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
+
+import static nl.ulso.magisto.io.Paths.createPath;
 
 /**
  *
@@ -32,8 +33,8 @@ public class DummyPathEntry {
         this.timestamp = timestamp;
     }
 
-    public static DummyPathEntry createPath(String fileName) {
-        return new DummyPathEntry(FileSystems.getDefault().getPath(fileName), System.currentTimeMillis());
+    public static DummyPathEntry createPathEntry(String fileName) {
+        return new DummyPathEntry(createPath(fileName), System.currentTimeMillis());
     }
 
     public Path getPath() {

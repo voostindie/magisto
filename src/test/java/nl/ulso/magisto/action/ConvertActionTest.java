@@ -16,8 +16,10 @@
 
 package nl.ulso.magisto.action;
 
+import nl.ulso.magisto.converter.DummyFileConverter;
 import nl.ulso.magisto.io.DummyFileSystemAccessor;
 import nl.ulso.magisto.io.DummyPathEntry;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.nio.file.Path;
@@ -26,20 +28,27 @@ import static nl.ulso.magisto.io.DummyPathEntry.createPathEntry;
 import static nl.ulso.magisto.io.Paths.createPath;
 import static org.junit.Assert.assertEquals;
 
-public class DeleteActionTest {
+public class ConvertActionTest {
 
-    @Test
-    public void testActionType() throws Exception {
-        assertEquals(ActionType.DELETE, new DeleteAction(createPath("delete")).getActionType());
+    private final DummyFileConverter fileConverter = new DummyFileConverter();
+
+    @Before
+    public void setUp() throws Exception {
+        fileConverter.clearRecordings();
     }
 
     @Test
-    public void testDelete() throws Exception {
+    public void testActionType() throws Exception {
+        assertEquals(ActionType.CONVERT, new ConvertAction(createPath("convert"), fileConverter).getActionType());
+    }
+
+    @Test
+    public void testCopy() throws Exception {
         final DummyFileSystemAccessor accessor = new DummyFileSystemAccessor();
         final Path sourceRoot = accessor.resolveSourceDirectory("source");
         final Path targetRoot = accessor.prepareTargetDirectory("target");
-        final DummyPathEntry entry = createPathEntry("file");
-        new DeleteAction(entry.getPath()).perform(accessor, sourceRoot, targetRoot);
-        assertEquals("target:file", accessor.getLoggedDeletions());
+        final DummyPathEntry entry = createPathEntry("file.convert");
+        new ConvertAction(entry.getPath(), fileConverter).perform(accessor, sourceRoot, targetRoot);
+        assertEquals("source:file.convert -> target:file.convert.converted", fileConverter.getLoggedConversions());
     }
 }

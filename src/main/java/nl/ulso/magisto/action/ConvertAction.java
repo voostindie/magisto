@@ -16,6 +16,7 @@
 
 package nl.ulso.magisto.action;
 
+import nl.ulso.magisto.converter.FileConverter;
 import nl.ulso.magisto.io.FileSystemAccessor;
 
 import java.io.IOException;
@@ -28,18 +29,21 @@ import java.util.logging.Logger;
  */
 class ConvertAction extends AbstractAction {
 
-    ConvertAction(Path path) {
+    private final FileConverter fileConverter;
+
+    ConvertAction(Path path, FileConverter fileConverter) {
         super(path);
+        this.fileConverter = fileConverter;
     }
 
     @Override
     public ActionType getActionType() {
-        return null;
+        return ActionType.CONVERT;
     }
 
     @Override
     public void perform(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot) throws IOException {
         Logger.getGlobal().log(Level.INFO, String.format("Converting '%s' from Markdown to HTML.", getPath()));
-
+        fileConverter.convert(fileSystemAccessor, sourceRoot, targetRoot, getPath());
     }
 }

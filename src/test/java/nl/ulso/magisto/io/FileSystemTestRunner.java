@@ -17,18 +17,23 @@
 package nl.ulso.magisto.io;
 
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.HashSet;
 import java.util.Set;
+
+import static nl.ulso.magisto.io.Paths.createPath;
 
 /**
  * Runs tests on the filesystem, preparing a temporary test directory when needed, and removing it afterwards.
  */
 class FileSystemTestRunner {
 
-    static final Path WORKING_DIRECTORY = FileSystems.getDefault().getPath(System.getProperty("user.dir"));
+    static final Path WORKING_DIRECTORY = createPath(System.getProperty("user.dir"));
 
     static void runFileSystemTest(FileSystemTest test) throws IOException {
         final Path path = resolveTempDirectory();

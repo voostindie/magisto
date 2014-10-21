@@ -19,25 +19,27 @@ package nl.ulso.magisto;
 import nl.ulso.magisto.action.Action;
 import nl.ulso.magisto.action.ActionComparator;
 import nl.ulso.magisto.action.ActionFactory;
+import nl.ulso.magisto.converter.FileConverter;
 import nl.ulso.magisto.io.FileSystemAccessor;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Knits all the components in the Magisto system together (like a module) and runs it.
  */
 class Magisto {
-
-    private final Set<String> MARKDOWN_EXTENSIONS = new HashSet<>(Arrays.asList("md", "markdown", "mdown"));
-
     private final FileSystemAccessor fileSystemAccessor;
     private final ActionFactory actionFactory;
+    private final FileConverter fileConverter;
 
-    public Magisto(FileSystemAccessor fileSystemAccessor, ActionFactory actionFactory) {
-        this.fileSystemAccessor = fileSystemAccessor;
-        this.actionFactory = actionFactory;
+    public Magisto(FileSystemAccessor fileSystemAccessor, ActionFactory actionFactory, FileConverter fileConverter) {
+        this.fileSystemAccessor = requireNonNull(fileSystemAccessor);
+        this.actionFactory = requireNonNull(actionFactory);
+        this.fileConverter = requireNonNull(fileConverter);
     }
 
     /*
@@ -50,6 +52,8 @@ class Magisto {
     them are two distinct steps. Also, I like this better.
      */
     public Statistics run(final String sourceDirectory, final String targetDirectory) throws IOException {
+        requireNonNull(sourceDirectory);
+        requireNonNull(targetDirectory);
         final Statistics statistics = new Statistics();
         try {
             statistics.begin();
@@ -118,27 +122,16 @@ class Magisto {
         if (target == null) {
             return -1;
         }
-        // TODO: take into account the rename performed by the conversion process.
+        if (fileConverter.supports(source)) {
+            return fileConverter.getConvertedFileName(source).compareTo(target);
+        }
         return source.compareTo(target);
     }
 
     private Action determineActionOnSource(Path source) {
-        if (isMarkdownFile(source)) {
-            return actionFactory.convert(source);
+        if (fileConverter.supports(source)) {
+            return actionFactory.convert(source, fileConverter);
         }
         return actionFactory.copy(source);
-    }
-
-    private boolean isMarkdownFile(Path source) {
-        final String fileName = source.getFileName().toString();
-        final int position = fileName.lastIndexOf('.');
-        if (position < 1) {
-            return false;
-        }
-        if (position == fileName.length()) {
-            return false;
-        }
-        final String extension = fileName.substring(position + 1).toLowerCase();
-        return MARKDOWN_EXTENSIONS.contains(extension);
     }
 }

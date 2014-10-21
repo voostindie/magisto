@@ -16,6 +16,8 @@
 
 package nl.ulso.magisto.action;
 
+import nl.ulso.magisto.converter.FileConverter;
+
 import java.nio.file.Path;
 
 /**
@@ -27,7 +29,7 @@ public interface ActionFactory {
 
     Action copy(Path path);
 
-    Action convert(Path path);
+    Action convert(Path path, FileConverter fileConverter);
 
     Action delete(Path path);
 }

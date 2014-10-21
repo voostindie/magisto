@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import static java.util.Objects.requireNonNull;
+import static nl.ulso.magisto.io.Paths.*;
 
 /**
  * Default implementation of the {@link nl.ulso.magisto.io.FileSystemAccessor} that actually writes to the file system.
@@ -32,7 +32,7 @@ public class RealFileSystemAccessor implements FileSystemAccessor {
 
     @Override
     public Path resolveSourceDirectory(String directoryName) throws IOException {
-        final Path path = FileSystems.getDefault().getPath(requireNonNull(directoryName));
+        final Path path = createPath(directoryName);
         if (Files.notExists(path)) {
             throw new NoSuchFileException(path.toString());
         }
@@ -47,7 +47,7 @@ public class RealFileSystemAccessor implements FileSystemAccessor {
 
     @Override
     public Path prepareTargetDirectory(String directoryName) throws IOException {
-        final Path path = FileSystems.getDefault().getPath(requireNonNull(directoryName));
+        final Path path = createPath(directoryName);
         if (Files.notExists(path)) {
             return Files.createDirectories(path);
         }
@@ -151,18 +151,6 @@ public class RealFileSystemAccessor implements FileSystemAccessor {
         requireAbsolutePath(root);
         requireRelativePath(path);
         Files.delete(root.resolve(path));
-    }
-
-    private void requireAbsolutePath(Path path) {
-        if (!requireNonNull(path).isAbsolute()) {
-            throw new IllegalStateException("Not an absolute path: " + path);
-        }
-    }
-
-    private void requireRelativePath(Path path) {
-        if (requireNonNull(path).isAbsolute()) {
-            throw new IllegalStateException("Not a relative path: " + path);
-        }
     }
 
     private static class TargetStatus {

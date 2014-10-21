@@ -18,6 +18,8 @@ package nl.ulso.magisto.action;
 
 import java.nio.file.Path;
 
+import static nl.ulso.magisto.io.Paths.requireRelativePath;
+
 /**
  * Abstract base class for {@link Action}s.
  */
@@ -25,7 +27,7 @@ abstract class AbstractAction implements Action {
     private final Path path;
 
     AbstractAction(Path path) {
-        this.path = path;
+        this.path = requireRelativePath(path);
     }
 
     @Override

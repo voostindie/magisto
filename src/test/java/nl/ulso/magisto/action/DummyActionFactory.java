@@ -16,6 +16,8 @@
 
 package nl.ulso.magisto.action;
 
+import nl.ulso.magisto.converter.FileConverter;
+
 import java.nio.file.Path;
 import java.util.*;
 
@@ -35,7 +37,7 @@ public class DummyActionFactory implements ActionFactory {
     }
 
     @Override
-    public Action convert(Path path) {
+    public Action convert(Path path, FileConverter fileConverter) {
         return new DummyAction(this, path, CONVERT);
     }
 

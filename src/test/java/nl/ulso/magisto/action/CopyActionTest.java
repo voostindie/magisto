@@ -22,14 +22,15 @@ import org.junit.Test;
 
 import java.nio.file.Path;
 
-import static nl.ulso.magisto.io.DummyPathEntry.createPath;
+import static nl.ulso.magisto.io.DummyPathEntry.createPathEntry;
+import static nl.ulso.magisto.io.Paths.createPath;
 import static org.junit.Assert.assertEquals;
 
 public class CopyActionTest {
 
     @Test
     public void testActionType() throws Exception {
-        assertEquals(ActionType.COPY, new CopyAction(null).getActionType());
+        assertEquals(ActionType.COPY, new CopyAction(createPath("copy")).getActionType());
     }
 
     @Test
@@ -37,7 +38,7 @@ public class CopyActionTest {
         final DummyFileSystemAccessor accessor = new DummyFileSystemAccessor();
         final Path sourceRoot = accessor.resolveSourceDirectory("source");
         final Path targetRoot = accessor.prepareTargetDirectory("target");
-        final DummyPathEntry entry = createPath("file");
+        final DummyPathEntry entry = createPathEntry("file");
         new CopyAction(entry.getPath()).perform(accessor, sourceRoot, targetRoot);
         assertEquals("source:file -> target", accessor.getLoggedCopies());
     }

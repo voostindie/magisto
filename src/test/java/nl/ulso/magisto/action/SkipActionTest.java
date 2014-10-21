@@ -18,12 +18,13 @@ package nl.ulso.magisto.action;
 
 import org.junit.Test;
 
+import static nl.ulso.magisto.io.Paths.createPath;
 import static org.junit.Assert.assertEquals;
 
 public class SkipActionTest {
 
     @Test
     public void testActionType() throws Exception {
-        assertEquals(ActionType.SKIP, new SkipAction(null).getActionType());
+        assertEquals(ActionType.SKIP, new SkipAction(createPath("skip")).getActionType());
     }
 }

@@ -17,9 +17,10 @@
 package nl.ulso.magisto.io;
 
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.*;
+
+import static nl.ulso.magisto.io.Paths.createPath;
 
 public class DummyFileSystemAccessor implements FileSystemAccessor {
 
@@ -32,13 +33,13 @@ public class DummyFileSystemAccessor implements FileSystemAccessor {
 
     @Override
     public Path resolveSourceDirectory(String directoryName) throws IOException {
-        sourceRoot = FileSystems.getDefault().getPath(directoryName);
+        sourceRoot = createPath(directoryName).toAbsolutePath();
         return sourceRoot;
     }
 
     @Override
     public Path prepareTargetDirectory(String directoryName) throws IOException {
-        targetRoot = FileSystems.getDefault().getPath(directoryName);
+        targetRoot = createPath(directoryName).toAbsolutePath();
         return targetRoot;
     }
 
@@ -76,12 +77,12 @@ public class DummyFileSystemAccessor implements FileSystemAccessor {
 
     @Override
     public void copy(Path sourceRoot, Path targetRoot, Path path) throws IOException {
-        loggedCopies += String.format("%s:%s -> %s%n", sourceRoot, path, targetRoot);
+        loggedCopies += String.format("%s:%s -> %s%n", sourceRoot.getFileName(), path, targetRoot.getFileName());
     }
 
     @Override
     public void delete(Path root, Path path) throws IOException {
-        loggedDeletions += String.format("%s:%s%n", root, path);
+        loggedDeletions += String.format("%s:%s%n", root.getFileName(), path);
     }
 
     private DummyPathEntry findEntry(Path source, Set<DummyPathEntry> entries) {

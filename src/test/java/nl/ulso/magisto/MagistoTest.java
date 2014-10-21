@@ -17,6 +17,7 @@
 package nl.ulso.magisto;
 
 import nl.ulso.magisto.action.DummyActionFactory;
+import nl.ulso.magisto.converter.DummyFileConverter;
 import nl.ulso.magisto.io.DummyFileSystemAccessor;
 import nl.ulso.magisto.io.DummyPathEntry;
 import org.junit.Before;
@@ -25,14 +26,15 @@ import org.junit.Test;
 import java.util.concurrent.TimeUnit;
 
 import static nl.ulso.magisto.action.ActionType.*;
-import static nl.ulso.magisto.io.DummyPathEntry.createPath;
+import static nl.ulso.magisto.io.DummyPathEntry.createPathEntry;
 import static org.junit.Assert.assertEquals;
 
 public class MagistoTest {
 
     private final DummyFileSystemAccessor accessor = new DummyFileSystemAccessor();
     private final DummyActionFactory actionFactory = new DummyActionFactory();
-    private final Magisto magisto = new Magisto(accessor, actionFactory);
+    private final DummyFileConverter fileConverter = new DummyFileConverter();
+    private final Magisto magisto = new Magisto(accessor, actionFactory, fileConverter);
 
     @Before
     public void setUp() throws Exception {
@@ -47,61 +49,56 @@ public class MagistoTest {
 
     @Test
     public void testNormalFileEmptyTargetDirectory() throws Exception {
-        accessor.addSourcePaths(createPath("file.jpg"));
+        accessor.addSourcePaths(createPathEntry("file.jpg"));
         runTest(0, 1, 0, 0);
     }
 
     @Test
-    public void testMarkdownFileEmptyTargetDirectory() throws Exception {
-        accessor.addSourcePaths(createPath("file.md"));
+    public void testConversionFileEmptyTargetDirectory() throws Exception {
+        accessor.addSourcePaths(createPathEntry("file.convert"));
         runTest(0, 0, 1, 0);
     }
 
     @Test
-    public void testDotFileEmptyTargetDirectory() throws Exception {
-        accessor.addSourcePaths(createPath(".md")); // Normal file, not a Markdown file!
-        runTest(0, 1, 0, 0);
-    }
-
-    @Test
-    public void testMarkdownExtensionsEmptyTargetDirectory() throws Exception {
-        accessor.addSourcePaths(createPath("foo.md"), createPath("bar.mdown"), createPath("baz.markdown"));
-        runTest(0, 0, 3, 0);
+    public void testUnknownFileInTargetDirectory() throws Exception {
+        accessor.addTargetPaths(createPathEntry("file.jpg"));
+        runTest(0, 0, 0, 1);
     }
 
     @Test
     public void testFilesExistNoChangesDetected() throws Exception {
-        final DummyPathEntry file1 = createPath("foo.md");
-        final DummyPathEntry file2 = createPath("bar.jpg");
+        final DummyPathEntry file1 = createPathEntry("foo.txt");
+        final DummyPathEntry file2 = createPathEntry("bar.jpg");
         accessor.addSourcePaths(file1, file2);
         accessor.addTargetPaths(file1, file2);
         runTest(2, 0, 0, 0);
     }
 
     @Test
-    public void testUnknownFileInTargetDirectory() throws Exception {
-        accessor.addTargetPaths(createPath("file.jpg"));
-        runTest(0, 0, 0, 1);
-    }
-
-    @Test
     public void testMultipleSourceAndTargetFiles() throws Exception {
-        final DummyPathEntry sameFile1 = createPath("foo.md");
-        final DummyPathEntry sameFile2 = createPath("bar.jpg");
+        final DummyPathEntry sameFile1 = createPathEntry("foo.txt");
+        final DummyPathEntry sameFile2 = createPathEntry("bar.jpg");
         accessor.addTargetPaths(
                 sameFile1,
                 sameFile2,
-                createPath("baz.txt"),
-                createPath("delete.me")
+                createPathEntry("baz.txt"),
+                createPathEntry("foo.convert.converted"),
+                createPathEntry("delete.me")
         );
         TimeUnit.SECONDS.sleep(1);
         accessor.addSourcePaths(
                 sameFile1,
                 sameFile2,
-                createPath("baz.txt") /* Same path, different timestamp: this one is newer */,
-                createPath("bar.md")
+                createPathEntry("baz.txt"), // Same path, different timestamp: this one is newer
+                createPathEntry("foo.convert"),
+                createPathEntry("bar.convert")
         );
-        runTest(2 /* sameFile1, sameFile 2 */, 1 /* baz.txt */, 1 /* bar.md */, 1 /* delete.me */);
+        runTest(
+                2, // sameFile1, sameFile2
+                1, // baz.txt
+                2, // foo.convert/foo.convert.converted, bar.convert
+                1  // delete.me
+        );
     }
 
     private void runTest(int expectedSkips, int expectedCopies, int expectedConversions, int expectedDeletions) throws Exception {

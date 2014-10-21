@@ -19,7 +19,6 @@ package nl.ulso.magisto.io;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -30,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 import static nl.ulso.magisto.io.FileSystemTestRunner.WORKING_DIRECTORY;
 import static nl.ulso.magisto.io.FileSystemTestRunner.runFileSystemTest;
+import static nl.ulso.magisto.io.Paths.createPath;
 import static org.junit.Assert.*;
 
 public class RealFileSystemAccessorTest {
@@ -180,9 +180,9 @@ public class RealFileSystemAccessorTest {
                 final SortedSet<Path> paths = accessor.findAllPaths(path);
                 assertEquals(3, paths.size());
                 assertArrayEquals(new Path[]{
-                        FileSystems.getDefault().getPath("bar"),
-                        FileSystems.getDefault().getPath("bar", "baz"),
-                        FileSystems.getDefault().getPath("foo")}, paths.toArray());
+                        createPath("bar"),
+                        createPath("bar", "baz"),
+                        createPath("foo")}, paths.toArray());
             }
         });
     }
@@ -295,9 +295,9 @@ public class RealFileSystemAccessorTest {
 
             @Override
             public void runTest(Path path) throws IOException {
-                accessor.copy(source, target, relativePath("file"));
-                accessor.copy(source, target, relativePath("directory"));
-                accessor.copy(source, target, relativePath("directory").resolve("file"));
+                accessor.copy(source, target, createPath("file"));
+                accessor.copy(source, target, createPath("directory"));
+                accessor.copy(source, target, createPath("directory").resolve("file"));
                 // Bad test, it depends on code that's under test itself:
                 assertEquals(3, accessor.findAllPaths(path.resolve("target")).size());
             }
@@ -315,16 +315,12 @@ public class RealFileSystemAccessorTest {
 
             @Override
             public void runTest(Path path) throws IOException {
-                accessor.delete(path, relativePath("file"));
-                accessor.delete(path, relativePath("directory"));
+                accessor.delete(path, createPath("file"));
+                accessor.delete(path, createPath("directory"));
                 // Bad test, it depends on code that's under test itself:
                 assertEquals(0, accessor.findAllPaths(path).size());
             }
         });
-    }
-
-    private Path relativePath(String name) {
-        return FileSystems.getDefault().getPath(name);
     }
 
     private Path resolveTouchFile(Path path) {

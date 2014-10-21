@@ -16,6 +16,8 @@
 
 package nl.ulso.magisto.action;
 
+import nl.ulso.magisto.converter.FileConverter;
+
 import java.nio.file.Path;
 
 /**
@@ -33,8 +35,8 @@ public class RealActionFactory implements ActionFactory {
     }
 
     @Override
-    public Action convert(Path path) {
-        return new ConvertAction(path);
+    public Action convert(Path path, FileConverter fileConverter) {
+        return new ConvertAction(path, fileConverter);
     }
 
     @Override

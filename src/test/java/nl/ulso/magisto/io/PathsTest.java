@@ -14,35 +14,32 @@
  * limitations under the License
  */
 
-package nl.ulso.magisto.action;
+package nl.ulso.magisto.io;
 
-import nl.ulso.magisto.converter.DummyFileConverter;
 import org.junit.Test;
 
 import static nl.ulso.magisto.io.Paths.createPath;
 import static org.junit.Assert.assertNotNull;
 
-public class RealActionFactoryTest {
-
-    private final ActionFactory factory = new RealActionFactory();
+public class PathsTest {
 
     @Test
-    public void testSkipAction() throws Exception {
-        assertNotNull(factory.skip(createPath("skip")));
+    public void testAbsoluteOk() throws Exception {
+        assertNotNull(Paths.requireAbsolutePath(createPath(System.getProperty("user.dir"))));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testAbsoluteNotOk() throws Exception {
+        assertNotNull(Paths.requireAbsolutePath(createPath("src")));
     }
 
     @Test
-    public void testCopyAction() throws Exception {
-        assertNotNull(factory.copy(createPath("copy")));
+    public void testRelativeOk() throws Exception {
+        assertNotNull(Paths.requireRelativePath(createPath("src")));
     }
 
-    @Test
-    public void testDeleteAction() throws Exception {
-        assertNotNull(factory.copy(createPath("delete")));
-    }
-
-    @Test
-    public void testConvertAction() throws Exception {
-        assertNotNull(factory.convert(createPath("convert"), new DummyFileConverter()));
+    @Test(expected = IllegalStateException.class)
+    public void testRelativeNotOk() throws Exception {
+        assertNotNull(Paths.requireRelativePath(createPath(System.getProperty("user.dir"))));
     }
 }
