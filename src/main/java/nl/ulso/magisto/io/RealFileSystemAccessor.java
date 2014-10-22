@@ -22,6 +22,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static nl.ulso.magisto.io.Paths.*;
 
@@ -137,6 +139,8 @@ public class RealFileSystemAccessor implements FileSystemAccessor {
         requireAbsolutePath(sourceRoot);
         requireAbsolutePath(targetRoot);
         requireRelativePath(path);
+        Logger.getGlobal().log(Level.INFO,
+                String.format("Copying '%s' from '%s' to '%s'.", path, sourceRoot, targetRoot));
         final Path source = sourceRoot.resolve(path);
         final Path target = targetRoot.resolve(path);
         if (Files.isDirectory(source)) {
@@ -150,6 +154,7 @@ public class RealFileSystemAccessor implements FileSystemAccessor {
     public void delete(Path root, Path path) throws IOException {
         requireAbsolutePath(root);
         requireRelativePath(path);
+        Logger.getGlobal().log(Level.INFO, String.format("Deleting '%s' from '%s'.", path, root));
         Files.delete(root.resolve(path));
     }
 

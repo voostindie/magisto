@@ -20,8 +20,6 @@ import nl.ulso.magisto.io.FileSystemAccessor;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static nl.ulso.magisto.action.ActionType.COPY;
 import static nl.ulso.magisto.io.Paths.requireAbsolutePath;
@@ -42,8 +40,6 @@ class CopyAction extends AbstractAction {
 
     @Override
     public void perform(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot) throws IOException {
-        Logger.getGlobal().log(Level.INFO,
-                String.format("Copying '%s' from '%s' to '%s'.", getPath(), sourceRoot, targetRoot));
         fileSystemAccessor.copy(
                 requireAbsolutePath(sourceRoot),
                 requireAbsolutePath(targetRoot),

@@ -20,8 +20,6 @@ import nl.ulso.magisto.io.FileSystemAccessor;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static nl.ulso.magisto.action.ActionType.DELETE;
 
@@ -41,7 +39,6 @@ class DeleteAction extends AbstractAction {
 
     @Override
     public void perform(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot) throws IOException {
-        Logger.getGlobal().log(Level.INFO, String.format("Deleting '%s' from '%s'.", getPath(), targetRoot));
         fileSystemAccessor.delete(targetRoot, getPath());
     }
 }
