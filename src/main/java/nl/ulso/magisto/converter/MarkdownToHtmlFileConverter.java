@@ -23,6 +23,8 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Converts Markdown files to HTML.
@@ -56,6 +58,7 @@ public class MarkdownToHtmlFileConverter implements FileConverter {
     @Override
     public void convert(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot, Path path)
             throws IOException {
+        Logger.getGlobal().log(Level.INFO, String.format("Converting '%s' from Markdown to HTML.", path));
         throw new IllegalStateException("Not implemented yet!");
     }
 }

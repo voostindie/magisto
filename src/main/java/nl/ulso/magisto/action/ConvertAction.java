@@ -21,11 +21,9 @@ import nl.ulso.magisto.io.FileSystemAccessor;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
- * Converts a Markdown file in the source root to an HTML file and writes it to the target root.
+ * Converts a file in the source root to a different format in the target root in the same directory.
  */
 class ConvertAction extends AbstractAction {
 
@@ -43,7 +41,6 @@ class ConvertAction extends AbstractAction {
 
     @Override
     public void perform(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot) throws IOException {
-        Logger.getGlobal().log(Level.INFO, String.format("Converting '%s' from Markdown to HTML.", getPath()));
         fileConverter.convert(fileSystemAccessor, sourceRoot, targetRoot, getPath());
     }
 }
