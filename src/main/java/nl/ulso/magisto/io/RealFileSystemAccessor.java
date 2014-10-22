@@ -144,7 +144,9 @@ public class RealFileSystemAccessor implements FileSystemAccessor {
         final Path source = sourceRoot.resolve(path);
         final Path target = targetRoot.resolve(path);
         if (Files.isDirectory(source)) {
-            Files.createDirectories(target);
+            if (Files.notExists(target)) {
+                Files.createDirectory(target);
+            }
         } else {
             Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
         }
