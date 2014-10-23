@@ -28,7 +28,7 @@ public enum ActionType {
 
     private final String pastTenseVerb;
 
-    ActionType(String pastTenseVerb) {
+    private ActionType(String pastTenseVerb) {
         this.pastTenseVerb = pastTenseVerb;
     }
 

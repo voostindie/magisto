@@ -24,9 +24,9 @@ import nl.ulso.magisto.io.FileSystemAccessor;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
-
-import static java.util.Objects.requireNonNull;
+import java.util.Iterator;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Knits all the components in the Magisto system together (like a module) and runs it.
@@ -37,9 +37,9 @@ class Magisto {
     private final FileConverter fileConverter;
 
     public Magisto(FileSystemAccessor fileSystemAccessor, ActionFactory actionFactory, FileConverter fileConverter) {
-        this.fileSystemAccessor = requireNonNull(fileSystemAccessor);
-        this.actionFactory = requireNonNull(actionFactory);
-        this.fileConverter = requireNonNull(fileConverter);
+        this.fileSystemAccessor = fileSystemAccessor;
+        this.actionFactory = actionFactory;
+        this.fileConverter = fileConverter;
     }
 
     /*
@@ -52,8 +52,6 @@ class Magisto {
     them are two distinct steps. Also, I like this better.
      */
     public Statistics run(final String sourceDirectory, final String targetDirectory) throws IOException {
-        requireNonNull(sourceDirectory);
-        requireNonNull(targetDirectory);
         final Statistics statistics = new Statistics();
         try {
             statistics.begin();

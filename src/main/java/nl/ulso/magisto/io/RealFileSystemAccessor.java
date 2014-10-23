@@ -91,8 +91,7 @@ public class RealFileSystemAccessor implements FileSystemAccessor {
 
     @Override
     public void writeTouchFile(Path directory) throws IOException {
-        requireAbsolutePath(directory);
-        final Path touchFile = directory.resolve(MAGISTO_EXPORT_MARKER_FILE);
+        final Path touchFile = requireAbsolutePath(directory).resolve(MAGISTO_EXPORT_MARKER_FILE);
         if (Files.exists(touchFile)) {
             Files.delete(touchFile);
         }
@@ -101,9 +100,8 @@ public class RealFileSystemAccessor implements FileSystemAccessor {
 
     @Override
     public SortedSet<Path> findAllPaths(final Path root) throws IOException {
-        requireAbsolutePath(root);
         final SortedSet<Path> paths = new TreeSet<>();
-        Files.walkFileTree(root, new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(requireAbsolutePath(root), new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes attributes) throws IOException {
                 if (Files.isHidden(path)) {
@@ -123,7 +121,6 @@ public class RealFileSystemAccessor implements FileSystemAccessor {
                 return FileVisitResult.CONTINUE;
             }
         });
-        // TODO: evict all paths that are directories and that no do have files in it?
         return paths;
     }
 
