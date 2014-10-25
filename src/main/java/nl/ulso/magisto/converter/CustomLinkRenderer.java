@@ -21,6 +21,7 @@ import org.pegdown.LinkRenderer;
 import org.pegdown.ast.ExpLinkNode;
 import org.pegdown.ast.RefLinkNode;
 
+import static nl.ulso.magisto.converter.MarkdownToHtmlFileConverter.MARKDOWN_EXTENSIONS;
 import static org.pegdown.FastEncoder.encode;
 
 /**
@@ -39,13 +40,15 @@ public class CustomLinkRenderer extends LinkRenderer {
         return StringUtils.isEmpty(title) ? rendering : rendering.withAttribute("title", encode(title));
     }
 
-    private String resolveLink(String originalLink) {
+    String resolveLink(String originalLink) {
         if (originalLink.contains("://")) {
             return originalLink;
         }
-        if (!originalLink.endsWith(".md")) {
-            return originalLink;
+        for (String extension : MARKDOWN_EXTENSIONS) {
+            if (originalLink.toLowerCase().endsWith(extension)) {
+                return originalLink.substring(0, originalLink.length() - extension.length()) + "html";
+            }
         }
-        return originalLink + ".html";
+        return originalLink;
     }
 }

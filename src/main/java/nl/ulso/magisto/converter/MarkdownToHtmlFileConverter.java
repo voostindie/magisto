@@ -21,7 +21,6 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import nl.ulso.magisto.io.FileSystemAccessor;
 import org.pegdown.Extensions;
-import org.pegdown.LinkRenderer;
 import org.pegdown.PegDownProcessor;
 
 import java.io.BufferedReader;
@@ -44,11 +43,11 @@ public class MarkdownToHtmlFileConverter implements FileConverter {
     private static final String TEMPLATE_PATH = "/nl/ulso/magisto";
     private static final String PAGE_TEMPLATE = "page_template.ftl";
     private static final Pattern TITLE_PATTERN = Pattern.compile("^#+ (.*)$", MULTILINE);
-    private static final Set<String> MARKDOWN_EXTENSIONS = new HashSet<>(Arrays.asList("md", "markdown", "mdown"));
+    static final Set<String> MARKDOWN_EXTENSIONS = new HashSet<>(Arrays.asList("md", "markdown", "mdown"));
 
     private final Template template;
     private final PegDownProcessor markdownProcessor;
-    private final LinkRenderer linkRenderer;
+    private final CustomLinkRenderer linkRenderer;
 
     public MarkdownToHtmlFileConverter() {
         try {
@@ -87,7 +86,7 @@ public class MarkdownToHtmlFileConverter implements FileConverter {
 
     @Override
     public Path getConvertedFileName(Path path) {
-        return path.resolveSibling(path.getFileName().toString() + ".html");
+        return path.resolveSibling(linkRenderer.resolveLink(path.getFileName().toString()));
     }
 
     @Override

@@ -58,7 +58,7 @@ public class MarkdownToHtmlFileConverterTest {
 
     @Test
     public void testConvertedFileName() throws Exception {
-        assertEquals(createPath("foo.MarkDown.html"), fileConverter.getConvertedFileName(createPath("foo.MarkDown")));
+        assertEquals(createPath("foo.html"), fileConverter.getConvertedFileName(createPath("foo.MarkDown")));
     }
 
     @Test
@@ -87,7 +87,7 @@ public class MarkdownToHtmlFileConverterTest {
         final DummyFileSystemAccessor fileSystemAccessor = new DummyFileSystemAccessor();
         fileSystemAccessor.registerTextFileForBufferedReader("test.md", String.format("# Title%n%nParagraph"));
         fileConverter.convert(fileSystemAccessor, createPath("."), createPath("."), createPath("test.md"));
-        final String output = fileSystemAccessor.getTextFileFromBufferedWriter("test.md.html");
+        final String output = fileSystemAccessor.getTextFileFromBufferedWriter("test.html");
         assertNotNull(output);
         System.out.println("output = " + output);
     }
@@ -107,7 +107,7 @@ public class MarkdownToHtmlFileConverterTest {
     @Test
     public void testMarkdownFileLink() throws Exception {
         final String html = fileConverter.convertMarkdownToHtml("[link](file.md)");
-        assertEquals("<p><a href=\"file.md.html\">link</a></p>", html);
+        assertEquals("<p><a href=\"file.html\">link</a></p>", html);
     }
 
     @Test
@@ -119,6 +119,6 @@ public class MarkdownToHtmlFileConverterTest {
     @Test
     public void testMarkdownFileReferenceLink() throws Exception {
         final String html = fileConverter.convertMarkdownToHtml(String.format("[link][id]%n%n[id]: file.md"));
-        assertEquals("<p><a href=\"file.md.html\">link</a></p>", html);
+        assertEquals("<p><a href=\"file.html\">link</a></p>", html);
     }
 }
