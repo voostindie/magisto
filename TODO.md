@@ -2,13 +2,8 @@
 
 ## Basic set
 
-* Implement each of the supported Actions
-    * Copy
-    * Convert
-    * Delete
 * Use a custom template if available
 * Copy over the static content, if any.
-* Correctly setup logging (java.util.logging)
 
 ## Improvements
 

@@ -16,18 +16,22 @@
 
 package nl.ulso.magisto.io;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.SortedSet;
 
 /**
  * Handles all file system access done by Magisto.
- *
+ * <p>
  * Yet another filesystem abstraction? Really?
- *
- * Magisto is doing a lot of file system access: reading files, loading template files, copying files, reading and
- * writing directories... All file system access is here, nicely isolated, so that it can easily be swapped out
+ * </p>
+ * <p>
+ * This application is doing a lot of file system access: reading files, loading template files, copying files, reading
+ * and writing directories... All file system access is here, nicely isolated, so that it can easily be swapped out
  * in unit tests.
+ * </p>
  */
 public interface FileSystemAccessor {
 
@@ -76,7 +80,7 @@ public interface FileSystemAccessor {
      *
      * @param directoryName Name of the target directory.
      * @return Existing, valid, real path to the directory.
-     * @throws IOException
+     * @throws IOException If an exception occurs while accessing the file system.
      */
     Path prepareTargetDirectory(String directoryName) throws IOException;
 
@@ -85,7 +89,7 @@ public interface FileSystemAccessor {
      *
      * @param sourceDirectory Source directory, must be a real path
      * @param targetDirectory Target directory, must be a real path
-     * @throws IOException If the directories overlap
+     * @throws IOException If the directories overlap.
      */
     void requireDistinct(Path sourceDirectory, Path targetDirectory) throws IOException;
 
@@ -99,16 +103,17 @@ public interface FileSystemAccessor {
     /**
      * @param root Directory to find all paths in.
      * @return All paths in a directory, all relative to the directory itself.
-     * @throws IOException If an exception occurred while finding all paths.
+     * @throws IOException If an exception occurrs while finding all paths.
      */
     SortedSet<Path> findAllPaths(Path root) throws IOException;
 
     /**
      * Checks whether the source path is newer than the target path.
+     *
      * @param source Source path, must be absolute.
      * @param target Target path, must be absolute.
      * @return {@code true} if source is newer, {@code false} otherwise.
-     * @throws IOException If an exception occurred while accessing the file system.
+     * @throws IOException If an exception occurs while accessing the file system.
      */
     boolean isSourceNewerThanTarget(Path source, Path target) throws IOException;
 
@@ -118,7 +123,7 @@ public interface FileSystemAccessor {
      *
      * @param sourceRoot Absolute path to the source directory.
      * @param targetRoot Absolute path to the target directory.
-     * @param path Relative path to the file or directory to copy within the source directory.
+     * @param path       Relative path to the file or directory to copy within the source directory.
      */
     void copy(Path sourceRoot, Path targetRoot, Path path) throws IOException;
 
@@ -129,4 +134,16 @@ public interface FileSystemAccessor {
      * @param path Relative path to the file or directory to delete within the root directory.
      */
     void delete(Path root, Path path) throws IOException;
+
+    /**
+     * @return A new reader for a text file in UTF-8.
+     * @throws IOException If an exception accessing occurs while accessing the file system.
+     */
+    BufferedReader newBufferedReaderForTextFile(Path path) throws IOException;
+
+    /**
+     * @return A new writer for a text file in UTF-8; if a file already exists it is overwritten.
+     * @throws IOException If an exception accessing occurs while accessing the file system.
+     */
+    BufferedWriter newBufferedWriterForTextFile(Path path) throws IOException;
 }

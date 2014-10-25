@@ -16,7 +16,10 @@
 
 package nl.ulso.magisto.io;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
@@ -25,12 +28,15 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static java.nio.file.StandardOpenOption.*;
 import static nl.ulso.magisto.io.Paths.*;
 
 /**
- * Default implementation of the {@link nl.ulso.magisto.io.FileSystemAccessor} that actually writes to the file system.
+ * Default implementation of the {@link nl.ulso.magisto.io.FileSystemAccessor} that actually accesses the file system.
  */
 public class RealFileSystemAccessor implements FileSystemAccessor {
+
+    private static final Charset CHARSET_UTF8 = Charset.forName("UTF-8");
 
     @Override
     public Path resolveSourceDirectory(String directoryName) throws IOException {
@@ -155,6 +161,16 @@ public class RealFileSystemAccessor implements FileSystemAccessor {
         requireRelativePath(path);
         Logger.getGlobal().log(Level.INFO, String.format("Deleting '%s' from '%s'.", path, root));
         Files.delete(root.resolve(path));
+    }
+
+    @Override
+    public BufferedReader newBufferedReaderForTextFile(Path path) throws IOException {
+        return Files.newBufferedReader(path, CHARSET_UTF8);
+    }
+
+    @Override
+    public BufferedWriter newBufferedWriterForTextFile(Path path) throws IOException {
+        return Files.newBufferedWriter(path, CHARSET_UTF8, CREATE, WRITE, TRUNCATE_EXISTING);
     }
 
     private static class TargetStatus {

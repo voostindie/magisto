@@ -41,9 +41,10 @@ To transform Markdown to HTML, Magisto uses a FreeMarker template. By default Ma
 
 A template typically uses a *model* to base its output on. Magisto exposes the following data to the model:
 
-* `title`: the title of the page. This is the text on the first header in the Markdown input.
-* `content`: the contents of the page. This is the converted Markdown content, already in HTML.
-* `...`: ...to be specified...
+* `timestamp` (`java.util.Date`): the time the Markdown file was converted to HTML.
+* `path` (`java.nio.file.Path`): the relative path to the source file.
+* `title` (`java.lang.String`): the title of the page. This is the text of the first header (atx-style).
+* `content` (`java.lang.String`): the contents of the page. This is the converted Markdown content, already in HTML.
 
 ## Static content
 

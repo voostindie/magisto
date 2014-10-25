@@ -18,12 +18,16 @@ package nl.ulso.magisto.io;
 
 import org.junit.Test;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.Collections;
+import java.util.List;
 import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
 
@@ -319,6 +323,33 @@ public class RealFileSystemAccessorTest {
                 accessor.delete(path, createPath("directory"));
                 // Bad test, it depends on code that's under test itself:
                 assertEquals(0, accessor.findAllPaths(path).size());
+            }
+        });
+    }
+
+    @Test
+    public void testBufferedReaderForTextFile() throws Exception {
+        final Path textFile = WORKING_DIRECTORY.resolve("README.md");
+        final String line;
+        try (final BufferedReader bufferedReader = accessor.newBufferedReaderForTextFile(textFile)) {
+            line = bufferedReader.readLine();
+        }
+        assertEquals("# Magisto", line);
+    }
+
+    @Test
+    public void testBufferedWriterForTextFile() throws Exception {
+        runFileSystemTest(new FileSystemTestWithEmptyTempDirectory() {
+            @Override
+            public void runTest(Path path) throws IOException {
+                final Path textFile = path.resolve("test.md");
+                try (final BufferedWriter writer = accessor.newBufferedWriterForTextFile(textFile)) {
+                    writer.write("# Test");
+                }
+                assertTrue(Files.exists(textFile));
+                final List<String> strings = Files.readAllLines(textFile, Charset.forName("UTF-8"));
+                assertEquals(1, strings.size());
+                assertEquals("# Test", strings.get(0));
             }
         });
     }

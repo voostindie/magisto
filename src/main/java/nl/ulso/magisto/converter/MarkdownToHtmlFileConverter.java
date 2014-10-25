@@ -16,22 +16,57 @@
 
 package nl.ulso.magisto.converter;
 
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import nl.ulso.magisto.io.FileSystemAccessor;
+import org.pegdown.Extensions;
+import org.pegdown.LinkRenderer;
+import org.pegdown.PegDownProcessor;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static java.util.regex.Pattern.MULTILINE;
 
 /**
  * Converts Markdown files to HTML.
  */
 public class MarkdownToHtmlFileConverter implements FileConverter {
 
-    private final Set<String> MARKDOWN_EXTENSIONS = new HashSet<>(Arrays.asList("md", "markdown", "mdown"));
+    private static final String TEMPLATE_PATH = "/nl/ulso/magisto";
+    private static final String PAGE_TEMPLATE = "page_template.ftl";
+    private static final Pattern TITLE_PATTERN = Pattern.compile("^#+ (.*)$", MULTILINE);
+    private static final Set<String> MARKDOWN_EXTENSIONS = new HashSet<>(Arrays.asList("md", "markdown", "mdown"));
+
+    private final Template template;
+    private final PegDownProcessor markdownProcessor;
+    private final LinkRenderer linkRenderer;
+
+    public MarkdownToHtmlFileConverter() {
+        try {
+            template = loadTemplate();
+        } catch (IOException e) {
+            throw new RuntimeException("Could not load built-in template", e);
+        }
+        markdownProcessor = new PegDownProcessor(Extensions.ALL - Extensions.HARDWRAPS);
+        linkRenderer = new CustomLinkRenderer();
+    }
+
+    private Template loadTemplate() throws IOException {
+        final Configuration configuration = new Configuration(Configuration.VERSION_2_3_21);
+        configuration.setClassForTemplateLoading(MarkdownToHtmlFileConverter.class, TEMPLATE_PATH);
+        configuration.setDefaultEncoding("UTF-8");
+        configuration.setDateTimeFormat("long");
+        return configuration.getTemplate(PAGE_TEMPLATE);
+    }
 
     @Override
     public boolean supports(Path path) {
@@ -59,6 +94,49 @@ public class MarkdownToHtmlFileConverter implements FileConverter {
     public void convert(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot, Path path)
             throws IOException {
         Logger.getGlobal().log(Level.INFO, String.format("Converting '%s' from Markdown to HTML.", path));
-        throw new IllegalStateException("Not implemented yet!");
+        final Path targetFile = targetRoot.resolve(getConvertedFileName(path));
+        try (final Writer writer = fileSystemAccessor.newBufferedWriterForTextFile(targetFile)) {
+            final String markdownText = readTextFile(fileSystemAccessor, sourceRoot.resolve(path));
+            final Map<String, Object> model = createPageModel(path, markdownText);
+            template.process(model, writer);
+        } catch (TemplateException e) {
+            throw new RuntimeException("Error in built-in FreeMarker template", e);
+        }
+    }
+
+    Map<String, Object> createPageModel(Path path, String markdownText) {
+        final Map<String, Object> model = new HashMap<>();
+        model.put("timestamp", new Date());
+        model.put("path", path);
+        model.put("title", extractTitleFromMarkdown(markdownText));
+        model.put("content", convertMarkdownToHtml(markdownText));
+        return model;
+    }
+
+    String extractTitleFromMarkdown(String markdownText) {
+        final Matcher matcher = TITLE_PATTERN.matcher(markdownText);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return "";
+    }
+
+    String convertMarkdownToHtml(String markdownText) {
+        return markdownProcessor.markdownToHtml(markdownText.toCharArray(), linkRenderer);
+    }
+
+    private String readTextFile(FileSystemAccessor fileSystemAccessor, Path path) throws IOException {
+        try (final BufferedReader reader = fileSystemAccessor.newBufferedReaderForTextFile(path)) {
+            final StringBuilder builder = new StringBuilder();
+            while (reader.ready()) {
+                final String line = reader.readLine();
+                if (line == null) {
+                    break;
+                }
+                builder.append(line);
+                builder.append(System.lineSeparator());
+            }
+            return builder.toString();
+        }
     }
 }
