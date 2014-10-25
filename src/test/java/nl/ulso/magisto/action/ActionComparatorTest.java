@@ -66,11 +66,11 @@ public class ActionComparatorTest {
     }
 
     @Test
-    public void testConvertBeforeCopy() throws Exception {
+    public void testCopyBeforeConvert() throws Exception {
         final ConvertAction convert = new ConvertAction(createPath("a"), null);
         final CopyAction copy = new CopyAction(createPath("a"));
-        assertEquals(-1, comparator.compare(convert, copy));
-        assertEquals(1, comparator.compare(copy, convert));
+        assertEquals(-1, comparator.compare(copy, convert));
+        assertEquals(1, comparator.compare(convert, copy));
     }
 
     @Test
