@@ -41,12 +41,12 @@ That's about it.
 
 ## Configuration
 
-You can (*not yet*) configure Magisto in two ways:
+You can configure Magisto in two ways:
 
 1. By supplying a custom page template.
-2. By adding additional static content to the output.
+2. By (*not yet*) adding additional static content to the output.
 
-## Custom template (*not yet*)
+## Custom template
 
 To transform Markdown to HTML, Magisto uses a FreeMarker template. By default Magisto uses one that is built-in. If you want to create your own, you can. Just name it `.page.ftl` and put it in the root of the source directory.
 

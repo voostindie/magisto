@@ -26,6 +26,7 @@ import org.pegdown.PegDownProcessor;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.logging.Level;
@@ -38,10 +39,11 @@ import static java.util.regex.Pattern.MULTILINE;
 /**
  * Converts Markdown files to HTML.
  */
-public class MarkdownToHtmlFileConverter implements FileConverter {
+class MarkdownToHtmlFileConverter implements FileConverter {
 
     private static final String TEMPLATE_PATH = "/nl/ulso/magisto";
-    private static final String PAGE_TEMPLATE = "page_template.ftl";
+    private static final String DEFAULT_PAGE_TEMPLATE = "page_template.ftl";
+    private static final String CUSTOM_PAGE_TEMPLATE = ".page.ftl";
     private static final Pattern TITLE_PATTERN = Pattern.compile("^#+ (.*)$", MULTILINE);
     static final Set<String> MARKDOWN_EXTENSIONS = new HashSet<>(Arrays.asList("md", "markdown", "mdown"));
 
@@ -49,9 +51,9 @@ public class MarkdownToHtmlFileConverter implements FileConverter {
     private final PegDownProcessor markdownProcessor;
     private final CustomLinkRenderer linkRenderer;
 
-    public MarkdownToHtmlFileConverter() {
+    MarkdownToHtmlFileConverter(Path sourceRoot) {
         try {
-            template = loadTemplate();
+            template = loadTemplate(sourceRoot);
         } catch (IOException e) {
             throw new RuntimeException("Could not load built-in template", e);
         }
@@ -59,12 +61,18 @@ public class MarkdownToHtmlFileConverter implements FileConverter {
         linkRenderer = new CustomLinkRenderer();
     }
 
-    private Template loadTemplate() throws IOException {
+    Template loadTemplate(Path sourceRoot) throws IOException {
         final Configuration configuration = new Configuration(Configuration.VERSION_2_3_21);
-        configuration.setClassForTemplateLoading(MarkdownToHtmlFileConverter.class, TEMPLATE_PATH);
         configuration.setDefaultEncoding("UTF-8");
         configuration.setDateTimeFormat("long");
-        return configuration.getTemplate(PAGE_TEMPLATE);
+        // TODO: Replace direct file access with the FileSystemAccessor. Probably requires a custom TemplateLoader.
+        if (Files.exists(sourceRoot.resolve(CUSTOM_PAGE_TEMPLATE))) {
+            configuration.setDirectoryForTemplateLoading(sourceRoot.toFile());
+            return configuration.getTemplate(CUSTOM_PAGE_TEMPLATE);
+        } else {
+            configuration.setClassForTemplateLoading(MarkdownToHtmlFileConverter.class, TEMPLATE_PATH);
+            return configuration.getTemplate(DEFAULT_PAGE_TEMPLATE);
+        }
     }
 
     @Override

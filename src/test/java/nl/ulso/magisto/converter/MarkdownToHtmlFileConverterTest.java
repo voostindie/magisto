@@ -16,6 +16,7 @@
 
 package nl.ulso.magisto.converter;
 
+import freemarker.template.Template;
 import nl.ulso.magisto.io.DummyFileSystemAccessor;
 import org.junit.Test;
 
@@ -29,7 +30,7 @@ import static org.junit.Assert.*;
 
 public class MarkdownToHtmlFileConverterTest {
 
-    private final MarkdownToHtmlFileConverter fileConverter = new MarkdownToHtmlFileConverter();
+    private final MarkdownToHtmlFileConverter fileConverter = new MarkdownToHtmlFileConverter(createPath("."));
 
     @Test
     public void testMarkdownExtensionMd() throws Exception {
@@ -120,5 +121,19 @@ public class MarkdownToHtmlFileConverterTest {
     public void testMarkdownFileReferenceLink() throws Exception {
         final String html = fileConverter.convertMarkdownToHtml(String.format("[link][id]%n%n[id]: file.md"));
         assertEquals("<p><a href=\"file.html\">link</a></p>", html);
+    }
+
+    @Test
+    public void testLoadDefaultTemplate() throws Exception {
+        Template template = fileConverter.loadTemplate(createPath("."));
+        assertNotNull(template);
+        assertEquals("page_template.ftl", template.getName());
+    }
+
+    @Test
+    public void testLoadCustomTemplate() throws Exception {
+        Template template = fileConverter.loadTemplate(createPath("src", "test", "resources", "freemarker"));
+        assertNotNull(template);
+        assertEquals(".page.ftl", template.getName());
     }
 }

@@ -4,7 +4,6 @@
 
 * Check that the source directory is a Git clone.
 * Expose Git information to the page template.
-* Use a custom template if available
 * Copy over the static content, if any.
 
 ## Improvements

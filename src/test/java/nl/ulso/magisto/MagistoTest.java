@@ -17,7 +17,7 @@
 package nl.ulso.magisto;
 
 import nl.ulso.magisto.action.DummyActionFactory;
-import nl.ulso.magisto.converter.DummyFileConverter;
+import nl.ulso.magisto.converter.DummyFileConverterFactory;
 import nl.ulso.magisto.io.DummyFileSystemAccessor;
 import nl.ulso.magisto.io.DummyPathEntry;
 import org.junit.Before;
@@ -33,8 +33,8 @@ public class MagistoTest {
 
     private final DummyFileSystemAccessor accessor = new DummyFileSystemAccessor();
     private final DummyActionFactory actionFactory = new DummyActionFactory();
-    private final DummyFileConverter fileConverter = new DummyFileConverter();
-    private final Magisto magisto = new Magisto(accessor, actionFactory, fileConverter);
+    private final DummyFileConverterFactory fileConverterFactory = new DummyFileConverterFactory();
+    private final Magisto magisto = new Magisto(accessor, actionFactory, fileConverterFactory);
 
     @Before
     public void setUp() throws Exception {

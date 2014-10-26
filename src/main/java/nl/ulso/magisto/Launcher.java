@@ -20,7 +20,7 @@ import com.lexicalscope.jewel.cli.ArgumentValidationException;
 import com.lexicalscope.jewel.cli.CliFactory;
 import com.lexicalscope.jewel.cli.ValidationFailure;
 import nl.ulso.magisto.action.RealActionFactory;
-import nl.ulso.magisto.converter.MarkdownToHtmlFileConverter;
+import nl.ulso.magisto.converter.RealFileConverterFactory;
 import nl.ulso.magisto.io.RealFileSystemAccessor;
 
 import java.io.IOException;
@@ -48,8 +48,9 @@ public class Launcher {
         configureLoggingSystem();
         try {
             final Options options = parseProgramOptions(arguments);
+            final String sourceDirectory = resolveSourceDirectory(options);
             final Magisto magisto = createMagisto();
-            run(magisto, resolveSourceDirectory(options), options.getTargetDirectory());
+            run(magisto, sourceDirectory, options.getTargetDirectory());
         } catch (RuntimeException e) {
             System.exit(-1);
         }
@@ -83,7 +84,7 @@ public class Launcher {
         if (DUMMY_MAGISTO != null) {
             return DUMMY_MAGISTO;
         }
-        return new Magisto(new RealFileSystemAccessor(), new RealActionFactory(), new MarkdownToHtmlFileConverter());
+        return new Magisto(new RealFileSystemAccessor(), new RealActionFactory(), new RealFileConverterFactory());
     }
 
     private static void run(Magisto magisto, String sourceDirectory, String targetDirectory) {
