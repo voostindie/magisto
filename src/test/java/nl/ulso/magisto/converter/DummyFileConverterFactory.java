@@ -16,11 +16,13 @@
 
 package nl.ulso.magisto.converter;
 
+import nl.ulso.magisto.io.FileSystemAccessor;
+
 import java.nio.file.Path;
 
 public class DummyFileConverterFactory implements FileConverterFactory {
     @Override
-    public FileConverter create(Path sourceRoot) {
+    public FileConverter create(FileSystemAccessor fileSystemAccessor, Path sourceRoot) {
         return new DummyFileConverter();
     }
 }

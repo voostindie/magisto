@@ -110,7 +110,7 @@ public class RealFileSystemAccessor implements FileSystemAccessor {
         Files.walkFileTree(requireAbsolutePath(root), new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes attributes) throws IOException {
-                if (Files.isHidden(path)) {
+                if (root != path && Files.isHidden(path)) {
                     return FileVisitResult.SKIP_SUBTREE;
                 }
                 if (root != path) {
@@ -131,10 +131,9 @@ public class RealFileSystemAccessor implements FileSystemAccessor {
     }
 
     @Override
-    public boolean isSourceNewerThanTarget(Path source, Path target) throws IOException {
-        requireAbsolutePath(source);
-        requireAbsolutePath(target);
-        return Files.getLastModifiedTime(source).toMillis() > Files.getLastModifiedTime(target).toMillis();
+    public long getLastModifiedInMillis(Path path) throws IOException {
+        requireAbsolutePath(path);
+        return Files.getLastModifiedTime(path).toMillis();
     }
 
     @Override
@@ -171,6 +170,16 @@ public class RealFileSystemAccessor implements FileSystemAccessor {
     @Override
     public BufferedWriter newBufferedWriterForTextFile(Path path) throws IOException {
         return Files.newBufferedWriter(path, CHARSET_UTF8, CREATE, WRITE, TRUNCATE_EXISTING);
+    }
+
+    @Override
+    public boolean exists(Path path) {
+        return Files.exists(path);
+    }
+
+    @Override
+    public boolean notExists(Path path) {
+        return Files.notExists(path);
     }
 
     private static class TargetStatus {

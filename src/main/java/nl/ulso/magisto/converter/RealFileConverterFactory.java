@@ -16,6 +16,8 @@
 
 package nl.ulso.magisto.converter;
 
+import nl.ulso.magisto.io.FileSystemAccessor;
+
 import java.nio.file.Path;
 
 /**
@@ -23,7 +25,7 @@ import java.nio.file.Path;
  */
 public class RealFileConverterFactory implements FileConverterFactory {
     @Override
-    public FileConverter create(Path sourceRoot) {
-        return new MarkdownToHtmlFileConverter(sourceRoot);
+    public FileConverter create(FileSystemAccessor fileSystemAccessor, Path sourceRoot) {
+        return new MarkdownToHtmlFileConverter(fileSystemAccessor, sourceRoot);
     }
 }

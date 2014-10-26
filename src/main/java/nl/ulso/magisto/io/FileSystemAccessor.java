@@ -108,14 +108,10 @@ public interface FileSystemAccessor {
     SortedSet<Path> findAllPaths(Path root) throws IOException;
 
     /**
-     * Checks whether the source path is newer than the target path.
-     *
-     * @param source Source path, must be absolute.
-     * @param target Target path, must be absolute.
-     * @return {@code true} if source is newer, {@code false} otherwise.
-     * @throws IOException If an exception occurs while accessing the file system.
+     * @param path Absolute path to get the last modified timestamp of.
+     * @return Last modified timestamp of {@code path}
      */
-    boolean isSourceNewerThanTarget(Path source, Path target) throws IOException;
+    long getLastModifiedInMillis(Path path) throws IOException;
 
     /**
      * Copies {@code path} in {@code sourceRoot} to {@code targetRoot}, overwriting the same path in the target
@@ -146,4 +142,16 @@ public interface FileSystemAccessor {
      * @throws IOException If an exception accessing occurs while accessing the file system.
      */
     BufferedWriter newBufferedWriterForTextFile(Path path) throws IOException;
+
+    /**
+     * @param path Absolute path to check for existence.
+     * @return {@code true} if the file exists, {@code false} if it doesn't.
+     */
+    boolean exists(Path path);
+
+    /**
+     * @param path Absolute path to check for existence.
+     * @return {@code true} if the file does not exist, {@code false} if it does.
+     */
+    boolean notExists(Path path);
 }

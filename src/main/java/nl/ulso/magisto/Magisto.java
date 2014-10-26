@@ -33,6 +33,8 @@ import java.util.TreeSet;
  * Knits all the components in the Magisto system together (like a module) and runs it.
  */
 class Magisto {
+    private static final String STATIC_CONTENT_DIRECTORY = ".static";
+
     private final FileSystemAccessor fileSystemAccessor;
     private final ActionFactory actionFactory;
     private final FileConverterFactory fileConverterFactory;
@@ -49,9 +51,9 @@ class Magisto {
     statistics along the way.
 
     The actions are collected and sorted in a specific manner, so that they are performed in the right order. For
-    example: deletions from the target for, in reverse order (first files in directories, then the directories
+    example: deletions from the target first, in reverse order (first files in directories, then the directories
     themselves). Copies go later, in lexicographical order. That's one reasons why collecting actions and performing
-    them are two distinct steps. Also, I like this better.
+    them are two distinct steps. Also, I like this more.
      */
     public Statistics run(final String sourceDirectory, final String targetDirectory) throws IOException {
         final Statistics statistics = new Statistics();
@@ -61,9 +63,20 @@ class Magisto {
             final Path targetRoot = fileSystemAccessor.prepareTargetDirectory(targetDirectory);
             fileSystemAccessor.requireDistinct(sourceRoot, targetRoot);
 
-            final FileConverter fileConverter = fileConverterFactory.create(sourceRoot);
-            for (Action action : createActions(sourceRoot, targetRoot, fileConverter)) {
+            for (Action action : createActions(sourceRoot, targetRoot)) {
                 action.perform(fileSystemAccessor, sourceRoot, targetRoot);
+                statistics.registerActionPerformed(action);
+            }
+
+            // The previous step has removed all static files. The next step copies them back in.
+            // The good part: if there's a new file in the source tree with the same name as a static file, then the
+            // the static file will not replace it.
+            // The bad part: in general static files will be copied over and over again.
+            // I still have to think of a solution to fix the bad part...
+
+            final Path staticRoot = sourceRoot.resolve(STATIC_CONTENT_DIRECTORY);
+            for (Action action : createStaticCopyActions(staticRoot, targetRoot)) {
+                action.perform(fileSystemAccessor, staticRoot, targetRoot);
                 statistics.registerActionPerformed(action);
             }
 
@@ -81,8 +94,9 @@ class Magisto {
     actions on the source files, to detect all files in the target directory that weren't updated. This balanced line
     algorithm is simpler. It's a bit faster too.
      */
-    private SortedSet<Action> createActions(Path sourceRoot, Path targetRoot, FileConverter fileConverter) throws IOException {
+    private SortedSet<Action> createActions(Path sourceRoot, Path targetRoot) throws IOException {
         final SortedSet<Action> actions = new TreeSet<>(new ActionComparator());
+        final FileConverter fileConverter = fileConverterFactory.create(fileSystemAccessor, sourceRoot);
         final Iterator<Path> sources = fileSystemAccessor.findAllPaths(sourceRoot).iterator();
         final Iterator<Path> targets = fileSystemAccessor.findAllPaths(targetRoot).iterator();
 
@@ -92,7 +106,7 @@ class Magisto {
             final int comparison = compareNullablePaths(source, target, fileConverter);
 
             if (comparison == 0) { // Corresponding source and target
-                if (fileSystemAccessor.isSourceNewerThanTarget(sourceRoot.resolve(source), targetRoot.resolve(target))) {
+                if (isSourceNewerThanTarget(sourceRoot.resolve(source), targetRoot.resolve(target))) {
                     actions.add(determineActionOnSource(source, fileConverter)); // Source is newer, so replace target
                 } else {
                     actions.add(actionFactory.skip(source));
@@ -107,6 +121,20 @@ class Magisto {
             } else if (comparison > 0) { // Target exists, no corresponding source
                 actions.add(actionFactory.delete(target));
                 target = nullableNext(targets);
+            }
+        }
+        return actions;
+    }
+
+    private SortedSet<Action> createStaticCopyActions(Path staticRoot, Path targetRoot) throws IOException {
+        final SortedSet<Action> actions = new TreeSet<>(new ActionComparator());
+        if (fileSystemAccessor.notExists(staticRoot)) {
+            return actions;
+        }
+        final SortedSet<Path> paths = fileSystemAccessor.findAllPaths(staticRoot);
+        for (Path path : paths) {
+            if (fileSystemAccessor.notExists(targetRoot.resolve(path))) {
+                actions.add(actionFactory.copy(path));
             }
         }
         return actions;
@@ -134,5 +162,11 @@ class Magisto {
             return actionFactory.convert(source, fileConverter);
         }
         return actionFactory.copy(source);
+    }
+
+    private boolean isSourceNewerThanTarget(Path sourcePath, Path targetPath) throws IOException {
+        final long sourceLastModified = fileSystemAccessor.getLastModifiedInMillis(sourcePath);
+        final long targetLastModified = fileSystemAccessor.getLastModifiedInMillis(targetPath);
+        return sourceLastModified > targetLastModified;
     }
 }

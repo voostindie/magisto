@@ -44,7 +44,7 @@ That's about it.
 You can configure Magisto in two ways:
 
 1. By supplying a custom page template.
-2. By (*not yet*) adding additional static content to the output.
+2. By adding additional static content to the output.
 
 ## Custom template
 
@@ -57,6 +57,6 @@ A template typically uses a *model* to base its output on. Magisto exposes the f
 * `title` (`java.lang.String`): the title of the page. This is the text of the first header (atx-style).
 * `content` (`java.lang.String`): the contents of the page. This is the converted Markdown content, already in HTML.
 
-## Static content (*not yet*)
+## Static content
 
 All files in `.static` are copied over to the target directory as is. This is where you can put your favicon, or the static content that you refer to from your template, like CSS, images, fonts, JavaScript and so on.

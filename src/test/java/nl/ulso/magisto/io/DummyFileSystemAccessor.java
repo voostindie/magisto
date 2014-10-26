@@ -65,17 +65,21 @@ public class DummyFileSystemAccessor implements FileSystemAccessor {
         return paths;
     }
 
+    @Override
+    public long getLastModifiedInMillis(Path path) throws IOException {
+        final DummyPathEntry entry;
+        if (path.startsWith(recording.sourceRoot)) {
+            entry = findEntry(recording.sourceRoot.relativize(path), recording.sourcePaths);
+        } else {
+            entry = findEntry(recording.targetRoot.relativize(path), recording.targetPaths);
+        }
+        return entry != null ? entry.getTimestamp() : -1;
+    }
+
     private void addAllPaths(SortedSet<Path> paths, Set<DummyPathEntry> entries) {
         for (DummyPathEntry entry : entries) {
             paths.add(entry.getPath());
         }
-    }
-
-    @Override
-    public boolean isSourceNewerThanTarget(Path source, Path target) throws IOException {
-        DummyPathEntry sourceEntry = findEntry(recording.sourceRoot.relativize(source), recording.sourcePaths);
-        DummyPathEntry targetEntry = findEntry(recording.targetRoot.relativize(target), recording.targetPaths);
-        return sourceEntry.getTimestamp() > targetEntry.getTimestamp();
     }
 
     @Override
@@ -99,6 +103,16 @@ public class DummyFileSystemAccessor implements FileSystemAccessor {
         final StringWriter writer = new StringWriter();
         recording.textFilesForWriting.put(path.getFileName().toString(), writer);
         return new BufferedWriter(writer);
+    }
+
+    @Override
+    public boolean exists(Path path) {
+        return recording.textFilesForReading.containsKey(path.getFileName().toString());
+    }
+
+    @Override
+    public boolean notExists(Path path) {
+        return !exists(path);
     }
 
     private DummyPathEntry findEntry(Path source, Set<DummyPathEntry> entries) {

@@ -16,15 +16,14 @@
 
 package nl.ulso.magisto.converter;
 
+import nl.ulso.magisto.io.FileSystemAccessor;
+
 import java.nio.file.Path;
 
 /**
  * Factory for converters.
  */
 public interface FileConverterFactory {
-    /**
-     * @param sourceRoot Absolute root of the directory containing files to convert.
-     * @return A converter for files in {@code sourceRoot}.
-     */
-    FileConverter create(Path sourceRoot);
+
+    FileConverter create(FileSystemAccessor fileSystemAccessor, Path sourceRoot);
 }

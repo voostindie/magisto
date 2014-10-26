@@ -29,7 +29,6 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.util.Collections;
 import java.util.List;
 import java.util.SortedSet;
-import java.util.concurrent.TimeUnit;
 
 import static nl.ulso.magisto.io.FileSystemTestRunner.WORKING_DIRECTORY;
 import static nl.ulso.magisto.io.FileSystemTestRunner.runFileSystemTest;
@@ -240,24 +239,23 @@ public class RealFileSystemAccessorTest {
     }
 
     @Test
-    public void testSourceNewerThanTarget() throws Exception {
+    public void testLastModified() throws Exception {
         runFileSystemTest(new FileSystemTestWithPreparedDirectory() {
+
+            private long now;
+
             @Override
             public void prepareTempDirectory(Path path) throws IOException {
+                now = System.currentTimeMillis() / 1000; // At least on OS X granularity is at seconds.
                 Files.createFile(path.resolve("target"));
-                try {
-                    TimeUnit.SECONDS.sleep(2); // Make sure the next file is newer
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-                Files.createFile(path.resolve("source"));
             }
 
             @Override
             public void runTest(Path path) throws IOException {
-                assertTrue(accessor.isSourceNewerThanTarget(path.resolve("source"), path.resolve("target")));
-                assertFalse(accessor.isSourceNewerThanTarget(path.resolve("target"), path.resolve("source")));
-                assertFalse(accessor.isSourceNewerThanTarget(path.resolve("source"), path.resolve("source")));
+                final long lastModifiedInMillis = accessor.getLastModifiedInMillis(path.resolve("target"));
+                System.out.println("now = " + now);
+                System.out.println("lastModifiedInMillis = " + lastModifiedInMillis);
+                assertTrue(lastModifiedInMillis / 1000 >= now);
             }
         });
     }

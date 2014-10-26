@@ -26,7 +26,6 @@ import org.pegdown.PegDownProcessor;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Writer;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.logging.Level;
@@ -51,9 +50,9 @@ class MarkdownToHtmlFileConverter implements FileConverter {
     private final PegDownProcessor markdownProcessor;
     private final CustomLinkRenderer linkRenderer;
 
-    MarkdownToHtmlFileConverter(Path sourceRoot) {
+    MarkdownToHtmlFileConverter(FileSystemAccessor fileSystemAccessor, Path sourceRoot) {
         try {
-            template = loadTemplate(sourceRoot);
+            template = loadTemplate(fileSystemAccessor, sourceRoot);
         } catch (IOException e) {
             throw new RuntimeException("Could not load built-in template", e);
         }
@@ -61,13 +60,12 @@ class MarkdownToHtmlFileConverter implements FileConverter {
         linkRenderer = new CustomLinkRenderer();
     }
 
-    Template loadTemplate(Path sourceRoot) throws IOException {
+    Template loadTemplate(FileSystemAccessor fileSystemAccessor, Path sourceRoot) throws IOException {
         final Configuration configuration = new Configuration(Configuration.VERSION_2_3_21);
         configuration.setDefaultEncoding("UTF-8");
         configuration.setDateTimeFormat("long");
-        // TODO: Replace direct file access with the FileSystemAccessor. Probably requires a custom TemplateLoader.
-        if (Files.exists(sourceRoot.resolve(CUSTOM_PAGE_TEMPLATE))) {
-            configuration.setDirectoryForTemplateLoading(sourceRoot.toFile());
+        if (fileSystemAccessor.exists(sourceRoot.resolve(CUSTOM_PAGE_TEMPLATE))) {
+            configuration.setTemplateLoader(new CustomTemplateLoader(fileSystemAccessor, sourceRoot));
             return configuration.getTemplate(CUSTOM_PAGE_TEMPLATE);
         } else {
             configuration.setClassForTemplateLoading(MarkdownToHtmlFileConverter.class, TEMPLATE_PATH);

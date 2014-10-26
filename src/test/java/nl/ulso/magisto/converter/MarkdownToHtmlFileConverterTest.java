@@ -25,12 +25,14 @@ import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static nl.ulso.magisto.io.DummyPathEntry.createPathEntry;
 import static nl.ulso.magisto.io.Paths.createPath;
 import static org.junit.Assert.*;
 
 public class MarkdownToHtmlFileConverterTest {
 
-    private final MarkdownToHtmlFileConverter fileConverter = new MarkdownToHtmlFileConverter(createPath("."));
+    private final MarkdownToHtmlFileConverter fileConverter = new MarkdownToHtmlFileConverter(
+            new DummyFileSystemAccessor(), createPath("."));
 
     @Test
     public void testMarkdownExtensionMd() throws Exception {
@@ -125,14 +127,18 @@ public class MarkdownToHtmlFileConverterTest {
 
     @Test
     public void testLoadDefaultTemplate() throws Exception {
-        Template template = fileConverter.loadTemplate(createPath("."));
+        Template template = fileConverter.loadTemplate(new DummyFileSystemAccessor(), createPath("."));
         assertNotNull(template);
         assertEquals("page_template.ftl", template.getName());
     }
 
     @Test
     public void testLoadCustomTemplate() throws Exception {
-        Template template = fileConverter.loadTemplate(createPath("src", "test", "resources", "freemarker"));
+        final DummyFileSystemAccessor fileSystemAccessor = new DummyFileSystemAccessor();
+        final Path sourcePath = fileSystemAccessor.resolveSourceDirectory(".");
+        fileSystemAccessor.addSourcePaths(createPathEntry(".page.ftl"));
+        fileSystemAccessor.registerTextFileForBufferedReader(".page.ftl", "CUSTOM TEMPLATE");
+        final Template template = fileConverter.loadTemplate(fileSystemAccessor, sourcePath);
         assertNotNull(template);
         assertEquals(".page.ftl", template.getName());
     }
