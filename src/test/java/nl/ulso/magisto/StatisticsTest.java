@@ -16,6 +16,7 @@
 
 package nl.ulso.magisto;
 
+import nl.ulso.magisto.action.ActionCategory;
 import nl.ulso.magisto.action.ActionType;
 import nl.ulso.magisto.action.DummyAction;
 import org.apache.commons.io.output.WriterOutputStream;
@@ -24,6 +25,7 @@ import org.junit.Test;
 import java.io.PrintStream;
 import java.io.StringWriter;
 
+import static nl.ulso.magisto.action.ActionCategory.*;
 import static nl.ulso.magisto.action.ActionType.*;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
@@ -47,12 +49,12 @@ public class StatisticsTest {
 
     @Test(expected = IllegalStateException.class)
     public void testActionPerformedCannotBeCalledBeforeStart() throws Exception {
-        new Statistics().registerActionPerformed(createAction(COPY));
+        new Statistics().registerActionPerformed(createAction(SOURCE, COPY_SOURCE));
     }
 
     @Test(expected = IllegalStateException.class)
     public void testActionPerformedCannotBeCalledAfterEnd() throws Exception {
-        new Statistics().begin().end().registerActionPerformed(createAction(COPY));
+        new Statistics().begin().end().registerActionPerformed(createAction(SOURCE, COPY_SOURCE));
     }
 
     @Test
@@ -61,26 +63,33 @@ public class StatisticsTest {
         final PrintStream stream = new PrintStream(new WriterOutputStream(writer));
         new Statistics()
                 .begin()
-                .registerActionPerformed(createAction(COPY))
-                .registerActionPerformed(createAction(DELETE))
-                .registerActionPerformed(createAction(SKIP))
-                .registerActionPerformed(createAction(CONVERT))
-                .registerActionPerformed(createAction(CONVERT))
-                .registerActionPerformed(createAction(SKIP))
-                .registerActionPerformed(createAction(COPY))
-                .registerActionPerformed(createAction(COPY))
+                .registerActionPerformed(createAction(SOURCE, COPY_SOURCE))
+                .registerActionPerformed(createAction(SOURCE, DELETE_TARGET))
+                .registerActionPerformed(createAction(STATIC, COPY_STATIC))
+                .registerActionPerformed(createAction(SOURCE, SKIP_SOURCE))
+                .registerActionPerformed(createAction(STATIC, COPY_STATIC))
+                .registerActionPerformed(createAction(STATIC, COPY_STATIC))
+                .registerActionPerformed(createAction(STATIC, COPY_STATIC))
+                .registerActionPerformed(createAction(SOURCE, CONVERT_SOURCE))
+                .registerActionPerformed(createAction(SOURCE, CONVERT_SOURCE))
+                .registerActionPerformed(createAction(SOURCE, SKIP_SOURCE))
+                .registerActionPerformed(createAction(STATIC, SKIP_STATIC))
+                .registerActionPerformed(createAction(SOURCE, COPY_SOURCE))
+                .registerActionPerformed(createAction(SOURCE, COPY_SOURCE))
                 .end()
                 .print(stream);
         stream.flush();
         stream.close();
         assertThat(writer.toString(), containsString("Done!"));
-        assertThat(writer.toString(), containsString("Copied 3"));
-        assertThat(writer.toString(), containsString("Converted 2"));
-        assertThat(writer.toString(), containsString("Deleted 1"));
-        assertThat(writer.toString(), containsString("Skipped 2"));
+        assertThat(writer.toString(), containsString("Copied 3 source"));
+        assertThat(writer.toString(), containsString("Copied 4 static"));
+        assertThat(writer.toString(), containsString("Converted 2 source"));
+        assertThat(writer.toString(), containsString("Deleted 1 target"));
+        assertThat(writer.toString(), containsString("Skipped 2 source"));
+        assertThat(writer.toString(), containsString("Skipped 1 static"));
     }
 
-    private DummyAction createAction(ActionType type) {
-        return new DummyAction(null, null, type);
+    private DummyAction createAction(ActionCategory category, ActionType type) {
+        return new DummyAction(null, null, category, type);
     }
 }

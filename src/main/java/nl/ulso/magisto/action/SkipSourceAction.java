@@ -23,23 +23,25 @@ import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static nl.ulso.magisto.action.ActionType.SKIP;
+import static nl.ulso.magisto.action.ActionCategory.SOURCE;
+import static nl.ulso.magisto.action.ActionType.SKIP_SOURCE;
 
 /**
  * Represents a no-op action, for a path that is skipped.
  */
-class SkipAction extends AbstractAction {
-    SkipAction(Path path) {
-        super(path);
+class SkipSourceAction extends AbstractAction {
+
+    SkipSourceAction(Path path) {
+        super(path, SOURCE);
     }
 
     @Override
     public ActionType getActionType() {
-        return SKIP;
+        return SKIP_SOURCE;
     }
 
     @Override
     public void perform(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot) throws IOException {
-        Logger.getGlobal().log(Level.INFO, String.format("Skipping '%s'. No changes detected.", getPath()));
+        Logger.getGlobal().log(Level.INFO, String.format("Skipping source '%s'. No changes detected.", getPath()));
     }
 }

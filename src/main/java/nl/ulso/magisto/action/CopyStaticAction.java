@@ -21,24 +21,33 @@ import nl.ulso.magisto.io.FileSystemAccessor;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import static nl.ulso.magisto.action.ActionType.DELETE;
+import static nl.ulso.magisto.action.ActionCategory.STATIC;
+import static nl.ulso.magisto.action.ActionType.COPY_STATIC;
+import static nl.ulso.magisto.io.Paths.requireAbsolutePath;
 
 /**
- * Deletes a file or directory from the target root
+ * Copies a file from the static root to the target root.
  */
-class DeleteAction extends AbstractAction {
+class CopyStaticAction extends AbstractAction {
 
-    DeleteAction(Path path) {
-        super(path);
+    private final String staticContentDirectory;
+
+    CopyStaticAction(Path path, String staticContentDirectory) {
+        super(path, STATIC);
+        this.staticContentDirectory = staticContentDirectory;
     }
 
     @Override
     public ActionType getActionType() {
-        return DELETE;
+        return COPY_STATIC;
     }
 
     @Override
     public void perform(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot) throws IOException {
-        fileSystemAccessor.delete(targetRoot, getPath());
+        fileSystemAccessor.copy(
+                requireAbsolutePath(sourceRoot).resolve(staticContentDirectory),
+                requireAbsolutePath(targetRoot),
+                getPath()
+        );
     }
 }

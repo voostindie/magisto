@@ -16,24 +16,30 @@
 
 package nl.ulso.magisto.action;
 
-import nl.ulso.magisto.converter.FileConverter;
+import nl.ulso.magisto.io.FileSystemAccessor;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
+import static nl.ulso.magisto.action.ActionCategory.SOURCE;
+import static nl.ulso.magisto.action.ActionType.DELETE_TARGET;
+
 /**
- * Factory for all the various types of actions.
+ * Deletes a file or directory from the target root
  */
-public interface ActionFactory {
+class DeleteTargetAction extends AbstractAction {
 
-    Action skipSource(Path path);
+    DeleteTargetAction(Path path) {
+        super(path, SOURCE);
+    }
 
-    Action skipStatic(Path path);
+    @Override
+    public ActionType getActionType() {
+        return DELETE_TARGET;
+    }
 
-    Action copySource(Path path);
-
-    Action copyStatic(Path path, String staticContentDirectory);
-
-    Action convertSource(Path path, FileConverter fileConverter);
-
-    Action deleteTarget(Path path);
+    @Override
+    public void perform(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot) throws IOException {
+        fileSystemAccessor.delete(targetRoot, getPath());
+    }
 }

@@ -16,10 +16,8 @@
 
 package nl.ulso.magisto.action;
 
-import nl.ulso.magisto.converter.DummyFileConverter;
 import nl.ulso.magisto.io.DummyFileSystemAccessor;
 import nl.ulso.magisto.io.DummyPathEntry;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.nio.file.Path;
@@ -28,27 +26,25 @@ import static nl.ulso.magisto.io.DummyPathEntry.createPathEntry;
 import static nl.ulso.magisto.io.Paths.createPath;
 import static org.junit.Assert.assertEquals;
 
-public class ConvertActionTest {
-
-    private final DummyFileConverter fileConverter = new DummyFileConverter();
-
-    @Before
-    public void setUp() throws Exception {
-        fileConverter.clearRecordings();
-    }
+public class DeleteTargetActionTest {
 
     @Test
     public void testActionType() throws Exception {
-        assertEquals(ActionType.CONVERT, new ConvertAction(createPath("convert"), fileConverter).getActionType());
+        assertEquals(ActionType.DELETE_TARGET, new DeleteTargetAction(createPath("delete")).getActionType());
     }
 
     @Test
-    public void testCopy() throws Exception {
+    public void testActionCategory() throws Exception {
+        assertEquals(ActionCategory.SOURCE, new DeleteTargetAction(createPath("delete")).getActionCategory());
+    }
+
+    @Test
+    public void testDelete() throws Exception {
         final DummyFileSystemAccessor accessor = new DummyFileSystemAccessor();
         final Path sourceRoot = accessor.resolveSourceDirectory("source");
         final Path targetRoot = accessor.prepareTargetDirectory("target");
-        final DummyPathEntry entry = createPathEntry("file.convert");
-        new ConvertAction(entry.getPath(), fileConverter).perform(accessor, sourceRoot, targetRoot);
-        assertEquals("source:file.convert -> target:file.convert.converted", fileConverter.getLoggedConversions());
+        final DummyPathEntry entry = createPathEntry("file");
+        new DeleteTargetAction(entry.getPath()).perform(accessor, sourceRoot, targetRoot);
+        assertEquals("target:file", accessor.getLoggedDeletions());
     }
 }

@@ -14,22 +14,14 @@
  * limitations under the License
  */
 
-package nl.ulso.magisto;
-
-import com.lexicalscope.jewel.cli.Option;
+package nl.ulso.magisto.action;
 
 /**
- * Represents the command-line options one can pass
+ * Callback called after an {@link Action} has been performed by the {@link ActionSet}.
+ *
+ * @see ActionSet
  */
-interface Options {
+public interface ActionCallback {
 
-    @Option(shortName = "s", longName = "source", description = "Source directory, defaults to the current directory",
-            defaultToNull = true)
-    String getSourceDirectory();
-
-    @Option(shortName = "t", longName = "target", description = "Target directory")
-    String getTargetDirectory();
-
-    @Option(shortName = "h", longName = "help", description = "Show this help text", helpRequest = true)
-    boolean getHelp();
+    void actionPerformed(Action action);
 }

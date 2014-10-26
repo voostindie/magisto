@@ -19,31 +19,44 @@ package nl.ulso.magisto.action;
 import nl.ulso.magisto.converter.FileConverter;
 
 import java.nio.file.Path;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
+import static nl.ulso.magisto.action.ActionCategory.SOURCE;
+import static nl.ulso.magisto.action.ActionCategory.STATIC;
 import static nl.ulso.magisto.action.ActionType.*;
 
 public class DummyActionFactory implements ActionFactory {
     private final Map<ActionType, Integer> counts = new HashMap<>();
 
     @Override
-    public Action skip(Path path) {
-        return new DummyAction(this, path, SKIP);
+    public Action skipSource(Path path) {
+        return new DummyAction(this, path, SOURCE, SKIP_SOURCE);
     }
 
     @Override
-    public Action copy(Path path) {
-        return new DummyAction(this, path, COPY);
+    public Action skipStatic(Path path) {
+        return new DummyAction(this, path, STATIC, SKIP_STATIC);
     }
 
     @Override
-    public Action convert(Path path, FileConverter fileConverter) {
-        return new DummyAction(this, path, CONVERT);
+    public Action copySource(Path path) {
+        return new DummyAction(this, path, SOURCE, COPY_SOURCE);
     }
 
     @Override
-    public Action delete(Path path) {
-        return new DummyAction(this, path, DELETE);
+    public Action copyStatic(Path path, String staticContentDirectory) {
+        return new DummyAction(this, path, STATIC, COPY_STATIC);
+    }
+
+    @Override
+    public Action convertSource(Path path, FileConverter fileConverter) {
+        return new DummyAction(this, path, SOURCE, CONVERT_SOURCE);
+    }
+
+    @Override
+    public Action deleteTarget(Path path) {
+        return new DummyAction(this, path, SOURCE, DELETE_TARGET);
     }
 
     public void clearRecordings() {

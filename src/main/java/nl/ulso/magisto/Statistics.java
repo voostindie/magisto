@@ -72,7 +72,8 @@ public class Statistics {
         final long duration = end - start;
         out.println("Done! This run took me about " + duration + " milliseconds. Here's what I did:");
         for (Map.Entry<ActionType, Integer> entry : actionsPerformed.entrySet()) {
-            out.format("- %s %d files", entry.getKey().getPastTenseVerb(), entry.getValue());
+            final ActionType actionType = entry.getKey();
+            out.format("- %s %d %s file(s)", actionType.getPastTenseVerb(), entry.getValue(), actionType.getFileType());
             out.println();
         }
     }

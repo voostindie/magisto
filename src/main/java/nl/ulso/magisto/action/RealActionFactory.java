@@ -25,22 +25,32 @@ import java.nio.file.Path;
  */
 public class RealActionFactory implements ActionFactory {
     @Override
-    public Action skip(Path path) {
-        return new SkipAction(path);
+    public Action skipSource(Path path) {
+        return new SkipSourceAction(path);
     }
 
     @Override
-    public Action copy(Path path) {
-        return new CopyAction(path);
+    public Action skipStatic(Path path) {
+        return new SkipStaticAction(path);
     }
 
     @Override
-    public Action convert(Path path, FileConverter fileConverter) {
-        return new ConvertAction(path, fileConverter);
+    public Action copySource(Path path) {
+        return new CopySourceAction(path);
     }
 
     @Override
-    public Action delete(Path path) {
-        return new DeleteAction(path);
+    public Action copyStatic(Path path, String staticContentDirectory) {
+        return new CopyStaticAction(path, staticContentDirectory);
+    }
+
+    @Override
+    public Action convertSource(Path path, FileConverter fileConverter) {
+        return new ConvertSourceAction(path, fileConverter);
+    }
+
+    @Override
+    public Action deleteTarget(Path path) {
+        return new DeleteTargetAction(path);
     }
 }

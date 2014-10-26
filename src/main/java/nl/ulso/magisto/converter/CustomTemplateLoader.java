@@ -27,7 +27,7 @@ import java.nio.file.Path;
 /**
  * FreeMarker {@link TemplateLoader} that loads templates from the file system using the {@link FileSystemAccessor}.
  */
-public class CustomTemplateLoader implements TemplateLoader {
+class CustomTemplateLoader implements TemplateLoader {
 
     private final FileSystemAccessor fileSystemAccessor;
     private final Path root;
@@ -39,7 +39,7 @@ public class CustomTemplateLoader implements TemplateLoader {
 
     @Override
     public Object findTemplateSource(String name) throws IOException {
-        final String[] parts = name.split("\\/");
+        final String[] parts = name.split("/");
         if (parts.length != 1) {
             throw new UnsupportedOperationException("Template sources in directories are not supported: " + name);
         }

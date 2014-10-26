@@ -103,7 +103,7 @@ public interface FileSystemAccessor {
     /**
      * @param root Directory to find all paths in.
      * @return All paths in a directory, all relative to the directory itself.
-     * @throws IOException If an exception occurrs while finding all paths.
+     * @throws IOException If an exception occurs while finding all paths.
      */
     SortedSet<Path> findAllPaths(Path root) throws IOException;
 
@@ -127,7 +127,7 @@ public interface FileSystemAccessor {
      * Deletes a path from the root.
      *
      * @param root Absolute path to the directory.
-     * @param path Relative path to the file or directory to delete within the root directory.
+     * @param path Relative path to the file or directory to deleteTarget within the root directory.
      */
     void delete(Path root, Path path) throws IOException;
 

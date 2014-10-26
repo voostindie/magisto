@@ -17,8 +17,9 @@
 package nl.ulso.magisto;
 
 import nl.ulso.magisto.action.Action;
-import nl.ulso.magisto.action.ActionComparator;
+import nl.ulso.magisto.action.ActionCallback;
 import nl.ulso.magisto.action.ActionFactory;
+import nl.ulso.magisto.action.ActionSet;
 import nl.ulso.magisto.converter.FileConverter;
 import nl.ulso.magisto.converter.FileConverterFactory;
 import nl.ulso.magisto.io.FileSystemAccessor;
@@ -27,7 +28,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.SortedSet;
-import java.util.TreeSet;
 
 /**
  * Knits all the components in the Magisto system together (like a module) and runs it.
@@ -63,22 +63,16 @@ class Magisto {
             final Path targetRoot = fileSystemAccessor.prepareTargetDirectory(targetDirectory);
             fileSystemAccessor.requireDistinct(sourceRoot, targetRoot);
 
-            for (Action action : createActions(sourceRoot, targetRoot)) {
-                action.perform(fileSystemAccessor, sourceRoot, targetRoot);
-                statistics.registerActionPerformed(action);
-            }
+            final ActionSet actions = new ActionSet(actionFactory);
+            addSourceActions(actions, sourceRoot, targetRoot);
+            addStaticActions(actions, sourceRoot, targetRoot);
 
-            // The previous step has removed all static files. The next step copies them back in.
-            // The good part: if there's a new file in the source tree with the same name as a static file, then the
-            // the static file will not replace it.
-            // The bad part: in general static files will be copied over and over again.
-            // I still have to think of a solution to fix the bad part...
-
-            final Path staticRoot = sourceRoot.resolve(STATIC_CONTENT_DIRECTORY);
-            for (Action action : createStaticCopyActions(staticRoot, targetRoot)) {
-                action.perform(fileSystemAccessor, staticRoot, targetRoot);
-                statistics.registerActionPerformed(action);
-            }
+            actions.performAll(fileSystemAccessor, sourceRoot, targetRoot, new ActionCallback() {
+                @Override
+                public void actionPerformed(Action action) {
+                    statistics.registerActionPerformed(action);
+                }
+            });
 
             fileSystemAccessor.writeTouchFile(targetRoot);
         } finally {
@@ -94,8 +88,7 @@ class Magisto {
     actions on the source files, to detect all files in the target directory that weren't updated. This balanced line
     algorithm is simpler. It's a bit faster too.
      */
-    private SortedSet<Action> createActions(Path sourceRoot, Path targetRoot) throws IOException {
-        final SortedSet<Action> actions = new TreeSet<>(new ActionComparator());
+    private void addSourceActions(ActionSet actions, Path sourceRoot, Path targetRoot) throws IOException {
         final FileConverter fileConverter = fileConverterFactory.create(fileSystemAccessor, sourceRoot);
         final Iterator<Path> sources = fileSystemAccessor.findAllPaths(sourceRoot).iterator();
         final Iterator<Path> targets = fileSystemAccessor.findAllPaths(targetRoot).iterator();
@@ -107,37 +100,39 @@ class Magisto {
 
             if (comparison == 0) { // Corresponding source and target
                 if (isSourceNewerThanTarget(sourceRoot.resolve(source), targetRoot.resolve(target))) {
-                    actions.add(determineActionOnSource(source, fileConverter)); // Source is newer, so replace target
+                    addActionOnSource(actions, source, fileConverter); // Source is newer, so replace target
                 } else {
-                    actions.add(actionFactory.skip(source));
+                    actions.addSkipSourceAction(source);
                 }
                 source = nullableNext(sources);
                 target = nullableNext(targets);
 
             } else if (comparison < 0) { // Source exists, no corresponding target
-                actions.add(determineActionOnSource(source, fileConverter));
+                addActionOnSource(actions, source, fileConverter);
                 source = nullableNext(sources);
 
             } else if (comparison > 0) { // Target exists, no corresponding source
-                actions.add(actionFactory.delete(target));
+                actions.addDeleteTargetAction(target);
                 target = nullableNext(targets);
             }
         }
-        return actions;
     }
 
-    private SortedSet<Action> createStaticCopyActions(Path staticRoot, Path targetRoot) throws IOException {
-        final SortedSet<Action> actions = new TreeSet<>(new ActionComparator());
+    private void addStaticActions(ActionSet actions, Path sourceRoot, Path targetRoot) throws IOException {
+        final Path staticRoot = sourceRoot.resolve(STATIC_CONTENT_DIRECTORY);
         if (fileSystemAccessor.notExists(staticRoot)) {
-            return actions;
+            return;
         }
-        final SortedSet<Path> paths = fileSystemAccessor.findAllPaths(staticRoot);
-        for (Path path : paths) {
-            if (fileSystemAccessor.notExists(targetRoot.resolve(path))) {
-                actions.add(actionFactory.copy(path));
+        final SortedSet<Path> staticPaths = fileSystemAccessor.findAllPaths(staticRoot);
+        for (Path staticPath : staticPaths) {
+            final Path targetPath = targetRoot.resolve(staticPath);
+            if (fileSystemAccessor.notExists(targetPath)
+                    || isSourceNewerThanTarget(staticRoot.resolve(staticPath), targetPath)) {
+                actions.addCopyStaticAction(staticPath, STATIC_CONTENT_DIRECTORY);
+            } else {
+                actions.addSkipStaticAction(staticPath);
             }
         }
-        return actions;
     }
 
     private Path nullableNext(Iterator<Path> paths) {
@@ -157,11 +152,12 @@ class Magisto {
         return source.compareTo(target);
     }
 
-    private Action determineActionOnSource(Path source, FileConverter fileConverter) {
+    private void addActionOnSource(ActionSet actions, Path source, FileConverter fileConverter) {
         if (fileConverter.supports(source)) {
-            return actionFactory.convert(source, fileConverter);
+            actions.addConvertSourceAction(source, fileConverter);
+        } else {
+            actions.addCopySourceAction(source);
         }
-        return actionFactory.copy(source);
     }
 
     private boolean isSourceNewerThanTarget(Path sourcePath, Path targetPath) throws IOException {

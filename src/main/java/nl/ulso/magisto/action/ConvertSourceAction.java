@@ -22,21 +22,23 @@ import nl.ulso.magisto.io.FileSystemAccessor;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import static nl.ulso.magisto.action.ActionCategory.SOURCE;
+
 /**
  * Converts a file in the source root to a different format in the target root in the same directory.
  */
-class ConvertAction extends AbstractAction {
+class ConvertSourceAction extends AbstractAction {
 
     private final FileConverter fileConverter;
 
-    ConvertAction(Path path, FileConverter fileConverter) {
-        super(path);
+    ConvertSourceAction(Path path, FileConverter fileConverter) {
+        super(path, SOURCE);
         this.fileConverter = fileConverter;
     }
 
     @Override
     public ActionType getActionType() {
-        return ActionType.CONVERT;
+        return ActionType.CONVERT_SOURCE;
     }
 
     @Override

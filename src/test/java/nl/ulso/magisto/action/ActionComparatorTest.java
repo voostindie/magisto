@@ -27,80 +27,80 @@ public class ActionComparatorTest {
 
     @Test
     public void testSkipBeforeDelete() throws Exception {
-        final SkipAction skip = new SkipAction(createPath("a"));
-        final DeleteAction delete = new DeleteAction(createPath("a"));
+        final SkipSourceAction skip = new SkipSourceAction(createPath("a"));
+        final DeleteTargetAction delete = new DeleteTargetAction(createPath("a"));
         assertEquals(-1, comparator.compare(skip, delete));
         assertEquals(1, comparator.compare(delete, skip));
     }
 
     @Test
     public void testSkipBeforeCopy() throws Exception {
-        final SkipAction skip = new SkipAction(createPath("a"));
-        final CopyAction copy = new CopyAction(createPath("a"));
+        final SkipSourceAction skip = new SkipSourceAction(createPath("a"));
+        final CopySourceAction copy = new CopySourceAction(createPath("a"));
         assertEquals(-1, comparator.compare(skip, copy));
         assertEquals(1, comparator.compare(copy, skip));
     }
 
     @Test
     public void testSkipBeforeConvert() throws Exception {
-        final SkipAction skip = new SkipAction(createPath("a"));
-        final ConvertAction convert = new ConvertAction(createPath("a"), null);
+        final SkipSourceAction skip = new SkipSourceAction(createPath("a"));
+        final ConvertSourceAction convert = new ConvertSourceAction(createPath("a"), null);
         assertEquals(-1, comparator.compare(skip, convert));
         assertEquals(1, comparator.compare(convert, skip));
     }
 
     @Test
     public void testDeleteBeforeCopy() throws Exception {
-        final DeleteAction delete = new DeleteAction(createPath("a"));
-        final CopyAction copy = new CopyAction(createPath("a"));
+        final DeleteTargetAction delete = new DeleteTargetAction(createPath("a"));
+        final CopySourceAction copy = new CopySourceAction(createPath("a"));
         assertEquals(-1, comparator.compare(delete, copy));
         assertEquals(1, comparator.compare(copy, delete));
     }
 
     @Test
     public void testDeleteBeforeConvert() throws Exception {
-        final DeleteAction delete = new DeleteAction(createPath("a"));
-        final ConvertAction convert = new ConvertAction(createPath("a"), null);
+        final DeleteTargetAction delete = new DeleteTargetAction(createPath("a"));
+        final ConvertSourceAction convert = new ConvertSourceAction(createPath("a"), null);
         assertEquals(-1, comparator.compare(delete, convert));
         assertEquals(1, comparator.compare(convert, delete));
     }
 
     @Test
     public void testCopyBeforeConvert() throws Exception {
-        final ConvertAction convert = new ConvertAction(createPath("a"), null);
-        final CopyAction copy = new CopyAction(createPath("a"));
+        final ConvertSourceAction convert = new ConvertSourceAction(createPath("a"), null);
+        final CopySourceAction copy = new CopySourceAction(createPath("a"));
         assertEquals(-1, comparator.compare(copy, convert));
         assertEquals(1, comparator.compare(convert, copy));
     }
 
     @Test
     public void testSkipOrderedLexicographically() throws Exception {
-        final SkipAction skip1 = new SkipAction(createPath("a"));
-        final SkipAction skip2 = new SkipAction(createPath("b"));
+        final SkipSourceAction skip1 = new SkipSourceAction(createPath("a"));
+        final SkipSourceAction skip2 = new SkipSourceAction(createPath("b"));
         assertEquals(-1, comparator.compare(skip1, skip2));
         assertEquals(1, comparator.compare(skip2, skip1));
     }
 
     @Test
     public void testCopyOrderedLexicographically() throws Exception {
-        final CopyAction copy1 = new CopyAction(createPath("a"));
-        final CopyAction copy2 = new CopyAction(createPath("b"));
+        final CopySourceAction copy1 = new CopySourceAction(createPath("a"));
+        final CopySourceAction copy2 = new CopySourceAction(createPath("b"));
         assertEquals(-1, comparator.compare(copy1, copy2));
         assertEquals(1, comparator.compare(copy2, copy1));
     }
 
     @Test
     public void testDeleteOrderedLexicographicallyReversed() throws Exception {
-        final DeleteAction delete1 = new DeleteAction(createPath("a"));
-        final DeleteAction delete2 = new DeleteAction(createPath("b"));
+        final DeleteTargetAction delete1 = new DeleteTargetAction(createPath("a"));
+        final DeleteTargetAction delete2 = new DeleteTargetAction(createPath("b"));
         assertEquals(1, comparator.compare(delete1, delete2));
         assertEquals(-1, comparator.compare(delete2, delete1));
     }
 
     @Test
     public void testConvertOrderedLexicographically() throws Exception {
-        final ConvertAction convert1 = new ConvertAction(createPath("a"), null);
-        final ConvertAction convert2 = new ConvertAction(createPath("b"), null);
+        final ConvertSourceAction convert1 = new ConvertSourceAction(createPath("a"), null);
+        final ConvertSourceAction convert2 = new ConvertSourceAction(createPath("b"), null);
         assertEquals(-1, comparator.compare(convert1, convert2));
         assertEquals(1, comparator.compare(convert2, convert1));
     }

@@ -16,30 +16,20 @@
 
 package nl.ulso.magisto.action;
 
-import nl.ulso.magisto.io.DummyFileSystemAccessor;
-import nl.ulso.magisto.io.DummyPathEntry;
 import org.junit.Test;
 
-import java.nio.file.Path;
-
-import static nl.ulso.magisto.io.DummyPathEntry.createPathEntry;
 import static nl.ulso.magisto.io.Paths.createPath;
 import static org.junit.Assert.assertEquals;
 
-public class DeleteActionTest {
+public class SkipSourceActionTest {
 
     @Test
     public void testActionType() throws Exception {
-        assertEquals(ActionType.DELETE, new DeleteAction(createPath("delete")).getActionType());
+        assertEquals(ActionType.SKIP_SOURCE, new SkipSourceAction(createPath("skip")).getActionType());
     }
 
     @Test
-    public void testDelete() throws Exception {
-        final DummyFileSystemAccessor accessor = new DummyFileSystemAccessor();
-        final Path sourceRoot = accessor.resolveSourceDirectory("source");
-        final Path targetRoot = accessor.prepareTargetDirectory("target");
-        final DummyPathEntry entry = createPathEntry("file");
-        new DeleteAction(entry.getPath()).perform(accessor, sourceRoot, targetRoot);
-        assertEquals("target:file", accessor.getLoggedDeletions());
+    public void testActionCategory() throws Exception {
+        assertEquals(ActionCategory.SOURCE, new SkipSourceAction(createPath("skip")).getActionCategory());
     }
 }

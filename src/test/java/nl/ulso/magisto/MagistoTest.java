@@ -97,21 +97,21 @@ public class MagistoTest {
                 2, // sameFile1, sameFile2
                 1, // baz.txt
                 2, // foo.convert/foo.convert.converted, bar.convert
-                1  // delete.me
+                1  // deleteTarget.me
         );
     }
 
     private void runTest(int expectedSkips, int expectedCopies, int expectedConversions, int expectedDeletions) throws Exception {
         final Statistics statistics = magisto.run("source", "target");
         // Number of actions performed must match up:
-        assertEquals(expectedSkips, actionFactory.countFor(SKIP));
-        assertEquals(expectedCopies, actionFactory.countFor(COPY));
-        assertEquals(expectedConversions, actionFactory.countFor(CONVERT));
-        assertEquals(expectedDeletions, actionFactory.countFor(DELETE));
+        assertEquals(expectedSkips, actionFactory.countFor(SKIP_SOURCE));
+        assertEquals(expectedCopies, actionFactory.countFor(COPY_SOURCE));
+        assertEquals(expectedConversions, actionFactory.countFor(CONVERT_SOURCE));
+        assertEquals(expectedDeletions, actionFactory.countFor(DELETE_TARGET));
         // Statistics must match the number of actions performed
-        assertEquals(expectedSkips, statistics.countFor(SKIP));
-        assertEquals(expectedCopies, statistics.countFor(COPY));
-        assertEquals(expectedConversions, statistics.countFor(CONVERT));
-        assertEquals(expectedDeletions, statistics.countFor(DELETE));
+        assertEquals(expectedSkips, statistics.countFor(SKIP_SOURCE));
+        assertEquals(expectedCopies, statistics.countFor(COPY_SOURCE));
+        assertEquals(expectedConversions, statistics.countFor(CONVERT_SOURCE));
+        assertEquals(expectedDeletions, statistics.countFor(DELETE_TARGET));
     }
 }

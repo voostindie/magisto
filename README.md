@@ -60,3 +60,5 @@ A template typically uses a *model* to base its output on. Magisto exposes the f
 ## Static content
 
 All files in `.static` are copied over to the target directory as is. This is where you can put your favicon, or the static content that you refer to from your template, like CSS, images, fonts, JavaScript and so on.
+
+Note: static content will **never** overwrite source content. Source content is considered more important and therefore always has precedence.

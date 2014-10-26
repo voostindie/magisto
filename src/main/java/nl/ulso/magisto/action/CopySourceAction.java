@@ -21,21 +21,22 @@ import nl.ulso.magisto.io.FileSystemAccessor;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import static nl.ulso.magisto.action.ActionType.COPY;
+import static nl.ulso.magisto.action.ActionCategory.SOURCE;
+import static nl.ulso.magisto.action.ActionType.COPY_SOURCE;
 import static nl.ulso.magisto.io.Paths.requireAbsolutePath;
 
 /**
  * Copies a file from the source root to the target root.
  */
-class CopyAction extends AbstractAction {
+class CopySourceAction extends AbstractAction {
 
-    CopyAction(Path path) {
-        super(path);
+    CopySourceAction(Path path) {
+        super(path, SOURCE);
     }
 
     @Override
     public ActionType getActionType() {
-        return COPY;
+        return COPY_SOURCE;
     }
 
     @Override

@@ -25,9 +25,11 @@ import static nl.ulso.magisto.io.Paths.requireRelativePath;
  */
 abstract class AbstractAction implements Action {
     private final Path path;
+    private final ActionCategory category;
 
-    AbstractAction(Path path) {
+    AbstractAction(Path path, ActionCategory category) {
         this.path = requireRelativePath(path);
+        this.category = category;
     }
 
     @Override
@@ -45,5 +47,10 @@ abstract class AbstractAction implements Action {
 
     public Path getPath() {
         return path;
+    }
+
+    @Override
+    public ActionCategory getActionCategory() {
+        return category;
     }
 }

@@ -27,7 +27,7 @@ import static org.pegdown.FastEncoder.encode;
 /**
  * Link renderer that converts links to Markdown files to links to their equivalent HTML files.
  */
-public class CustomLinkRenderer extends LinkRenderer {
+class CustomLinkRenderer extends LinkRenderer {
     @Override
     public Rendering render(ExpLinkNode node, String text) {
         Rendering rendering = new Rendering(resolveLink(node.url), text);

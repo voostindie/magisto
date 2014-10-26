@@ -28,21 +28,21 @@ public class RealActionFactoryTest {
 
     @Test
     public void testSkipAction() throws Exception {
-        assertNotNull(factory.skip(createPath("skip")));
+        assertNotNull(factory.skipSource(createPath("skip")));
     }
 
     @Test
     public void testCopyAction() throws Exception {
-        assertNotNull(factory.copy(createPath("copy")));
+        assertNotNull(factory.copySource(createPath("copy")));
     }
 
     @Test
     public void testDeleteAction() throws Exception {
-        assertNotNull(factory.copy(createPath("delete")));
+        assertNotNull(factory.copySource(createPath("delete")));
     }
 
     @Test
     public void testConvertAction() throws Exception {
-        assertNotNull(factory.convert(createPath("convert"), new DummyFileConverter()));
+        assertNotNull(factory.convertSource(createPath("convert"), new DummyFileConverter()));
     }
 }

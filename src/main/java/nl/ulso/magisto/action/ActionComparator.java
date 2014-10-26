@@ -20,12 +20,18 @@ import java.util.Comparator;
 
 /**
  * Comparator for {@link Action}s. It puts actions in order of type. If actions are of the same type, they are ordered
- * lexicographically on path, except for {@link DeleteAction}s. These are ordered in reverse.
+ * lexicographically on path, except for {@link DeleteTargetAction}s. These are ordered in reverse.
  */
-public class ActionComparator implements Comparator<Action> {
+class ActionComparator implements Comparator<Action> {
 
     private final Class[] actionClasses = new Class[]{
-            SkipAction.class, DeleteAction.class, CopyAction.class, ConvertAction.class};
+            SkipSourceAction.class,
+            DeleteTargetAction.class,
+            CopySourceAction.class,
+            ConvertSourceAction.class,
+            SkipStaticAction.class,
+            CopyStaticAction.class
+    };
 
     @Override
     public int compare(Action action1, Action action2) {
@@ -37,7 +43,7 @@ public class ActionComparator implements Comparator<Action> {
                 return 1;
             }
         }
-        if (action1 instanceof DeleteAction) {
+        if (action1 instanceof DeleteTargetAction) {
             return action2.getPath().compareTo(action1.getPath());
         }
         return action1.getPath().compareTo(action2.getPath());

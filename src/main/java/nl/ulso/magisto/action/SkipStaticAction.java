@@ -20,17 +20,28 @@ import nl.ulso.magisto.io.FileSystemAccessor;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static nl.ulso.magisto.action.ActionCategory.STATIC;
+import static nl.ulso.magisto.action.ActionType.SKIP_STATIC;
 
 /**
- * Represents an action to perform on a path
+ * Represents a no-op action, for a path that is skipped.
  */
-public interface Action {
+class SkipStaticAction extends AbstractAction {
 
-    Path getPath();
+    SkipStaticAction(Path path) {
+        super(path, STATIC);
+    }
 
-    ActionCategory getActionCategory();
+    @Override
+    public ActionType getActionType() {
+        return SKIP_STATIC;
+    }
 
-    ActionType getActionType();
-
-    void perform(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot) throws IOException;
+    @Override
+    public void perform(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot) throws IOException {
+        Logger.getGlobal().log(Level.INFO, String.format("Skipping static '%s'. No changes detected.", getPath()));
+    }
 }

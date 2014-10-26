@@ -24,17 +24,24 @@ public class DummyAction implements Action {
 
     private final DummyActionFactory factory;
     private final Path path;
+    private final ActionCategory category;
     private final ActionType type;
 
-    public DummyAction(DummyActionFactory factory, Path path, ActionType type) {
+    public DummyAction(DummyActionFactory factory, Path path, ActionCategory category, ActionType type) {
         this.factory = factory;
         this.path = path;
+        this.category = category;
         this.type = type;
     }
 
     @Override
     public Path getPath() {
         return path;
+    }
+
+    @Override
+    public ActionCategory getActionCategory() {
+        return category;
     }
 
     @Override
