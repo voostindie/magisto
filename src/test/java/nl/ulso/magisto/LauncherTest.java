@@ -87,13 +87,13 @@ public class LauncherTest {
     @Test
     public void testDefaultMagistoCreation() throws Exception {
         Launcher.setDummyMagistoForTesting(null);
-        final Magisto magisto = Launcher.createMagisto();
+        final Magisto magisto = Launcher.createMagisto(false);
         assertNotNull(magisto);
     }
 
     private static final class DummyMagisto extends Magisto {
         private DummyMagisto() {
-            super(new DummyFileSystemAccessor(), new DummyActionFactory(), new DummyFileConverterFactory());
+            super(false, new DummyFileSystemAccessor(), new DummyActionFactory(), new DummyFileConverterFactory());
         }
 
         @Override
@@ -104,7 +104,7 @@ public class LauncherTest {
 
     private static final class DummyMagistoWithIOException extends Magisto {
         private DummyMagistoWithIOException() {
-            super(new DummyFileSystemAccessor(), new DummyActionFactory(), new DummyFileConverterFactory());
+            super(false, new DummyFileSystemAccessor(), new DummyActionFactory(), new DummyFileConverterFactory());
         }
 
         @Override

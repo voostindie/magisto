@@ -20,30 +20,36 @@ import java.io.*;
 import java.nio.file.Path;
 import java.util.*;
 
+import static nl.ulso.magisto.io.DummyPathEntry.createPathEntry;
 import static nl.ulso.magisto.io.Paths.createPath;
 
 public class DummyFileSystemAccessor implements FileSystemAccessor {
 
-    private Recording recording;
+    private Path sourceRoot = null;
+    private Path staticRoot = null;
+    private Path targetRoot = null;
+    private String loggedCopies = "";
+    private String loggedDeletions = "";
+    private final Set<DummyPathEntry> sourcePaths = new HashSet<>();
+    private final Set<DummyPathEntry> staticPaths = new HashSet<>();
+    private final Set<DummyPathEntry> targetPaths = new HashSet<>();
+    private final Map<String, String> textFilesForReading = new HashMap<>();
+    private final Map<String, StringWriter> textFilesForWriting = new HashMap<>();
 
     public DummyFileSystemAccessor() {
-        clearRecordings();
-    }
-
-    public void clearRecordings() {
-        recording = new Recording();
+        this.sourceRoot = createPath("source").toAbsolutePath();
+        this.staticRoot = this.sourceRoot.resolve(".static");
+        this.targetRoot = createPath("target").toAbsolutePath();
     }
 
     @Override
     public Path resolveSourceDirectory(String directoryName) throws IOException {
-        recording.sourceRoot = createPath(directoryName).toAbsolutePath();
-        return recording.sourceRoot;
+        return sourceRoot;
     }
 
     @Override
     public Path prepareTargetDirectory(String directoryName) throws IOException {
-        recording.targetRoot = createPath(directoryName).toAbsolutePath();
-        return recording.targetRoot;
+        return targetRoot;
     }
 
     @Override
@@ -57,10 +63,12 @@ public class DummyFileSystemAccessor implements FileSystemAccessor {
     @Override
     public SortedSet<Path> findAllPaths(Path root) throws IOException {
         final SortedSet<Path> paths = new TreeSet<>();
-        if (root.equals(recording.sourceRoot)) {
-            addAllPaths(paths, recording.sourcePaths);
-        } else if (root.equals(recording.targetRoot)) {
-            addAllPaths(paths, recording.targetPaths);
+        if (root.equals(sourceRoot)) {
+            addAllPaths(paths, sourcePaths);
+        } else if (root.equals(staticRoot)) {
+            addAllPaths(paths, staticPaths);
+        } else if (root.equals(targetRoot)) {
+            addAllPaths(paths, targetPaths);
         }
         return paths;
     }
@@ -68,10 +76,14 @@ public class DummyFileSystemAccessor implements FileSystemAccessor {
     @Override
     public long getLastModifiedInMillis(Path path) throws IOException {
         final DummyPathEntry entry;
-        if (path.startsWith(recording.sourceRoot)) {
-            entry = findEntry(recording.sourceRoot.relativize(path), recording.sourcePaths);
+        if (path.startsWith(staticRoot)) {
+            entry = findEntry(staticRoot.relativize(path), staticPaths);
+        } else if (path.startsWith(sourceRoot)) {
+            entry = findEntry(sourceRoot.relativize(path), sourcePaths);
+        } else if (path.startsWith(targetRoot)) {
+            entry = findEntry(targetRoot.relativize(path), targetPaths);
         } else {
-            entry = findEntry(recording.targetRoot.relativize(path), recording.targetPaths);
+            entry = null;
         }
         return entry != null ? entry.getTimestamp() : -1;
     }
@@ -84,30 +96,36 @@ public class DummyFileSystemAccessor implements FileSystemAccessor {
 
     @Override
     public void copy(Path sourceRoot, Path targetRoot, Path path) throws IOException {
-        recording.loggedCopies += String.format("%s:%s -> %s%n",
-                sourceRoot.getFileName(), path, targetRoot.getFileName());
+        loggedCopies += String.format("%s:%s -> %s%n", sourceRoot.getFileName(), path, targetRoot.getFileName());
     }
 
     @Override
     public void delete(Path root, Path path) throws IOException {
-        recording.loggedDeletions += String.format("%s:%s%n", root.getFileName(), path);
+        loggedDeletions += String.format("%s:%s%n", root.getFileName(), path);
     }
 
     @Override
     public BufferedReader newBufferedReaderForTextFile(Path path) throws IOException {
-        return new BufferedReader(new StringReader(recording.textFilesForReading.get(path.getFileName().toString())));
+        return new BufferedReader(new StringReader(textFilesForReading.get(path.getFileName().toString())));
     }
 
     @Override
     public BufferedWriter newBufferedWriterForTextFile(Path path) throws IOException {
         final StringWriter writer = new StringWriter();
-        recording.textFilesForWriting.put(path.getFileName().toString(), writer);
+        textFilesForWriting.put(path.getFileName().toString(), writer);
         return new BufferedWriter(writer);
     }
 
     @Override
     public boolean exists(Path path) {
-        return recording.textFilesForReading.containsKey(path.getFileName().toString());
+        if (path.equals(staticRoot)) {
+            return !staticPaths.isEmpty();
+        }
+        if (path.startsWith(targetRoot)) {
+            return targetPaths.contains(createPathEntry(path));
+        }
+        return staticPaths.contains(createPathEntry(path))
+                || textFilesForReading.containsKey(path.getFileName().toString());
     }
 
     @Override
@@ -125,37 +143,30 @@ public class DummyFileSystemAccessor implements FileSystemAccessor {
     }
 
     public void addSourcePaths(DummyPathEntry... paths) {
-        recording.sourcePaths.addAll(Arrays.asList(paths));
+        sourcePaths.addAll(Arrays.asList(paths));
+    }
+
+    public void addStaticPaths(DummyPathEntry... paths) {
+        staticPaths.addAll(Arrays.asList(paths));
     }
 
     public void addTargetPaths(DummyPathEntry... paths) {
-        recording.targetPaths.addAll(Arrays.asList(paths));
+        targetPaths.addAll(Arrays.asList(paths));
     }
 
     public String getLoggedCopies() {
-        return recording.loggedCopies.trim();
+        return loggedCopies.trim();
     }
 
     public String getLoggedDeletions() {
-        return recording.loggedDeletions.trim();
+        return loggedDeletions.trim();
     }
 
     public void registerTextFileForBufferedReader(String fileName, String content) {
-        recording.textFilesForReading.put(fileName, content);
+        textFilesForReading.put(fileName, content);
     }
 
     public String getTextFileFromBufferedWriter(String fileName) {
-        return recording.textFilesForWriting.get(fileName).toString();
-    }
-
-    private class Recording {
-        private Path sourceRoot = null;
-        private Path targetRoot = null;
-        private String loggedCopies = "";
-        private String loggedDeletions = "";
-        private final Set<DummyPathEntry> sourcePaths = new HashSet<>();
-        private final Set<DummyPathEntry> targetPaths = new HashSet<>();
-        private final Map<String, String> textFilesForReading = new HashMap<>();
-        private final Map<String, StringWriter> textFilesForWriting = new HashMap<>();
+        return textFilesForWriting.get(fileName).toString();
     }
 }

@@ -35,12 +35,14 @@ import java.util.SortedSet;
 class Magisto {
     private static final String STATIC_CONTENT_DIRECTORY = ".static";
 
+    private final boolean forceOverwrite;
     private final FileSystemAccessor fileSystemAccessor;
     private final ActionFactory actionFactory;
     private final FileConverterFactory fileConverterFactory;
 
-    public Magisto(FileSystemAccessor fileSystemAccessor, ActionFactory actionFactory,
+    public Magisto(boolean forceOverwrite, FileSystemAccessor fileSystemAccessor, ActionFactory actionFactory,
                    FileConverterFactory fileConverterFactory) {
+        this.forceOverwrite = forceOverwrite;
         this.fileSystemAccessor = fileSystemAccessor;
         this.actionFactory = actionFactory;
         this.fileConverterFactory = fileConverterFactory;
@@ -99,7 +101,7 @@ class Magisto {
             final int comparison = compareNullablePaths(source, target, fileConverter);
 
             if (comparison == 0) { // Corresponding source and target
-                if (isSourceNewerThanTarget(sourceRoot.resolve(source), targetRoot.resolve(target))) {
+                if (forceOverwrite || isSourceNewerThanTarget(sourceRoot.resolve(source), targetRoot.resolve(target))) {
                     addActionOnSource(actions, source, fileConverter); // Source is newer, so replace target
                 } else {
                     actions.addSkipSourceAction(source);
@@ -126,7 +128,7 @@ class Magisto {
         final SortedSet<Path> staticPaths = fileSystemAccessor.findAllPaths(staticRoot);
         for (Path staticPath : staticPaths) {
             final Path targetPath = targetRoot.resolve(staticPath);
-            if (fileSystemAccessor.notExists(targetPath)
+            if (forceOverwrite || fileSystemAccessor.notExists(targetPath)
                     || isSourceNewerThanTarget(staticRoot.resolve(staticPath), targetPath)) {
                 actions.addCopyStaticAction(staticPath, STATIC_CONTENT_DIRECTORY);
             } else {

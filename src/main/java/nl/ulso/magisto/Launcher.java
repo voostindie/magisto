@@ -49,7 +49,7 @@ public class Launcher {
         try {
             final Options options = parseProgramOptions(arguments);
             final String sourceDirectory = resolveSourceDirectory(options);
-            final Magisto magisto = createMagisto();
+            final Magisto magisto = createMagisto(options.isForceOverwrite());
             run(magisto, sourceDirectory, options.getTargetDirectory());
         } catch (RuntimeException e) {
             System.exit(-1);
@@ -80,11 +80,12 @@ public class Launcher {
         }
     }
 
-    static Magisto createMagisto() {
+    static Magisto createMagisto(boolean forceOverwrite) {
         if (DUMMY_MAGISTO != null) {
             return DUMMY_MAGISTO;
         }
-        return new Magisto(new RealFileSystemAccessor(), new RealActionFactory(), new RealFileConverterFactory());
+        return new Magisto(forceOverwrite, new RealFileSystemAccessor(), new RealActionFactory(),
+                new RealFileConverterFactory());
     }
 
     private static void run(Magisto magisto, String sourceDirectory, String targetDirectory) {

@@ -30,6 +30,9 @@ interface Options {
     @Option(shortName = "t", longName = "target", description = "Target directory")
     String getTargetDirectory();
 
+    @Option(shortName = "f", longName = "force", description = "Forces overwriting of files that would be skipped otherwise")
+    boolean isForceOverwrite();
+
     @Option(shortName = "h", longName = "help", description = "Show this help text", helpRequest = true)
-    boolean getHelp();
+    boolean isHelp();
 }

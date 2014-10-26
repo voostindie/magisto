@@ -22,12 +22,15 @@ Run Magisto with the `-h` or `--help` command line argument to get something lik
 
 ```raw
 The options available are:
+	[--force -f] : Forces overwriting
 	[--help -h]
 	[--source -s value] : Source directory
 	--target -t value : Target directory
 ```
 
 The source directory is an optional argument and defaults to the current one.
+
+The `-f` flag enforces that files that would normally be skipped are also processed. This can be useful in some edge cases, like when you've changed the custom page template. You shouldn't need it for day to day usage.
 
 When executed with valid arguments, Magisto:
 
@@ -37,7 +40,7 @@ When executed with valid arguments, Magisto:
     * Files that haven't changed since the last run aren't touched.
     * Files that are no longer in the source directory are removed from the target directory.
 
-That's about it.
+That's about it. Excepting some add-ons. See below.
 
 ## Configuration
 

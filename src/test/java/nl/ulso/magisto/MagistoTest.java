@@ -31,87 +31,138 @@ import static org.junit.Assert.assertEquals;
 
 public class MagistoTest {
 
-    private final DummyFileSystemAccessor accessor = new DummyFileSystemAccessor();
-    private final DummyActionFactory actionFactory = new DummyActionFactory();
-    private final DummyFileConverterFactory fileConverterFactory = new DummyFileConverterFactory();
-    private final Magisto magisto = new Magisto(accessor, actionFactory, fileConverterFactory);
+    private DummyFileSystemAccessor accessor;
+    private DummyActionFactory actionFactory;
+    private DummyFileConverterFactory fileConverterFactory;
+    private Magisto magisto;
 
     @Before
     public void setUp() throws Exception {
-        accessor.clearRecordings();
-        actionFactory.clearRecordings();
+        accessor = new DummyFileSystemAccessor();
+        actionFactory = new DummyActionFactory();
+        fileConverterFactory = new DummyFileConverterFactory();
+        magisto = new Magisto(false, accessor, actionFactory, fileConverterFactory);
     }
 
     @Test
     public void testEmptySourceEmptyTarget() throws Exception {
-        runTest(0, 0, 0, 0);
+        runTest(0, 0, 0, 0, 0, 0);
     }
 
     @Test
     public void testNormalFileEmptyTargetDirectory() throws Exception {
         accessor.addSourcePaths(createPathEntry("file.jpg"));
-        runTest(0, 1, 0, 0);
+        runTest(0, 1, 0, 0, 0, 0);
     }
 
     @Test
     public void testConversionFileEmptyTargetDirectory() throws Exception {
         accessor.addSourcePaths(createPathEntry("file.convert"));
-        runTest(0, 0, 1, 0);
+        runTest(0, 0, 1, 0, 0, 0);
     }
 
     @Test
     public void testUnknownFileInTargetDirectory() throws Exception {
         accessor.addTargetPaths(createPathEntry("file.jpg"));
-        runTest(0, 0, 0, 1);
+        runTest(0, 0, 0, 1, 0, 0);
     }
 
     @Test
-    public void testFilesExistNoChangesDetected() throws Exception {
+    public void testStaticFileEmptyTargetDirectory() throws Exception {
+        accessor.addStaticPaths(createPathEntry("file.jpg"));
+        runTest(0, 0, 0, 0, 0, 1);
+    }
+
+    @Test
+    public void testNormalFilesExistNoChangesDetected() throws Exception {
         final DummyPathEntry file1 = createPathEntry("foo.txt");
         final DummyPathEntry file2 = createPathEntry("bar.jpg");
         accessor.addSourcePaths(file1, file2);
         accessor.addTargetPaths(file1, file2);
-        runTest(2, 0, 0, 0);
+        runTest(2, 0, 0, 0, 0, 0);
+    }
+
+    @Test
+    public void testStaticFilesExistNoChangesDetected() throws Exception {
+        final DummyPathEntry file1 = createPathEntry("foo.txt");
+        final DummyPathEntry file2 = createPathEntry("bar.jpg");
+        accessor.addStaticPaths(file1, file2);
+        accessor.addTargetPaths(file1, file2);
+        runTest(0, 0, 0, 0, 2, 0);
     }
 
     @Test
     public void testMultipleSourceAndTargetFiles() throws Exception {
-        final DummyPathEntry sameFile1 = createPathEntry("foo.txt");
-        final DummyPathEntry sameFile2 = createPathEntry("bar.jpg");
+        prepareMultipleSourceAndTargetFiles();
+        runTest(
+                2, // sameFile1, sameFile2
+                1, // baz.txt
+                2, // foo.convert/foo.convert.converted, bar.convert
+                1, // deleteTarget.me
+                1, // .static/favicon.ico
+                1  // .static/image.jpg
+        );
+    }
+
+    @Test
+    public void testMultipleSourceAndTargetFilesWithForcedOverwrite() throws Exception {
+        magisto = new Magisto(true, accessor, actionFactory, fileConverterFactory);
+        prepareMultipleSourceAndTargetFiles();
+        runTest(
+                0, // no skips: forced overwrite
+                3, // sameFile1, sameFile2, baz.txt
+                2, // foo.convert/foo.convert.converted, bar.convert
+                1, // deleteTarget.me
+                0, // no skips: forced overwrite
+                2  // .static/favicon.ico, .static/image.jpg
+        );
+    }
+
+    private void prepareMultipleSourceAndTargetFiles() throws InterruptedException {
+        final DummyPathEntry sameSourceFile1 = createPathEntry("foo.txt");
+        final DummyPathEntry sameSourceFile2 = createPathEntry("bar.jpg");
+        final DummyPathEntry sameStaticFile = createPathEntry("favicon.ico");
         accessor.addTargetPaths(
-                sameFile1,
-                sameFile2,
+                sameSourceFile1,
+                sameSourceFile2,
+                sameStaticFile,
                 createPathEntry("baz.txt"),
                 createPathEntry("foo.convert.converted"),
                 createPathEntry("delete.me")
         );
         TimeUnit.SECONDS.sleep(1);
         accessor.addSourcePaths(
-                sameFile1,
-                sameFile2,
+                sameSourceFile1,
+                sameSourceFile2,
                 createPathEntry("baz.txt"), // Same path, different timestamp: this one is newer
                 createPathEntry("foo.convert"),
                 createPathEntry("bar.convert")
         );
-        runTest(
-                2, // sameFile1, sameFile2
-                1, // baz.txt
-                2, // foo.convert/foo.convert.converted, bar.convert
-                1  // deleteTarget.me
+        accessor.addStaticPaths(
+                sameStaticFile,
+                createPathEntry("image.jpg")
         );
+
     }
 
-    private void runTest(int expectedSkips, int expectedCopies, int expectedConversions, int expectedDeletions) throws Exception {
+    private void runTest(int expectedSourceSkips, int expectedSourceCopies, int expectedSourceConversions,
+                         int expectedTargetDeletions, int expectedStaticSkips, int expectedStaticCopies)
+            throws Exception {
         final Statistics statistics = magisto.run("source", "target");
+        statistics.print(System.out);
         // Number of actions performed must match up:
-        assertEquals(expectedSkips, actionFactory.countFor(SKIP_SOURCE));
-        assertEquals(expectedCopies, actionFactory.countFor(COPY_SOURCE));
-        assertEquals(expectedConversions, actionFactory.countFor(CONVERT_SOURCE));
-        assertEquals(expectedDeletions, actionFactory.countFor(DELETE_TARGET));
+        assertEquals(expectedSourceSkips, actionFactory.countFor(SKIP_SOURCE));
+        assertEquals(expectedSourceCopies, actionFactory.countFor(COPY_SOURCE));
+        assertEquals(expectedSourceConversions, actionFactory.countFor(CONVERT_SOURCE));
+        assertEquals(expectedTargetDeletions, actionFactory.countFor(DELETE_TARGET));
+        assertEquals(expectedStaticSkips, actionFactory.countFor(SKIP_STATIC));
+        assertEquals(expectedStaticCopies, actionFactory.countFor(COPY_STATIC));
         // Statistics must match the number of actions performed
-        assertEquals(expectedSkips, statistics.countFor(SKIP_SOURCE));
-        assertEquals(expectedCopies, statistics.countFor(COPY_SOURCE));
-        assertEquals(expectedConversions, statistics.countFor(CONVERT_SOURCE));
-        assertEquals(expectedDeletions, statistics.countFor(DELETE_TARGET));
+        assertEquals(expectedSourceSkips, statistics.countFor(SKIP_SOURCE));
+        assertEquals(expectedSourceCopies, statistics.countFor(COPY_SOURCE));
+        assertEquals(expectedSourceConversions, statistics.countFor(CONVERT_SOURCE));
+        assertEquals(expectedTargetDeletions, statistics.countFor(DELETE_TARGET));
+        assertEquals(expectedStaticSkips, statistics.countFor(SKIP_STATIC));
+        assertEquals(expectedStaticCopies, statistics.countFor(COPY_STATIC));
     }
 }
