@@ -53,7 +53,7 @@ public class LocalLinkRewriteDirective implements TemplateDirectiveModel {
             throw new TemplateException("Expected a SimpleScalar. Got a(n) " + parameter.getClass().getSimpleName(),
                     environment);
         }
-        final String link= ((SimpleScalar) parameter).getAsString();
+        final String link = ((SimpleScalar) parameter).getAsString();
         final Path filePath = (Path) ((StringModel) environment.getDataModel().get(MODEL_PARAMETER_NAME)).getWrappedObject();
         final Writer writer = environment.getOut();
         writer.write(rewriteLink(filePath, link));
@@ -61,11 +61,16 @@ public class LocalLinkRewriteDirective implements TemplateDirectiveModel {
 
     String rewriteLink(Path filePath, String link) {
         final StringBuilder rewrite = new StringBuilder();
-        for (int i = 0; i < filePath.getNameCount() - 1; i++) {
-            if (i > 0) {
-                rewrite.append(SLASH);
+        final int pathParts = filePath.getNameCount() - 1;
+        if (pathParts == 0) {
+            rewrite.append(".");
+        } else {
+            for (int i = 0; i < pathParts; i++) {
+                if (i > 0) {
+                    rewrite.append(SLASH);
+                }
+                rewrite.append(SUPER);
             }
-            rewrite.append(SUPER);
         }
         if (!link.startsWith(SLASH)) {
             rewrite.append(SLASH);

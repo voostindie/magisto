@@ -34,13 +34,13 @@ public class LocalLinkRewriteDirectiveTest {
     @Test
     public void testLinkRewriteWithFileInRoot() throws Exception {
         final String link = directive.rewriteLink(createPath("test.md"), "/favicon.ico");
-        assertEquals("/favicon.ico", link);
+        assertEquals("./favicon.ico", link);
     }
 
     @Test
     public void testLinkRewriteWithFileInRootNoForwardSlash() throws Exception {
         final String link = directive.rewriteLink(createPath("test.md"), "favicon.ico");
-        assertEquals("/favicon.ico", link);
+        assertEquals("./favicon.ico", link);
     }
 
     @Test

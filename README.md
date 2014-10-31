@@ -65,7 +65,7 @@ A template typically uses a *model* to base its output on. Magisto exposes the f
 If you need to generate a link to a local file in your template, for example to your favicon, use the custom `link` directive that Magisto provides. For example:
 
 ```html
-<link rel="icon"  href="<@link "/static/favicon.png"/>">
+<link rel="icon"  href="<@link path="/static/favicon.png"/>">
 ```
 
 This ensures that the link will always resolve correctly, independent of how deep the Markdown file being processed is in the source directory structure. (In other words: if the Markdown file is for example two levels deep, then the link will be prefixed with "`../..`".) By processing links in this manner, it doesn't matter where you put the output on your web server; the links will always resolve correctly.
