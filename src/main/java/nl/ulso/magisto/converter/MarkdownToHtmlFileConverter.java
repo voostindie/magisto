@@ -106,7 +106,8 @@ class MarkdownToHtmlFileConverter implements FileConverter {
             final Map<String, Object> model = createPageModel(path, markdownText);
             template.process(model, writer);
         } catch (TemplateException e) {
-            throw new RuntimeException("Error in built-in FreeMarker template", e);
+            Logger.getGlobal().log(Level.SEVERE, String.format("There was a problem in your custom page template. " +
+                    "All converted pages are probably broken! The cause: %s", e.getMessage()), e);
         }
     }
 
