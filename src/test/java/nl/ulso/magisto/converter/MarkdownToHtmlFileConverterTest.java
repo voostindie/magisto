@@ -97,7 +97,6 @@ public class MarkdownToHtmlFileConverterTest {
 
     @Test
     public void testConvertMarkdownFile() throws Exception {
-        final DummyFileSystemAccessor fileSystemAccessor = new DummyFileSystemAccessor();
         fileSystemAccessor.registerTextFileForBufferedReader("test.md", String.format("# Title%n%nParagraph"));
         fileConverter.convert(fileSystemAccessor, createPath("."), createPath("."), createPath("test.md"));
         final String output = fileSystemAccessor.getTextFileFromBufferedWriter("test.html");
@@ -149,5 +148,16 @@ public class MarkdownToHtmlFileConverterTest {
         final Template template = fileConverter.loadTemplate(fileSystemAccessor, sourcePath);
         assertNotNull(template);
         assertEquals(".page.ftl", template.getName());
+    }
+
+    @Test
+    public void testConvertLocalLinkInTemplate() throws Exception {
+        fileSystemAccessor.addSourcePaths(createPathEntry(".page.ftl"));
+        fileSystemAccessor.registerTextFileForBufferedReader(".page.ftl", "<@link path=\"/static/favicon.ico\"/>");
+        fileSystemAccessor.registerTextFileForBufferedReader("test.md", String.format("# Title%n%nParagraph"));
+        this.fileConverter = new MarkdownToHtmlFileConverter(fileSystemAccessor, createPath("."));
+        fileConverter.convert(fileSystemAccessor, createPath("."), createPath("."), createPath("dir", "test.md"));
+        final String output = fileSystemAccessor.getTextFileFromBufferedWriter("test.html");
+        assertEquals("../static/favicon.ico", output);
     }
 }

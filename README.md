@@ -12,6 +12,8 @@ If your ambitions reach beyond these plain goals, then Magisto is not the tool f
 
 At the company I work for there are a lot of Git repositories containing documentation in Markdown format. Although our Git repository manager ([Stash](http://www.atlassian.com/stash)) has a web-based viewer that nicely renders Markdown as HTML, that interface is too complex for most audiences. Most users want to view the documentation without distractions (files, directories, commits, branches, tags, diffs... WTF?!).
 
+By running Magisto on those Git repositories and sticking the output on a web server, we get distraction-free documentation.
+
 ## Installation
 
 Magisto requires Java 7 or later. It's a fat JAR, so once downloaded you can execute it directly, with `java -jar magisto-<VERSION>.jar`.
@@ -49,7 +51,7 @@ You can configure Magisto in two ways:
 1. By supplying a custom page template.
 2. By adding additional static content to the output.
 
-## Custom template
+### Custom template
 
 To transform Markdown to HTML, Magisto uses a FreeMarker template. By default Magisto uses one that is built-in. If you want to create your own, you can. Just name it `.page.ftl` and put it in the root of the source directory.
 
@@ -60,7 +62,15 @@ A template typically uses a *model* to base its output on. Magisto exposes the f
 * `title` (`java.lang.String`): the title of the page. This is the text of the first header (atx-style).
 * `content` (`java.lang.String`): the contents of the page. This is the converted Markdown content, already in HTML.
 
-## Static content
+If you need to generate a link to a local file in your template, for example to your favicon, use the custom `link` directive that Magisto provides. For example:
+
+```html
+<link rel="icon"  href="<@link "/static/favicon.png"/>">
+```
+
+This ensures that the link will always resolve correctly, independent of how deep the Markdown file being processed is in the source directory structure. (In other words: if the Markdown file is for example two levels deep, then the link will be prefixed with "`../..`".) By processing links in this manner, it doesn't matter where you put the output on your web server; the links will always resolve correctly.
+
+### Static content
 
 All files in `.static` are copied over to the target directory as is. This is where you can put your favicon, or the static content that you refer to from your template, like CSS, images, fonts, JavaScript and so on.
 

@@ -64,6 +64,7 @@ class MarkdownToHtmlFileConverter implements FileConverter {
         final Configuration configuration = new Configuration(Configuration.VERSION_2_3_21);
         configuration.setDefaultEncoding("UTF-8");
         configuration.setDateTimeFormat("long");
+        configuration.setSharedVariable("link", new LocalLinkRewriteDirective());
         if (fileSystemAccessor.exists(sourceRoot.resolve(CUSTOM_PAGE_TEMPLATE))) {
             configuration.setTemplateLoader(new CustomTemplateLoader(fileSystemAccessor, sourceRoot));
             return configuration.getTemplate(CUSTOM_PAGE_TEMPLATE);

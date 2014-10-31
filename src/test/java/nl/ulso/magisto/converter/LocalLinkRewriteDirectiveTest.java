@@ -1,0 +1,57 @@
+/*
+ * Copyright 2014 Vincent Oostindie
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
+ */
+
+package nl.ulso.magisto.converter;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import static nl.ulso.magisto.io.Paths.createPath;
+import static org.junit.Assert.*;
+
+public class LocalLinkRewriteDirectiveTest {
+
+    private LocalLinkRewriteDirective directive;
+
+    @Before
+    public void setUp() throws Exception {
+        directive = new LocalLinkRewriteDirective();
+    }
+
+    @Test
+    public void testLinkRewriteWithFileInRoot() throws Exception {
+        final String link = directive.rewriteLink(createPath("test.md"), "/favicon.ico");
+        assertEquals("/favicon.ico", link);
+    }
+
+    @Test
+    public void testLinkRewriteWithFileInRootNoForwardSlash() throws Exception {
+        final String link = directive.rewriteLink(createPath("test.md"), "favicon.ico");
+        assertEquals("/favicon.ico", link);
+    }
+
+    @Test
+    public void testLinkRewriteWithFileInSubdirectory1() throws Exception {
+        final String link = directive.rewriteLink(createPath("dir", "test.md"), "/favicon.ico");
+        assertEquals("../favicon.ico", link);
+    }
+
+    @Test
+    public void testLinkRewriteWithFileInSubdirectory2() throws Exception {
+        final String link = directive.rewriteLink(createPath("dir1", "dir2", "test.md"), "/favicon.ico");
+        assertEquals("../../favicon.ico", link);
+    }
+}
