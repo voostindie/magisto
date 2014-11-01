@@ -52,7 +52,11 @@ class MarkdownToHtmlFileConverter implements FileConverter {
 
     MarkdownToHtmlFileConverter(FileSystemAccessor fileSystemAccessor, Path sourceRoot) {
         try {
-            template = loadTemplate(fileSystemAccessor, sourceRoot);
+            if (isCustomTemplateAvailable(fileSystemAccessor, sourceRoot)) {
+                template = loadCustomTemplate(fileSystemAccessor, sourceRoot);
+            } else {
+                template = loadDefaultTemplate();
+            }
         } catch (IOException e) {
             throw new RuntimeException("Could not load built-in template", e);
         }
@@ -60,18 +64,41 @@ class MarkdownToHtmlFileConverter implements FileConverter {
         linkRenderer = new CustomLinkRenderer();
     }
 
-    Template loadTemplate(FileSystemAccessor fileSystemAccessor, Path sourceRoot) throws IOException {
+    boolean isCustomTemplateAvailable(FileSystemAccessor fileSystemAccessor, Path sourceRoot) {
+        return fileSystemAccessor.exists(sourceRoot.resolve(CUSTOM_PAGE_TEMPLATE));
+    }
+
+    Template loadDefaultTemplate() throws IOException {
+        Configuration configuration = createTemplateConfiguration();
+        configuration.setClassForTemplateLoading(MarkdownToHtmlFileConverter.class, TEMPLATE_PATH);
+        return configuration.getTemplate(DEFAULT_PAGE_TEMPLATE);
+
+    }
+
+    Template loadCustomTemplate(FileSystemAccessor fileSystemAccessor, Path sourceRoot) throws IOException {
+        Configuration configuration = createTemplateConfiguration();
+        configuration.setTemplateLoader(new CustomTemplateLoader(fileSystemAccessor, sourceRoot));
+        return configuration.getTemplate(CUSTOM_PAGE_TEMPLATE);
+    }
+
+    private Configuration createTemplateConfiguration() {
         final Configuration configuration = new Configuration(Configuration.VERSION_2_3_21);
         configuration.setDefaultEncoding("UTF-8");
         configuration.setDateTimeFormat("long");
         configuration.setSharedVariable("link", new LocalLinkRewriteDirective());
-        if (fileSystemAccessor.exists(sourceRoot.resolve(CUSTOM_PAGE_TEMPLATE))) {
-            configuration.setTemplateLoader(new CustomTemplateLoader(fileSystemAccessor, sourceRoot));
-            return configuration.getTemplate(CUSTOM_PAGE_TEMPLATE);
-        } else {
-            configuration.setClassForTemplateLoading(MarkdownToHtmlFileConverter.class, TEMPLATE_PATH);
-            return configuration.getTemplate(DEFAULT_PAGE_TEMPLATE);
+        return configuration;
+    }
+
+    @Override
+    public boolean isCustomTemplateChanged(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot)
+            throws IOException {
+        if (isCustomTemplateAvailable(fileSystemAccessor, sourceRoot)) {
+            final long touchFileTimestamp = fileSystemAccessor.getTouchFileLastModifiedInMillis(targetRoot);
+            final long customTemplateTimestamp = fileSystemAccessor.getLastModifiedInMillis(
+                    sourceRoot.resolve(CUSTOM_PAGE_TEMPLATE));
+            return customTemplateTimestamp > touchFileTimestamp;
         }
+        return false;
     }
 
     @Override

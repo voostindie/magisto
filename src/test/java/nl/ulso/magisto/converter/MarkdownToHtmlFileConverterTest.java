@@ -136,7 +136,7 @@ public class MarkdownToHtmlFileConverterTest {
 
     @Test
     public void testLoadDefaultTemplate() throws Exception {
-        Template template = fileConverter.loadTemplate(fileSystemAccessor, sourcePath);
+        Template template = fileConverter.loadDefaultTemplate();
         assertNotNull(template);
         assertEquals("page_template.ftl", template.getName());
     }
@@ -145,7 +145,7 @@ public class MarkdownToHtmlFileConverterTest {
     public void testLoadCustomTemplate() throws Exception {
         fileSystemAccessor.addSourcePaths(createPathEntry(".page.ftl"));
         fileSystemAccessor.registerTextFileForBufferedReader(".page.ftl", "CUSTOM TEMPLATE");
-        final Template template = fileConverter.loadTemplate(fileSystemAccessor, sourcePath);
+        final Template template = fileConverter.loadCustomTemplate(fileSystemAccessor, sourcePath);
         assertNotNull(template);
         assertEquals(".page.ftl", template.getName());
     }

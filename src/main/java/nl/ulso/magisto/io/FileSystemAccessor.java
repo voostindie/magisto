@@ -87,18 +87,25 @@ public interface FileSystemAccessor {
     /**
      * Ensures that the source and target directories do not overlap
      *
-     * @param sourceDirectory Source directory, must be a real path
-     * @param targetDirectory Target directory, must be a real path
+     * @param sourceRoot Source directory, must be a real path
+     * @param targetRoot Target directory, must be a real path
      * @throws IOException If the directories overlap.
      */
-    void requireDistinct(Path sourceDirectory, Path targetDirectory) throws IOException;
+    void requireDistinct(Path sourceRoot, Path targetRoot) throws IOException;
 
     /**
      * Writes the {@value #MAGISTO_EXPORT_MARKER_FILE} to the directory.
      *
-     * @param directory Directory, must be a real path.
+     * @param targetRoot Directory, must be a real path.
      */
-    void writeTouchFile(Path directory) throws IOException;
+    void writeTouchFile(Path targetRoot) throws IOException;
+
+    /**
+     * @param targetRoot Target directory, must be a real path;
+     * @return The last modified timestamp of the touch file, or {@value -1} if the file doesn't exist.
+     * @throws IOException If an exception occurred with accessing the touch file.
+     */
+    long getTouchFileLastModifiedInMillis(Path targetRoot) throws IOException;
 
     /**
      * @param root Directory to find all paths in.

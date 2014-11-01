@@ -53,11 +53,16 @@ public class DummyFileSystemAccessor implements FileSystemAccessor {
     }
 
     @Override
-    public void requireDistinct(Path sourceDirectory, Path targetDirectory) throws IOException {
+    public void requireDistinct(Path sourceRoot, Path targetRoot) throws IOException {
     }
 
     @Override
-    public void writeTouchFile(Path directory) throws IOException {
+    public void writeTouchFile(Path targetRoot) throws IOException {
+    }
+
+    @Override
+    public long getTouchFileLastModifiedInMillis(Path targetRoot) throws IOException {
+        return -1;
     }
 
     @Override

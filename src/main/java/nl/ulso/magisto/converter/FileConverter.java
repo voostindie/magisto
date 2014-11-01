@@ -36,4 +36,6 @@ public interface FileConverter {
     Path getConvertedFileName(Path path);
 
     void convert(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot, Path path) throws IOException;
+
+    boolean isCustomTemplateChanged(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot) throws IOException;
 }

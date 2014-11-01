@@ -84,24 +84,33 @@ public class RealFileSystemAccessor implements FileSystemAccessor {
     }
 
     @Override
-    public void requireDistinct(Path sourceDirectory, Path targetDirectory) throws IOException {
-        requireAbsolutePath(sourceDirectory);
-        requireAbsolutePath(targetDirectory);
-        if (targetDirectory.startsWith(sourceDirectory)) {
+    public void requireDistinct(Path sourceRoot, Path targetRoot) throws IOException {
+        requireAbsolutePath(sourceRoot);
+        requireAbsolutePath(targetRoot);
+        if (targetRoot.startsWith(sourceRoot)) {
             throw new IOException("The target directory may not be inside the source directory");
         }
-        if (sourceDirectory.startsWith(targetDirectory)) {
+        if (sourceRoot.startsWith(targetRoot)) {
             throw new IOException("The source directory may not be inside the target directory");
         }
     }
 
     @Override
-    public void writeTouchFile(Path directory) throws IOException {
-        final Path touchFile = requireAbsolutePath(directory).resolve(MAGISTO_EXPORT_MARKER_FILE);
+    public void writeTouchFile(Path targetRoot) throws IOException {
+        final Path touchFile = requireAbsolutePath(targetRoot).resolve(MAGISTO_EXPORT_MARKER_FILE);
         if (Files.exists(touchFile)) {
             Files.delete(touchFile);
         }
         Files.createFile(touchFile);
+    }
+
+    @Override
+    public long getTouchFileLastModifiedInMillis(Path targetRoot) throws IOException {
+        final Path touchFile = requireAbsolutePath(targetRoot).resolve(MAGISTO_EXPORT_MARKER_FILE);
+        if (Files.notExists(touchFile)) {
+            return -1;
+        }
+        return Files.getLastModifiedTime(touchFile).toMillis();
     }
 
     @Override

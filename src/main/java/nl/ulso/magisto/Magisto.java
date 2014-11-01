@@ -35,14 +35,14 @@ import java.util.SortedSet;
 class Magisto {
     private static final String STATIC_CONTENT_DIRECTORY = ".static";
 
-    private final boolean forceOverwrite;
+    private final boolean forceCopy;
     private final FileSystemAccessor fileSystemAccessor;
     private final ActionFactory actionFactory;
     private final FileConverterFactory fileConverterFactory;
 
     public Magisto(boolean forceOverwrite, FileSystemAccessor fileSystemAccessor, ActionFactory actionFactory,
                    FileConverterFactory fileConverterFactory) {
-        this.forceOverwrite = forceOverwrite;
+        this.forceCopy = forceOverwrite;
         this.fileSystemAccessor = fileSystemAccessor;
         this.actionFactory = actionFactory;
         this.fileConverterFactory = fileConverterFactory;
@@ -92,6 +92,8 @@ class Magisto {
      */
     private void addSourceActions(ActionSet actions, Path sourceRoot, Path targetRoot) throws IOException {
         final FileConverter fileConverter = fileConverterFactory.create(fileSystemAccessor, sourceRoot);
+        final boolean forceConvert = forceCopy
+                || fileConverter.isCustomTemplateChanged(fileSystemAccessor, sourceRoot, targetRoot);
         final Iterator<Path> sources = fileSystemAccessor.findAllPaths(sourceRoot).iterator();
         final Iterator<Path> targets = fileSystemAccessor.findAllPaths(targetRoot).iterator();
 
@@ -101,8 +103,16 @@ class Magisto {
             final int comparison = compareNullablePaths(source, target, fileConverter);
 
             if (comparison == 0) { // Corresponding source and target
-                if (forceOverwrite || isSourceNewerThanTarget(sourceRoot.resolve(source), targetRoot.resolve(target))) {
-                    addActionOnSource(actions, source, fileConverter); // Source is newer, so replace target
+                if (isSourceNewerThanTarget(sourceRoot.resolve(source), targetRoot.resolve(target))) {
+                    if (fileConverter.supports(source)) {
+                        actions.addConvertSourceAction(source, fileConverter);
+                    } else {
+                        actions.addCopySourceAction(source);
+                    }
+                } else if (forceConvert && fileConverter.supports(source)) {
+                    actions.addConvertSourceAction(source, fileConverter);
+                } else if (forceCopy) {
+                    actions.addCopySourceAction(source);
                 } else {
                     actions.addSkipSourceAction(source);
                 }
@@ -110,7 +120,11 @@ class Magisto {
                 target = nullableNext(targets);
 
             } else if (comparison < 0) { // Source exists, no corresponding target
-                addActionOnSource(actions, source, fileConverter);
+                if (fileConverter.supports(source)) {
+                    actions.addConvertSourceAction(source, fileConverter);
+                } else {
+                    actions.addCopySourceAction(source);
+                }
                 source = nullableNext(sources);
 
             } else if (comparison > 0) { // Target exists, no corresponding source
@@ -128,7 +142,7 @@ class Magisto {
         final SortedSet<Path> staticPaths = fileSystemAccessor.findAllPaths(staticRoot);
         for (Path staticPath : staticPaths) {
             final Path targetPath = targetRoot.resolve(staticPath);
-            if (forceOverwrite || fileSystemAccessor.notExists(targetPath)
+            if (forceCopy || fileSystemAccessor.notExists(targetPath)
                     || isSourceNewerThanTarget(staticRoot.resolve(staticPath), targetPath)) {
                 actions.addCopyStaticAction(staticPath, STATIC_CONTENT_DIRECTORY);
             } else {
@@ -152,14 +166,6 @@ class Magisto {
             return fileConverter.getConvertedFileName(source).compareTo(target);
         }
         return source.compareTo(target);
-    }
-
-    private void addActionOnSource(ActionSet actions, Path source, FileConverter fileConverter) {
-        if (fileConverter.supports(source)) {
-            actions.addConvertSourceAction(source, fileConverter);
-        } else {
-            actions.addCopySourceAction(source);
-        }
     }
 
     private boolean isSourceNewerThanTarget(Path sourcePath, Path targetPath) throws IOException {

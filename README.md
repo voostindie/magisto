@@ -32,7 +32,7 @@ The options available are:
 
 The source directory is an optional argument and defaults to the current one.
 
-The `-f` flag enforces that files that would normally be skipped are also processed. This can be useful in some edge cases, like when you've changed the custom page template. You shouldn't need it for day to day usage.
+The `-f` flag enforces that files that would normally be skipped are also processed. This can be useful in some edge cases. You shouldn't need it for day to day usage. There's no need to set this flag after you've changed the custom template, because then Magisto will automatically re-convert all Markdown files.
 
 When executed with valid arguments, Magisto:
 
