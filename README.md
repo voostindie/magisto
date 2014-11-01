@@ -14,11 +14,17 @@ At the company I work for there are a lot of Git repositories containing documen
 
 By running Magisto on those Git repositories and sticking the output on a web server, we get distraction-free documentation.
 
-## Installation
+## Requires
 
-Magisto requires Java 7 or later. It comes as a ZIP that you have to unpack. In the `bin` directory you'll find run scripts for your favorite OS. (Note: I don't use Windows myself, so I couldn't test that particular script.)
+Magisto requires Java 7 or later. That's it.
 
 ## Usage
+
+Magisto can be used in two ways: as a standalone application, and as a Maven plugin.
+
+### Standalone
+
+Magisto comes as a ZIP that you have to unpack. In the `bin` directory you'll find scripts for your favorite OS. (Note: I don't use Windows myself, so I couldn't test that particular script.)
 
 Run Magisto with the `-h` or `--help` command line argument to get something like this:
 
@@ -33,6 +39,23 @@ The options available are:
 The source directory is an optional argument and defaults to the current one.
 
 The `-f` flag enforces that files that would normally be skipped are also processed. This can be useful in some edge cases. You shouldn't need it for day to day usage. There's no need to set this flag after you've changed the custom template, because then Magisto will automatically re-convert all Markdown files.
+
+### Maven plugin
+
+Magisto is also a Maven plugin. It doesn't require a project. It is ideal to use on a build server where you can't install software yourself. Just stick a Maven job in there, and the plugin and all its dependencies will be downloaded automatically.
+
+You run the plugin like so:
+
+```raw
+mvn nl.ulso.magisto:magisto:export \
+    -Dsource=/path/to/source \
+    -Dtarget=/path/to/target \
+    -Dforce=false
+```
+
+Like the standalone version, the `source` and `force` argument are optional. The first defaults to the current directory, the second to `false`.
+
+## Execution
 
 When executed with valid arguments, Magisto:
 
