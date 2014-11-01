@@ -14,7 +14,7 @@ At the company I work for there are a lot of Git repositories containing documen
 
 By running Magisto on those Git repositories and sticking the output on a web server, we get distraction-free documentation.
 
-## Requires
+## Requirements
 
 Magisto requires Java 7 or later. That's it.
 
