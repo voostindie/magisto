@@ -98,3 +98,9 @@ This ensures that the link will always resolve correctly, independent of how dee
 All files in `.static` are copied over to the target directory as is. This is where you can put your favicon, or the static content that you refer to from your template, like CSS, images, fonts, JavaScript and so on.
 
 Note: static content will **never** overwrite source content. Source content is considered more important and therefore always has precedence.
+
+## About the default template
+
+The default template is pretty simple. It's based on Bootstrap with jQuery. All dependencies are downloaded from CDNs. If you don't want that then make sure to create your own custom template.
+
+You can find the default template in [page_template.ftl](src/main/resources/nl/ulso/magisto/page_template.ftl).
