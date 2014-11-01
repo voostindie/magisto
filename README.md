@@ -34,11 +34,14 @@ The options available are:
 	[--help -h]
 	[--source -s value] : Source directory
 	--target -t value : Target directory
+    [--verbose -v] : Use verbose logging
 ```
 
 The source directory is an optional argument and defaults to the current one.
 
 The `-f` flag enforces that files that would normally be skipped are also processed. This can be useful in some edge cases. You shouldn't need it for day to day usage. There's no need to set this flag after you've changed the custom template, because then Magisto will automatically re-convert all Markdown files.
+
+By default Magisto only outputs some statistics when it's done. If you want  information on each file it processes, specify `-v`, for verbose logging.
 
 ### Maven plugin
 
