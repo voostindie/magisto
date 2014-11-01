@@ -16,7 +16,7 @@ By running Magisto on those Git repositories and sticking the output on a web se
 
 ## Installation
 
-Magisto requires Java 7 or later. It's a fat JAR, so once downloaded you can execute it directly, with `java -jar magisto-<VERSION>.jar`.
+Magisto requires Java 7 or later. It comes as a ZIP that you have to unpack. In the `bin` directory you'll find run scripts for your favorite OS. (Note: I don't use Windows myself, so I couldn't test that particular script.)
 
 ## Usage
 
