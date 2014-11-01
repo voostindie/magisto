@@ -150,7 +150,7 @@ public class RealFileSystemAccessor implements FileSystemAccessor {
         requireAbsolutePath(sourceRoot);
         requireAbsolutePath(targetRoot);
         requireRelativePath(path);
-        Logger.getGlobal().log(Level.INFO,
+        Logger.getGlobal().log(Level.FINE,
                 String.format("Copying '%s' from '%s' to '%s'.", path, sourceRoot, targetRoot));
         final Path source = sourceRoot.resolve(path);
         final Path target = targetRoot.resolve(path);
@@ -167,7 +167,7 @@ public class RealFileSystemAccessor implements FileSystemAccessor {
     public void delete(Path root, Path path) throws IOException {
         requireAbsolutePath(root);
         requireRelativePath(path);
-        Logger.getGlobal().log(Level.INFO, String.format("Deleting '%s' from '%s'.", path, root));
+        Logger.getGlobal().log(Level.FINE, String.format("Deleting '%s' from '%s'.", path, root));
         Files.delete(root.resolve(path));
     }
 

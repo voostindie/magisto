@@ -19,9 +19,10 @@ package nl.ulso.magisto;
 import nl.ulso.magisto.action.Action;
 import nl.ulso.magisto.action.ActionType;
 
-import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Keeps tracks of what Magisto is doing.
@@ -65,16 +66,18 @@ public class Statistics {
         return this;
     }
 
-    public void print(PrintStream out) {
+    public void log() {
         if (end == -1) {
             throw new IllegalStateException("end() must be called before print() is called!");
         }
         final long duration = end - start;
-        out.println("Done! This run took me about " + duration + " milliseconds. Here's what I did:");
+        final Logger logger = Logger.getGlobal();
+        logger.log(Level.INFO,
+                String.format("Done! This run took me about %d milliseconds. Here's what I did:", duration));
         for (Map.Entry<ActionType, Integer> entry : actionsPerformed.entrySet()) {
             final ActionType actionType = entry.getKey();
-            out.format("- %s %d %s file(s)", actionType.getPastTenseVerb(), entry.getValue(), actionType.getFileType());
-            out.println();
+            logger.log(Level.INFO, String.format(
+                    "- %s %d %s file(s)", actionType.getPastTenseVerb(), entry.getValue(), actionType.getFileType()));
         }
     }
 
@@ -84,4 +87,6 @@ public class Statistics {
         }
         return 0;
     }
+
+
 }

@@ -33,6 +33,9 @@ interface Options {
     @Option(shortName = "f", longName = "force", description = "Forces overwriting of files that would be skipped otherwise")
     boolean isForceOverwrite();
 
+    @Option(shortName = "v", longName = "verbose", description = "Use verbose logging")
+    boolean isVerbose();
+
     @Option(shortName = "h", longName = "help", description = "Show this help text", helpRequest = true)
     boolean isHelp();
 }

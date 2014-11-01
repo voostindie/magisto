@@ -126,7 +126,7 @@ class MarkdownToHtmlFileConverter implements FileConverter {
     @Override
     public void convert(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot, Path path)
             throws IOException {
-        Logger.getGlobal().log(Level.INFO, String.format("Converting '%s' from Markdown to HTML.", path));
+        Logger.getGlobal().log(Level.FINE, String.format("Converting '%s' from Markdown to HTML.", path));
         final Path targetFile = targetRoot.resolve(getConvertedFileName(path));
         try (final Writer writer = fileSystemAccessor.newBufferedWriterForTextFile(targetFile)) {
             final String markdownText = readTextFile(fileSystemAccessor, sourceRoot.resolve(path));

@@ -149,7 +149,6 @@ public class MagistoTest {
                          int expectedTargetDeletions, int expectedStaticSkips, int expectedStaticCopies)
             throws Exception {
         final Statistics statistics = magisto.run("source", "target");
-        statistics.print(System.out);
         // Number of actions performed must match up:
         assertEquals(expectedSourceSkips, actionFactory.countFor(SKIP_SOURCE));
         assertEquals(expectedSourceCopies, actionFactory.countFor(COPY_SOURCE));

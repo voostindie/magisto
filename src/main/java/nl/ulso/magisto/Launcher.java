@@ -45,9 +45,9 @@ public class Launcher {
     private static Magisto DUMMY_MAGISTO = null; // For testing
 
     public static void main(String[] arguments) {
-        configureLoggingSystem();
         try {
             final Options options = parseProgramOptions(arguments);
+            configureLoggingSystem(options.isVerbose());
             final String sourceDirectory = resolveSourceDirectory(options);
             final Magisto magisto = createMagisto(options.isForceOverwrite());
             run(magisto, sourceDirectory, options.getTargetDirectory());
@@ -56,10 +56,12 @@ public class Launcher {
         }
     }
 
-    private static void configureLoggingSystem() {
+    private static void configureLoggingSystem(boolean verbose) {
         final Logger rootLogger = Logger.getLogger("");
-        rootLogger.setLevel(Level.INFO);
+        final Level level = verbose ? Level.FINEST : Level.INFO;
         final Handler handler = rootLogger.getHandlers()[0];
+        rootLogger.setLevel(level);
+        handler.setLevel(level);
         handler.setFormatter(new Formatter() {
             @Override
             public String format(LogRecord record) {
@@ -100,7 +102,7 @@ public class Launcher {
             e.printStackTrace(System.err);
             throw new RuntimeException();
         }
-        statistics.print(System.out);
+        statistics.log();
     }
 
     static String resolveSourceDirectory(Options options) {

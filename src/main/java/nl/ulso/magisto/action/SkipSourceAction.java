@@ -42,6 +42,6 @@ class SkipSourceAction extends AbstractAction {
 
     @Override
     public void perform(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot) throws IOException {
-        Logger.getGlobal().log(Level.INFO, String.format("Skipping source '%s'. No changes detected.", getPath()));
+        Logger.getGlobal().log(Level.FINE, String.format("Skipping source '%s'. No changes detected.", getPath()));
     }
 }
