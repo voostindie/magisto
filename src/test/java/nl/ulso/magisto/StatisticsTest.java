@@ -23,11 +23,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.logging.Formatter;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
-
 import static nl.ulso.magisto.action.ActionCategory.SOURCE;
 import static nl.ulso.magisto.action.ActionCategory.STATIC;
 import static nl.ulso.magisto.action.ActionType.*;
@@ -36,23 +31,14 @@ import static org.junit.Assert.assertThat;
 
 public class StatisticsTest {
 
-    private LogCapturingHandler logCapturingHandler;
-
     @Before
     public void setUp() throws Exception {
-        logCapturingHandler = new LogCapturingHandler();
-        logCapturingHandler.setFormatter(new Formatter() {
-            @Override
-            public String format(LogRecord record) {
-                return String.format("%s%n", record.getMessage());
-            }
-        });
-        Logger.getLogger("").addHandler(logCapturingHandler);
+        DummyLogHandler.install();
     }
 
     @After
     public void tearDown() throws Exception {
-        Logger.getLogger("").removeHandler(logCapturingHandler);
+        DummyLogHandler.uninstall();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -99,7 +85,7 @@ public class StatisticsTest {
                 .registerActionPerformed(createAction(SOURCE, COPY_SOURCE))
                 .end()
                 .log();
-        String log = logCapturingHandler.getLog();
+        String log = DummyLogHandler.getLog();
         assertThat(log, containsString("Done!"));
         assertThat(log, containsString("Copied 3 source"));
         assertThat(log, containsString("Copied 4 static"));
@@ -113,25 +99,4 @@ public class StatisticsTest {
         return new DummyAction(null, null, category, type);
     }
 
-    private class LogCapturingHandler extends Handler {
-
-        private final StringBuilder builder = new StringBuilder();
-
-        @Override
-        public void publish(LogRecord record) {
-            builder.append(getFormatter().formatMessage(record));
-        }
-
-        @Override
-        public void flush() {
-        }
-
-        @Override
-        public void close() throws SecurityException {
-        }
-
-        public String getLog() {
-            return builder.toString();
-        }
-    }
 }

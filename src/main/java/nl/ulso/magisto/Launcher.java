@@ -56,7 +56,7 @@ public class Launcher {
         }
     }
 
-    private static void configureLoggingSystem(boolean verbose) {
+    static void configureLoggingSystem(boolean verbose) {
         final Logger rootLogger = Logger.getLogger("");
         final Level level = verbose ? Level.FINEST : Level.INFO;
         final Handler handler = rootLogger.getHandlers()[0];

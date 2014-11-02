@@ -19,6 +19,8 @@ package nl.ulso.magisto;
 import nl.ulso.magisto.action.DummyActionFactory;
 import nl.ulso.magisto.converter.DummyFileConverterFactory;
 import nl.ulso.magisto.io.DummyFileSystemAccessor;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
@@ -26,9 +28,10 @@ import org.junit.contrib.java.lang.system.StandardErrorStreamLog;
 import org.junit.contrib.java.lang.system.StandardOutputStreamLog;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
@@ -43,6 +46,16 @@ public class LauncherTest {
     @Rule
     public final StandardOutputStreamLog outputLog = new StandardOutputStreamLog();
 
+    @Before
+    public void setUp() throws Exception {
+        DummyLogHandler.install();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        DummyLogHandler.uninstall();
+    }
+
     @Test
     public void testNoProgramArguments() throws Exception {
         systemExit.expectSystemExitWithStatus(-1);
@@ -56,9 +69,9 @@ public class LauncherTest {
     public void testValidProgramArguments() throws Exception {
         Launcher.setDummyMagistoForTesting(new DummyMagisto());
         Launcher.main(new String[]{"-t", "foo"});
-        // TODO: find out why in this particular case the logging is sent to the wrong stream (if it is...)
-        assertThat(errorLog.getLog(), containsString("Done!"));
+        assertThat(errorLog.getLog(), is(""));
         assertThat(outputLog.getLog(), is(""));
+        assertThat(DummyLogHandler.getLog(), containsString("Done!"));
     }
 
     @Test
@@ -90,6 +103,26 @@ public class LauncherTest {
         Launcher.setDummyMagistoForTesting(null);
         final Magisto magisto = Launcher.createMagisto(false);
         assertNotNull(magisto);
+    }
+
+    @Test
+    public void testNormalLogging() throws Exception {
+        Launcher.configureLoggingSystem(false);
+        Logger.getGlobal().log(Level.FINE, "FINE");
+        Logger.getGlobal().log(Level.INFO, "INFO");
+        final String log = DummyLogHandler.getLog();
+        assertThat(log, not(containsString("FINE")));
+        assertThat(log, containsString("INFO"));
+    }
+
+    @Test
+    public void testVerboseLogging() throws Exception {
+        Launcher.configureLoggingSystem(true);
+        Logger.getGlobal().log(Level.FINE, "FINE");
+        Logger.getGlobal().log(Level.INFO, "INFO");
+        final String log = DummyLogHandler.getLog();
+        assertThat(log, containsString("FINE"));
+        assertThat(log, containsString("INFO"));
     }
 
     private static final class DummyMagisto extends Magisto {
