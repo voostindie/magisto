@@ -14,25 +14,17 @@
  * limitations under the License
  */
 
-package nl.ulso.magisto.converter;
-
-import nl.ulso.magisto.git.GitClient;
-import nl.ulso.magisto.io.FileSystemAccessor;
+package nl.ulso.magisto.git;
 
 import java.nio.file.Path;
 
 /**
- * Default implementation of the {@link FileConverterFactory}.
+ * Dummy implementation used then the source directory is not an actual Git repository.
  */
-public class MarkdownToHtmlFileConverterFactory implements FileConverterFactory {
-    private final GitClient gitClient;
-
-    public MarkdownToHtmlFileConverterFactory(GitClient gitClient) {
-        this.gitClient = gitClient;
-    }
+public class DummyGitClient implements GitClient {
 
     @Override
-    public FileConverter create(FileSystemAccessor fileSystemAccessor, Path sourceRoot) {
-        return new MarkdownToHtmlFileConverter(fileSystemAccessor, sourceRoot, gitClient);
+    public Commit getLastCommit(Path path) {
+        return Commit.DEFAULT_COMMIT;
     }
 }

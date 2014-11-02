@@ -63,7 +63,6 @@ Like the standalone version, the `source`, `force` and `verbose` arguments are o
 
 When executed with valid arguments, Magisto:
 
-* (*Not yet*) checks that the source directory is indeed a Git clone.
 * Checks that the target directory either doesn't exist, is empty, or contains an earlier Magisto export.
 * Goes through all files in the source directory recursively, copying them to the target directory, transforming all Markdown files to HTML files in the process. Where:
     * Files that haven't changed since the last run aren't touched.
@@ -88,6 +87,13 @@ A template typically uses a *model* to base its output on. Magisto exposes the f
 * `path` (`java.nio.file.Path`): the relative path to the source file.
 * `title` (`java.lang.String`): the title of the page. This is the text of the first header (atx-style).
 * `content` (`java.lang.String`): the contents of the page. This is the converted Markdown content, already in HTML.
+* `commit`: information on the last commit the file was changed in. This information is replaced with dummy data if the source directory is not a Git repository. This object exposes the following fields:
+    * `id` (`java.lang.String`): ID of the commit
+    * `shortId` (`java.lang.String`): ID of the commit, abbreviated to the first 7 characters.
+    * `timestamp` (`java.util.Date`): the time the file was last commit.
+    * `committer` (`java.lang.String`): Name of the committer.
+    * `emailAddress` (`java.lang.String`): Email address of the committer.
+    * `shortMessage` (`java.lang.Stirng`): Short message of the commit.
 
 If you need to generate a link to a local file in your template, for example to your favicon, use the custom `link` directive that Magisto provides. For example:
 
@@ -98,6 +104,7 @@ If you need to generate a link to a local file in your template, for example to 
 This ensures that the link will always resolve correctly, independent of how deep the Markdown file being processed is in the source directory structure. (In other words: if the Markdown file is for example two levels deep, then the link will be prefixed with "`../..`".) By processing links in this manner, it doesn't matter where you put the output on your web server; the links will always resolve correctly.
 
 ### Static content
+
 
 All files in `.static` are copied over to the target directory as is. This is where you can put your favicon, or the static content that you refer to from your template, like CSS, images, fonts, JavaScript and so on.
 

@@ -19,6 +19,7 @@ package nl.ulso.magisto.converter;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import nl.ulso.magisto.git.GitClient;
 import nl.ulso.magisto.io.FileSystemAccessor;
 import org.pegdown.Extensions;
 import org.pegdown.PegDownProcessor;
@@ -46,11 +47,13 @@ class MarkdownToHtmlFileConverter implements FileConverter {
     private static final Pattern TITLE_PATTERN = Pattern.compile("^#+ (.*)$", MULTILINE);
     static final Set<String> MARKDOWN_EXTENSIONS = new HashSet<>(Arrays.asList("md", "markdown", "mdown"));
 
+    private final GitClient gitClient;
     private final Template template;
     private final PegDownProcessor markdownProcessor;
     private final CustomLinkRenderer linkRenderer;
 
-    MarkdownToHtmlFileConverter(FileSystemAccessor fileSystemAccessor, Path sourceRoot) {
+    MarkdownToHtmlFileConverter(FileSystemAccessor fileSystemAccessor, Path sourceRoot, GitClient gitClient) {
+        this.gitClient = gitClient;
         try {
             if (isCustomTemplateAvailable(fileSystemAccessor, sourceRoot)) {
                 template = loadCustomTemplate(fileSystemAccessor, sourceRoot);
@@ -138,12 +141,13 @@ class MarkdownToHtmlFileConverter implements FileConverter {
         }
     }
 
-    Map<String, Object> createPageModel(Path path, String markdownText) {
+    Map<String, Object> createPageModel(Path path, String markdownText) throws IOException {
         final Map<String, Object> model = new HashMap<>();
         model.put("timestamp", new Date());
         model.put("path", path);
         model.put("title", extractTitleFromMarkdown(markdownText));
         model.put("content", convertMarkdownToHtml(markdownText));
+        model.put("commit", gitClient.getLastCommit(path));
         return model;
     }
 

@@ -17,6 +17,7 @@
 package nl.ulso.magisto.converter;
 
 import freemarker.template.Template;
+import nl.ulso.magisto.git.DummyGitClient;
 import nl.ulso.magisto.io.DummyFileSystemAccessor;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +35,7 @@ public class MarkdownToHtmlFileConverterTest {
 
     private MarkdownToHtmlFileConverter fileConverter;
     private DummyFileSystemAccessor fileSystemAccessor;
+    private DummyGitClient gitClient;
     private Path sourcePath;
 
     @Before
@@ -41,7 +43,8 @@ public class MarkdownToHtmlFileConverterTest {
         this.fileSystemAccessor = new DummyFileSystemAccessor();
         this.sourcePath = fileSystemAccessor.resolveSourceDirectory("source");
         fileSystemAccessor.prepareTargetDirectory("target");
-        this.fileConverter = new MarkdownToHtmlFileConverter(fileSystemAccessor, createPath("."));
+        this.gitClient = new DummyGitClient();
+        this.fileConverter = new MarkdownToHtmlFileConverter(fileSystemAccessor, createPath("."), gitClient);
     }
 
     @Test
@@ -92,6 +95,7 @@ public class MarkdownToHtmlFileConverterTest {
         assertTrue(timestamp.before(end));
         assertEquals("test.md", ((Path) model.get("path")).getFileName().toString());
         assertEquals("Title", model.get("title"));
+        assertNotNull(model.get("commit"));
         assertNotNull(model.get("content"));
     }
 
@@ -155,7 +159,7 @@ public class MarkdownToHtmlFileConverterTest {
         fileSystemAccessor.addSourcePaths(createPathEntry(".page.ftl"));
         fileSystemAccessor.registerTextFileForBufferedReader(".page.ftl", "<@link path=\"/static/favicon.ico\"/>");
         fileSystemAccessor.registerTextFileForBufferedReader("test.md", String.format("# Title%n%nParagraph"));
-        this.fileConverter = new MarkdownToHtmlFileConverter(fileSystemAccessor, createPath("."));
+        this.fileConverter = new MarkdownToHtmlFileConverter(fileSystemAccessor, createPath("."), gitClient);
         fileConverter.convert(fileSystemAccessor, createPath("."), createPath("."), createPath("dir", "test.md"));
         final String output = fileSystemAccessor.getTextFileFromBufferedWriter("test.html");
         assertEquals("../static/favicon.ico", output);

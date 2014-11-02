@@ -15,6 +15,7 @@
         ${content}
     </article>
     <p class="text-muted">
+        Last changed on ${commit.timestamp?date} at ${commit.timestamp?time} by ${commit.committer} in commit ${commit.shortId}.<br/>
         Generated on ${timestamp?date} at ${timestamp?time} from /${path}.
     </p>
 </div>

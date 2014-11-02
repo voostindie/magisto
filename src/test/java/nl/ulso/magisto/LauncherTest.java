@@ -101,7 +101,7 @@ public class LauncherTest {
     @Test
     public void testDefaultMagistoCreation() throws Exception {
         Launcher.setDummyMagistoForTesting(null);
-        final Magisto magisto = Launcher.createMagisto(false);
+        final Magisto magisto = Launcher.createMagisto(false, null);
         assertNotNull(magisto);
     }
 

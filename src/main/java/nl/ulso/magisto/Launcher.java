@@ -21,6 +21,9 @@ import com.lexicalscope.jewel.cli.CliFactory;
 import com.lexicalscope.jewel.cli.ValidationFailure;
 import nl.ulso.magisto.action.RealActionFactory;
 import nl.ulso.magisto.converter.MarkdownToHtmlFileConverterFactory;
+import nl.ulso.magisto.git.DummyGitClient;
+import nl.ulso.magisto.git.GitClient;
+import nl.ulso.magisto.git.JGitClient;
 import nl.ulso.magisto.io.RealFileSystemAccessor;
 
 import java.io.IOException;
@@ -49,7 +52,8 @@ public class Launcher {
             final Options options = parseProgramOptions(arguments);
             configureLoggingSystem(options.isVerbose());
             final String sourceDirectory = resolveSourceDirectory(options);
-            final Magisto magisto = createMagisto(options.isForceOverwrite());
+            final GitClient gitClient = createGitClient(sourceDirectory);
+            final Magisto magisto = createMagisto(options.isForceOverwrite(), gitClient);
             run(magisto, sourceDirectory, options.getTargetDirectory());
         } catch (RuntimeException e) {
             System.exit(-1);
@@ -78,16 +82,25 @@ public class Launcher {
             for (ValidationFailure failure : e.getValidationFailures()) {
                 System.err.println(failure);
             }
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 
-    static Magisto createMagisto(boolean forceOverwrite) {
+    private static GitClient createGitClient(String sourceDirectory) {
+        try {
+            return new JGitClient(sourceDirectory);
+        } catch (IOException e) {
+            Logger.getGlobal().log(Level.INFO, "No Git repository found. Version information will not be available.");
+            return new DummyGitClient();
+        }
+    }
+
+    static Magisto createMagisto(boolean forceOverwrite, GitClient gitClient) {
         if (DUMMY_MAGISTO != null) {
             return DUMMY_MAGISTO;
         }
         return new Magisto(forceOverwrite, new RealFileSystemAccessor(), new RealActionFactory(),
-                new MarkdownToHtmlFileConverterFactory());
+                new MarkdownToHtmlFileConverterFactory(gitClient));
     }
 
     private static void run(Magisto magisto, String sourceDirectory, String targetDirectory) {
