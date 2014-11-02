@@ -17,7 +17,7 @@
 package nl.ulso.magisto;
 
 import nl.ulso.magisto.action.RealActionFactory;
-import nl.ulso.magisto.converter.RealFileConverterFactory;
+import nl.ulso.magisto.converter.MarkdownToHtmlFileConverterFactory;
 import nl.ulso.magisto.io.RealFileSystemAccessor;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -46,7 +46,7 @@ public class MagistoMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         final Magisto magisto = new Magisto(forceOverwrite, new RealFileSystemAccessor(), new RealActionFactory(),
-                new RealFileConverterFactory());
+                new MarkdownToHtmlFileConverterFactory());
         try {
             magisto.run(sourceDirectory, targetDirectory);
         } catch (IOException e) {

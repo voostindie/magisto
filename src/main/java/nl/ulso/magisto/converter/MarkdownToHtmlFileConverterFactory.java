@@ -23,7 +23,7 @@ import java.nio.file.Path;
 /**
  * Default implementation of the {@link FileConverterFactory}.
  */
-public class RealFileConverterFactory implements FileConverterFactory {
+public class MarkdownToHtmlFileConverterFactory implements FileConverterFactory {
     @Override
     public FileConverter create(FileSystemAccessor fileSystemAccessor, Path sourceRoot) {
         return new MarkdownToHtmlFileConverter(fileSystemAccessor, sourceRoot);
