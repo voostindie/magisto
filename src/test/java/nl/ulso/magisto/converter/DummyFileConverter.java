@@ -23,7 +23,16 @@ import java.nio.file.Path;
 
 public class DummyFileConverter implements FileConverter {
 
+    private final boolean isCustomTemplateChanged;
     private String loggedConversions = "";
+
+    public DummyFileConverter() {
+        this(false);
+    }
+
+    public DummyFileConverter(boolean isCustomTemplateChanged) {
+        this.isCustomTemplateChanged = isCustomTemplateChanged;
+    }
 
     @Override
     public boolean supports(Path path) {
@@ -45,7 +54,7 @@ public class DummyFileConverter implements FileConverter {
     @Override
     public boolean isCustomTemplateChanged(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot)
             throws IOException {
-        return false;
+        return isCustomTemplateChanged;
     }
 
     public String getLoggedConversions() {

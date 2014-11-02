@@ -21,8 +21,15 @@ import nl.ulso.magisto.io.FileSystemAccessor;
 import java.nio.file.Path;
 
 public class DummyFileConverterFactory implements FileConverterFactory {
+
+    private boolean isCustomTemplateChanged = false;
+
     @Override
     public FileConverter create(FileSystemAccessor fileSystemAccessor, Path sourceRoot) {
-        return new DummyFileConverter();
+        return new DummyFileConverter(isCustomTemplateChanged);
+    }
+
+    public void setCustomTemplateChanged() {
+        isCustomTemplateChanged = true;
     }
 }

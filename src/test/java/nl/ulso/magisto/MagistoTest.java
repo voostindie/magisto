@@ -95,6 +95,21 @@ public class MagistoTest {
     public void testMultipleSourceAndTargetFiles() throws Exception {
         prepareMultipleSourceAndTargetFiles();
         runTest(
+                3, // sameFile1, sameFile2, foo.convert/foo.convert.converted
+                1, // baz.txt
+                1, // bar.convert
+                1, // deleteTarget.me
+                1, // .static/favicon.ico
+                1  // .static/image.jpg
+        );
+    }
+
+    @Test
+    public void testMultipleSourceAndTargetFilesWithDetectedOverwrite() throws Exception {
+        prepareMultipleSourceAndTargetFiles();
+        fileConverterFactory.setCustomTemplateChanged();
+        magisto = new Magisto(false, accessor, actionFactory, fileConverterFactory);
+        runTest(
                 2, // sameFile1, sameFile2
                 1, // baz.txt
                 2, // foo.convert/foo.convert.converted, bar.convert
@@ -122,6 +137,7 @@ public class MagistoTest {
         final DummyPathEntry sameSourceFile1 = createPathEntry("foo.txt");
         final DummyPathEntry sameSourceFile2 = createPathEntry("bar.jpg");
         final DummyPathEntry sameStaticFile = createPathEntry("favicon.ico");
+        final DummyPathEntry nonChangedConversionFile = createPathEntry("foo.convert");
         accessor.addTargetPaths(
                 sameSourceFile1,
                 sameSourceFile2,
@@ -135,7 +151,7 @@ public class MagistoTest {
                 sameSourceFile1,
                 sameSourceFile2,
                 createPathEntry("baz.txt"), // Same path, different timestamp: this one is newer
-                createPathEntry("foo.convert"),
+                nonChangedConversionFile,
                 createPathEntry("bar.convert")
         );
         accessor.addStaticPaths(
@@ -149,6 +165,7 @@ public class MagistoTest {
                          int expectedTargetDeletions, int expectedStaticSkips, int expectedStaticCopies)
             throws Exception {
         final Statistics statistics = magisto.run("source", "target");
+        System.out.println(statistics);
         // Number of actions performed must match up:
         assertEquals(expectedSourceSkips, actionFactory.countFor(SKIP_SOURCE));
         assertEquals(expectedSourceCopies, actionFactory.countFor(COPY_SOURCE));

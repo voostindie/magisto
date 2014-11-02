@@ -25,16 +25,17 @@ import static nl.ulso.magisto.io.Paths.createPath;
 
 public class DummyFileSystemAccessor implements FileSystemAccessor {
 
-    private Path sourceRoot = null;
-    private Path staticRoot = null;
-    private Path targetRoot = null;
-    private String loggedCopies = "";
-    private String loggedDeletions = "";
+    private final Path sourceRoot;
+    private final Path staticRoot;
+    private final Path targetRoot;
     private final Set<DummyPathEntry> sourcePaths = new HashSet<>();
     private final Set<DummyPathEntry> staticPaths = new HashSet<>();
     private final Set<DummyPathEntry> targetPaths = new HashSet<>();
     private final Map<String, String> textFilesForReading = new HashMap<>();
     private final Map<String, StringWriter> textFilesForWriting = new HashMap<>();
+    private String loggedCopies = "";
+    private String loggedDeletions = "";
+    private long touchFileTimestamp = -1;
 
     public DummyFileSystemAccessor() {
         this.sourceRoot = createPath("source").toAbsolutePath();
@@ -62,7 +63,7 @@ public class DummyFileSystemAccessor implements FileSystemAccessor {
 
     @Override
     public long getTouchFileLastModifiedInMillis(Path targetRoot) throws IOException {
-        return -1;
+        return touchFileTimestamp;
     }
 
     @Override
@@ -173,5 +174,9 @@ public class DummyFileSystemAccessor implements FileSystemAccessor {
 
     public String getTextFileFromBufferedWriter(String fileName) {
         return textFilesForWriting.get(fileName).toString();
+    }
+
+    public void markTouchFile() {
+        touchFileTimestamp = System.currentTimeMillis() - 1000;
     }
 }

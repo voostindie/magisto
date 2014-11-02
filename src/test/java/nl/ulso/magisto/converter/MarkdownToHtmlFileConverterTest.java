@@ -160,4 +160,19 @@ public class MarkdownToHtmlFileConverterTest {
         final String output = fileSystemAccessor.getTextFileFromBufferedWriter("test.html");
         assertEquals("../static/favicon.ico", output);
     }
+
+    @Test
+    public void testCustomTemplateHasNotChanged() throws Exception {
+        fileSystemAccessor.addSourcePaths(createPathEntry(".page.ftl"));
+        assertFalse(fileConverter.isCustomTemplateChanged(fileSystemAccessor, createPath("."), createPath(".")));
+    }
+
+    @Test
+    public void testCustomTemplateHasChanged() throws Exception {
+        fileSystemAccessor.markTouchFile();
+        final Path sourceRoot = fileSystemAccessor.resolveSourceDirectory(".");
+        fileSystemAccessor.addSourcePaths(createPathEntry(sourceRoot.resolve(".page.ftl")));
+        fileSystemAccessor.registerTextFileForBufferedReader(".page.ftl", "CUSTOM TEMPLATE");
+        assertTrue(fileConverter.isCustomTemplateChanged(fileSystemAccessor, sourceRoot, createPath(".")));
+    }
 }

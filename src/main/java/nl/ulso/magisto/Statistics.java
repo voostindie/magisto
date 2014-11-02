@@ -88,5 +88,14 @@ public class Statistics {
         return 0;
     }
 
-
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        for (Map.Entry<ActionType, Integer> entry : actionsPerformed.entrySet()) {
+            final ActionType actionType = entry.getKey();
+            builder.append(String.format("%s %d %s%n",
+                    actionType.getPastTenseVerb(), entry.getValue(), actionType.getFileType()));
+        }
+        return builder.toString();
+    }
 }
