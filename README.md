@@ -53,10 +53,11 @@ You run the plugin like so:
 mvn nl.ulso.magisto:magisto:export \
     -Dsource=/path/to/source \
     -Dtarget=/path/to/target \
-    -Dforce=false
+    -Dforce=false \
+    -Dverbose=false
 ```
 
-Like the standalone version, the `source` and `force` argument are optional. The first defaults to the current directory, the second to `false`.
+Like the standalone version, the `source`, `force` and `verbose` arguments are optional. The first defaults to the current directory, the second and third to `false`.
 
 ## Execution
 

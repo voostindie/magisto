@@ -22,16 +22,20 @@ import nl.ulso.magisto.io.RealFileSystemAccessor;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.IOException;
+import java.util.logging.*;
 
 /**
  * Runs Magisto as a Maven plugin.
  */
 @Mojo(name = "export", requiresProject = false)
 public class MagistoMojo extends AbstractMojo {
+
+    private final Handler logHandler = new MavenLogHandler();
 
     @Parameter(property = "source", defaultValue = ".")
     private String sourceDirectory;
@@ -42,15 +46,64 @@ public class MagistoMojo extends AbstractMojo {
     @Parameter(property = "force", defaultValue = "false")
     private boolean forceOverwrite;
 
-    @Override
+    @Parameter(property = "verbose", defaultValue = "false")
+    private boolean verbose;
 
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         final Magisto magisto = new Magisto(forceOverwrite, new RealFileSystemAccessor(), new RealActionFactory(),
                 new MarkdownToHtmlFileConverterFactory());
+        Handler consoleHandler = configureLogging(verbose);
         try {
-            magisto.run(sourceDirectory, targetDirectory);
+            magisto.run(sourceDirectory, targetDirectory).log();
         } catch (IOException e) {
             throw new MojoFailureException("IOException occurred", e);
+        } finally {
+            resetLogging(consoleHandler);
+        }
+    }
+
+    private Handler configureLogging(boolean verbose) {
+        final Level level = verbose ? Level.FINEST : Level.INFO;
+        final Logger rootLogger = Logger.getLogger("");
+        final Handler consoleHandler = rootLogger.getHandlers()[0];
+        rootLogger.removeHandler(consoleHandler);
+        rootLogger.addHandler(logHandler);
+        rootLogger.setLevel(level);
+        logHandler.setLevel(level);
+        return consoleHandler;
+    }
+
+    private void resetLogging(Handler consoleHandler) {
+        final Logger rootLogger = Logger.getLogger("");
+        rootLogger.removeHandler(logHandler);
+        rootLogger.addHandler(consoleHandler);
+    }
+
+    private class MavenLogHandler extends Handler {
+
+        @Override
+        public void publish(LogRecord record) {
+            final Log log = MagistoMojo.this.getLog();
+            final String message = record.getMessage();
+            final Level level = record.getLevel();
+            if (log.isInfoEnabled() && (level == Level.INFO || level == Level.FINE)) {
+                log.info(message);
+            } else if (log.isDebugEnabled() && (level == Level.FINER || level == Level.FINEST)) {
+                log.debug(message);
+            } else if (log.isWarnEnabled() && level == Level.WARNING) {
+                log.warn(message);
+            } else if (log.isErrorEnabled() && level == Level.SEVERE) {
+                log.error(message);
+            }
+        }
+
+        @Override
+        public void flush() {
+        }
+
+        @Override
+        public void close() throws SecurityException {
         }
     }
 }
