@@ -35,6 +35,7 @@ import java.util.SortedSet;
 class Magisto {
     private static final String STATIC_CONTENT_DIRECTORY = ".static";
 
+    private final boolean forceOverwrite;
     private final boolean forceCopy;
     private final FileSystemAccessor fileSystemAccessor;
     private final ActionFactory actionFactory;
@@ -42,6 +43,7 @@ class Magisto {
 
     public Magisto(boolean forceOverwrite, FileSystemAccessor fileSystemAccessor, ActionFactory actionFactory,
                    FileConverterFactory fileConverterFactory) {
+        this.forceOverwrite = forceOverwrite;
         this.forceCopy = forceOverwrite;
         this.fileSystemAccessor = fileSystemAccessor;
         this.actionFactory = actionFactory;
@@ -92,7 +94,7 @@ class Magisto {
      */
     private void addSourceActions(ActionSet actions, Path sourceRoot, Path targetRoot) throws IOException {
         final FileConverter fileConverter = fileConverterFactory.create(fileSystemAccessor, sourceRoot);
-        final boolean forceConvert = forceCopy
+        final boolean forceConvert = forceOverwrite
                 || fileConverter.isCustomTemplateChanged(fileSystemAccessor, sourceRoot, targetRoot);
         final Iterator<Path> sources = fileSystemAccessor.findAllPaths(sourceRoot).iterator();
         final Iterator<Path> targets = fileSystemAccessor.findAllPaths(targetRoot).iterator();
