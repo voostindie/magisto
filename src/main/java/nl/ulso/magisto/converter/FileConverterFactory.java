@@ -18,6 +18,7 @@ package nl.ulso.magisto.converter;
 
 import nl.ulso.magisto.io.FileSystemAccessor;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 /**
@@ -25,5 +26,5 @@ import java.nio.file.Path;
  */
 public interface FileConverterFactory {
 
-    FileConverter create(FileSystemAccessor fileSystemAccessor, Path sourceRoot);
+    FileConverter create(FileSystemAccessor fileSystemAccessor, Path sourceRoot) throws IOException;
 }

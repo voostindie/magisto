@@ -16,7 +16,10 @@
 
 package nl.ulso.magisto.git;
 
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Dummy implementation used then the source directory is not an actual Git repository.
@@ -26,5 +29,10 @@ public class DummyGitClient implements GitClient {
     @Override
     public Commit getLastCommit(Path path) {
         return Commit.DEFAULT_COMMIT;
+    }
+
+    @Override
+    public List<Commit> getChangelog() throws IOException {
+        return Collections.emptyList();
     }
 }

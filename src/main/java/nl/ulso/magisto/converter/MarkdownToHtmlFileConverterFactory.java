@@ -19,6 +19,7 @@ package nl.ulso.magisto.converter;
 import nl.ulso.magisto.git.GitClient;
 import nl.ulso.magisto.io.FileSystemAccessor;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 /**
@@ -32,7 +33,7 @@ public class MarkdownToHtmlFileConverterFactory implements FileConverterFactory 
     }
 
     @Override
-    public FileConverter create(FileSystemAccessor fileSystemAccessor, Path sourceRoot) {
+    public FileConverter create(FileSystemAccessor fileSystemAccessor, Path sourceRoot) throws IOException {
         return new MarkdownToHtmlFileConverter(fileSystemAccessor, sourceRoot, gitClient);
     }
 }

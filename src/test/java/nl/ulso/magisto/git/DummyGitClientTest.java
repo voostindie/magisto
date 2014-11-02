@@ -18,9 +18,12 @@ package nl.ulso.magisto.git;
 
 import org.junit.Test;
 
+import java.util.List;
+
 import static nl.ulso.magisto.io.Paths.createPath;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class DummyGitClientTest {
 
@@ -29,5 +32,12 @@ public class DummyGitClientTest {
         final Commit commit = new DummyGitClient().getLastCommit(createPath("file"));
         assertNotNull(commit);
         assertEquals("UNKNOWN", commit.getId());
+    }
+
+    @Test
+    public void testChangelog() throws Exception {
+        final List<Commit> changelog = new DummyGitClient().getChangelog();
+        assertNotNull(changelog);
+        assertTrue(changelog.isEmpty());
     }
 }

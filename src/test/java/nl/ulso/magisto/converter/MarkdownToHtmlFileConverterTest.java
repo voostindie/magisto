@@ -97,6 +97,7 @@ public class MarkdownToHtmlFileConverterTest {
         assertEquals("Title", model.get("title"));
         assertNotNull(model.get("commit"));
         assertNotNull(model.get("content"));
+        assertNotNull(model.get("changelog"));
     }
 
     @Test

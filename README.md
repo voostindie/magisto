@@ -94,6 +94,7 @@ A template typically uses a *model* to base its output on. Magisto exposes the f
     * `committer` (`java.lang.String`): Name of the committer.
     * `emailAddress` (`java.lang.String`): Email address of the committer.
     * `shortMessage` (`java.lang.Stirng`): Short message of the commit.
+* `changelog`: a list of `commit`s, describing the last - at most 30 - changes in the Git repository. If the source directory is not a Git repository, this is an empty list.
 
 If you need to generate a link to a local file in your template, for example to your favicon, use the custom `link` directive that Magisto provides. For example:
 

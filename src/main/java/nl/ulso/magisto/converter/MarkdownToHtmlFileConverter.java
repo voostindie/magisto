@@ -52,7 +52,8 @@ class MarkdownToHtmlFileConverter implements FileConverter {
     private final PegDownProcessor markdownProcessor;
     private final CustomLinkRenderer linkRenderer;
 
-    MarkdownToHtmlFileConverter(FileSystemAccessor fileSystemAccessor, Path sourceRoot, GitClient gitClient) {
+    MarkdownToHtmlFileConverter(FileSystemAccessor fileSystemAccessor, Path sourceRoot, GitClient gitClient)
+            throws IOException {
         this.gitClient = gitClient;
         try {
             if (isCustomTemplateAvailable(fileSystemAccessor, sourceRoot)) {
@@ -148,6 +149,7 @@ class MarkdownToHtmlFileConverter implements FileConverter {
         model.put("title", extractTitleFromMarkdown(markdownText));
         model.put("content", convertMarkdownToHtml(markdownText));
         model.put("commit", gitClient.getLastCommit(path));
+        model.put("changelog", gitClient.getChangelog());
         return model;
     }
 
