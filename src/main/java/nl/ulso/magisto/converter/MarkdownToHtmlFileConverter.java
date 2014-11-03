@@ -148,8 +148,7 @@ class MarkdownToHtmlFileConverter implements FileConverter {
         model.put("path", path);
         model.put("title", extractTitleFromMarkdown(markdownText));
         model.put("content", convertMarkdownToHtml(markdownText));
-        model.put("commit", gitClient.getLastCommit(path));
-        model.put("changelog", gitClient.getChangelog());
+        model.put("history", gitClient.getHistory(path));
         return model;
     }
 

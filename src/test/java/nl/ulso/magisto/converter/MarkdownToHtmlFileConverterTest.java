@@ -95,9 +95,8 @@ public class MarkdownToHtmlFileConverterTest {
         assertTrue(timestamp.before(end));
         assertEquals("test.md", ((Path) model.get("path")).getFileName().toString());
         assertEquals("Title", model.get("title"));
-        assertNotNull(model.get("commit"));
         assertNotNull(model.get("content"));
-        assertNotNull(model.get("changelog"));
+        assertNotNull(model.get("history"));
     }
 
     @Test

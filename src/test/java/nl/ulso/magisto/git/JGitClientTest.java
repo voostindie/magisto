@@ -18,23 +18,24 @@ package nl.ulso.magisto.git;
 
 import org.junit.Test;
 
-import java.util.List;
-
 import static nl.ulso.magisto.io.Paths.createPath;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class JGitClientTest {
 
     @Test
     public void testCommitAvailable() throws Exception {
-        final Commit commit = new JGitClient(System.getProperty("user.dir")).getLastCommit(createPath("pom.xml"));
-        assertNotNull(commit);
+        final History history = new JGitClient(System.getProperty("user.dir")).getHistory(createPath("pom.xml"));
+        assertNotNull(history);
+        assertNotNull(history.getLastCommit());
     }
 
     @Test
     public void testChangelog() throws Exception {
-        final List<Commit> changelog = new JGitClient(System.getProperty("user.dir")).getChangelog();
-        assertEquals(30, changelog.size());
+        final History history = new JGitClient(System.getProperty("user.dir")).getHistory(createPath("pom.xml"));
+        assertNotNull(history);
+        assertNotNull(history.getCommits());
+        assertTrue(history.getCommits().size() > 0);
     }
 }

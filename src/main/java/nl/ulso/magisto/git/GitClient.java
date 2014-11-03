@@ -16,12 +16,9 @@
 
 package nl.ulso.magisto.git;
 
-import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
 
 public interface GitClient {
-    Commit getLastCommit(Path path) throws IOException;
 
-    List<Commit> getChangelog() throws IOException;
+    History getHistory(Path path);
 }

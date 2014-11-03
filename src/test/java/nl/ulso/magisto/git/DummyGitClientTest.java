@@ -29,15 +29,17 @@ public class DummyGitClientTest {
 
     @Test
     public void testCommitAvailable() throws Exception {
-        final Commit commit = new DummyGitClient().getLastCommit(createPath("file"));
+        final History history = new DummyGitClient().getHistory(createPath("file"));
+        final Commit commit = history.getLastCommit();
         assertNotNull(commit);
         assertEquals("UNKNOWN", commit.getId());
     }
 
     @Test
     public void testChangelog() throws Exception {
-        final List<Commit> changelog = new DummyGitClient().getChangelog();
-        assertNotNull(changelog);
-        assertTrue(changelog.isEmpty());
+        final History history = new DummyGitClient().getHistory(createPath("file"));
+        final List<Commit> commits = history.getCommits();
+        assertNotNull(commits);
+        assertTrue(commits.isEmpty());
     }
 }
