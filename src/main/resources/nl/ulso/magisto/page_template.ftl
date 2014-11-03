@@ -8,11 +8,28 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css"/>
     <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+        @media (min-width: 768px) {
+            .container {
+                max-width: 730px;
+            }
+        }
+        blockquote {
+            font-size: 1em;
+        }
+        footer {
+            border-top: 1px solid #e5e5e5;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
-    <div>
-        <ul class="nav nav-pills pull-right" role="tablist">
+    <header>
+        <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active">
                 <a href="#content" role="tab" data-toggle="tab">Content</a>
             </li>
@@ -20,7 +37,7 @@
                 <a href="#history" role="tab" data-toggle="tab">History</a>
             </li>
         </ul>
-    </div>
+    </header>
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="content">
             <article>
@@ -28,6 +45,7 @@
             </article>
         </div>
         <div role="tabpanel" class="tab-pane" id="history">
+            <h1>Page history</h1>
             <table class="table-condensed">
                 <thead>
                 <tr>
@@ -47,21 +65,23 @@
                 </tbody>
             </table>
             <#list history.commits as commit>
-                <h2><a name="${commit.shortId}"></a><strong>${commit.shortId}</strong>: ${commit.shortMessage}</h2>
-                <ul>
-                    <li><strong>Commit</strong>: ${commit.id}</li>
-                    <li><strong>Timestamp</strong>: ${commit.timestamp?date} at ${commit.timestamp?time}</li>
-                    <li><strong>Committer</strong>: ${commit.committer}</li>
-                </ul>
-                <pre>${commit.fullMessage?html}</pre>
+            <h2><a name="${commit.shortId}"></a><strong>${commit.shortId}</strong>: ${commit.shortMessage}</h2>
+            <ul>
+                <li><strong>Commit</strong>: ${commit.id}</li>
+                <li><strong>Timestamp</strong>: ${commit.timestamp?date} at ${commit.timestamp?time}</li>
+                <li><strong>Committer</strong>: ${commit.committer}</li>
+            </ul>
+            <pre>${commit.fullMessage?html}</pre>
             </#list>
         </div>
+    </div>
+    <footer>
         <p class="text-muted">
             Last changed on ${history.lastCommit.timestamp?date} at ${history.lastCommit.timestamp?time}
             by ${history.lastCommit.committer} in commit ${history.lastCommit.shortId}.<br/>
             Generated on ${timestamp?date} at ${timestamp?time} from /${path}.
         </p>
-    </div>
+    </footer>
 </div>
 <script>
     $("table").addClass("table table-striped");
