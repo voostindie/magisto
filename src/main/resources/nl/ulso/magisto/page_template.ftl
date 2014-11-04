@@ -49,36 +49,26 @@
             <table class="table-condensed">
                 <thead>
                 <tr>
-                    <th>Commit</th>
-                    <th>Timestamp</th>
-                    <th>Short message</th>
+                    <th>Date</th>
+                    <th>Changed by</th>
+                    <th>Description</th>
                 </tr>
                 </thead>
                 <tbody>
                 <#list history.commits as commit>
                 <tr>
-                    <td><a href="#${commit.shortId}">${commit.shortId}</a></td>
-                    <td>${commit.timestamp?date} at ${commit.timestamp?time}</td>
+                    <td>${commit.timestamp?datetime}</td>
+                    <td>${commit.committer}</td>
                     <td>${commit.shortMessage}</td>
                 </tr>
                 </#list>
                 </tbody>
             </table>
-            <#list history.commits as commit>
-            <h2><a name="${commit.shortId}"></a><strong>${commit.shortId}</strong>: ${commit.shortMessage}</h2>
-            <ul>
-                <li><strong>Commit</strong>: ${commit.id}</li>
-                <li><strong>Timestamp</strong>: ${commit.timestamp?date} at ${commit.timestamp?time}</li>
-                <li><strong>Committer</strong>: ${commit.committer}</li>
-            </ul>
-            <pre>${commit.fullMessage?html}</pre>
-            </#list>
         </div>
     </div>
     <footer>
         <p class="text-muted">
-            Last changed on ${history.lastCommit.timestamp?date} at ${history.lastCommit.timestamp?time}
-            by ${history.lastCommit.committer} in commit ${history.lastCommit.shortId}.<br/>
+            Last changed by ${history.lastCommit.committer} on ${history.lastCommit.timestamp?date} at ${history.lastCommit.timestamp?time}.<br/>
             Generated on ${timestamp?date} at ${timestamp?time} from /${path}.
         </p>
     </footer>
