@@ -31,32 +31,42 @@ import static java.util.Collections.unmodifiableList;
 
 class JGitHistory implements History {
 
-    final Git git;
-    final String path;
+    private final Git git;
+    private final String path;
+
+    private Commit lastCommit;
+    private List<Commit> commits;
 
     JGitHistory(Git git, Path path) {
         this.git = git;
         this.path = path.toString();
+        this.lastCommit = null;
+        this.commits = null;
     }
 
     @Override
     public List<Commit> getCommits() throws IOException {
-        final List<Commit> changes = new ArrayList<>();
-        final Iterator<RevCommit> commits = createCommitIterator();
-        while (commits.hasNext()) {
-            changes.add(createCommit(commits.next()));
+        if (commits == null) {
+            commits = new ArrayList<>();
+            final Iterator<RevCommit> iterator = createCommitIterator();
+            while (iterator.hasNext()) {
+                commits.add(createCommit(iterator.next()));
+            }
         }
-        return unmodifiableList(changes);
+        return unmodifiableList(commits);
     }
 
     @Override
     public Commit getLastCommit() throws IOException {
-        final Iterator<RevCommit> commits = createCommitIterator();
-        if (commits.hasNext()) {
-            return createCommit(commits.next());
-        } else {
-            return Commit.DEFAULT_COMMIT;
+        if (lastCommit == null) {
+            final Iterator<RevCommit> commits = createCommitIterator();
+            if (commits.hasNext()) {
+                lastCommit = createCommit(commits.next());
+            } else {
+                lastCommit = Commit.DEFAULT_COMMIT;
+            }
         }
+        return lastCommit;
     }
 
     private Iterator<RevCommit> createCommitIterator() throws IOException {
