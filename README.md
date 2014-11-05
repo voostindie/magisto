@@ -24,7 +24,7 @@ Magisto can be used in two ways: as a standalone application, and as a Maven plu
 
 ### Standalone
 
-Magisto comes as a ZIP that you have to unpack. In the `bin` directory you'll find scripts for your favorite OS. (Note: I don't use Windows myself, so I couldn't test that particular script.)
+Magisto [comes as a ZIP](http://search.maven.org/remotecontent?filepath=nl/ulso/magisto/magisto/1.0.0/magisto-1.0.0.zip) that you have to unpack. In the `bin` directory you'll find scripts for your favorite OS. (Note: I don't use Windows myself, so I couldn't test that particular script.)
 
 Run Magisto with the `-h` or `--help` command line argument to get something like this:
 
