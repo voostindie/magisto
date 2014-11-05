@@ -20,6 +20,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>9</version>
+    </parent>
+
     <groupId>nl.ulso.magisto</groupId>
     <artifactId>magisto</artifactId>
     <version>1.0.0-SNAPSHOT</version>
@@ -27,6 +33,12 @@
 
     <name>Magisto</name>
     <description>Exports Markdown in Git repositories to static sites</description>
+
+    <scm>
+        <connection>scm:git:https://github.com/voostindie/magisto.git</connection>
+        <developerConnection>scm:git:git@github.com:voostindie/magisto.git</developerConnection>
+        <url>https://github.com/voostindie/magisto</url>
+    </scm>
 
     <developers>
         <developer>
@@ -43,10 +55,6 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
     <dependencies>
         <dependency>
