@@ -33,7 +33,16 @@ import static nl.ulso.magisto.io.Paths.createPath;
  */
 class FileSystemTestRunner {
 
-    static final Path WORKING_DIRECTORY = createPath(System.getProperty("user.dir"));
+    static final Path WORKING_DIRECTORY;
+    static {
+        try {
+            // The "toRealPath" ensures that capitalization is correct
+            // "/Users/vincent/Code" (real path) versus "/Users/vincent/code" (user.dir))
+            WORKING_DIRECTORY = createPath(System.getProperty("user.dir")).toRealPath();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     static void runFileSystemTest(FileSystemTest test) throws IOException {
         final Path path = resolveTempDirectory();
