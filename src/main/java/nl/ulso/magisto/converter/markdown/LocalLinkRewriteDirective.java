@@ -14,7 +14,7 @@
  * limitations under the License
  */
 
-package nl.ulso.magisto.converter;
+package nl.ulso.magisto.converter.markdown;
 
 import freemarker.core.Environment;
 import freemarker.ext.beans.StringModel;
@@ -27,8 +27,7 @@ import java.util.Map;
 
 /**
  * FreeMarker directive that rewrites local links of the form {@code /path/to/file} to {@code ../../path/to/file} in
- * the
- * template; inserting as many parent directory navigation steps as needed. This allows templates to be include static
+ * the template; inserting as many parent directory navigation steps as needed. This allows templates to include static
  * files that are always resolved correctly, no matter at what level the template is processed.
  */
 public class LocalLinkRewriteDirective implements TemplateDirectiveModel {

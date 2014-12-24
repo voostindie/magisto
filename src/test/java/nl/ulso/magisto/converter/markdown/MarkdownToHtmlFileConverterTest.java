@@ -14,7 +14,7 @@
  * limitations under the License
  */
 
-package nl.ulso.magisto.converter;
+package nl.ulso.magisto.converter.markdown;
 
 import freemarker.template.Template;
 import nl.ulso.magisto.git.DummyGitClient;
@@ -73,13 +73,8 @@ public class MarkdownToHtmlFileConverterTest {
     }
 
     @Test
-    public void testConvertedFileName() throws Exception {
+    public void testConvertedFileNameAtx() throws Exception {
         assertEquals(createPath("foo.html"), fileConverter.getConvertedFileName(createPath("foo.MarkDown")));
-    }
-
-    @Test
-    public void testTitleExtraction() throws Exception {
-        assertEquals("title", fileConverter.extractTitleFromMarkdown("abstract\n\n# title\n\n## subtitle\n\nsome text"));
     }
 
     @Test
@@ -87,7 +82,7 @@ public class MarkdownToHtmlFileConverterTest {
         final Date start = new Date();
         TimeUnit.SECONDS.sleep(1);
         final Map<String, Object> model = fileConverter.createPageModel(createPath("test.md"),
-                String.format("# Title%n%nParagraph"));
+                new MarkdownDocument("# Title\n\nParagraph".toCharArray()));
         TimeUnit.SECONDS.sleep(1);
         final Date end = new Date();
         final Date timestamp = (Date) model.get("timestamp");
@@ -106,36 +101,6 @@ public class MarkdownToHtmlFileConverterTest {
         final String output = fileSystemAccessor.getTextFileFromBufferedWriter("test.html");
         assertNotNull(output);
         System.out.println("output = " + output);
-    }
-
-    @Test
-    public void testNormalFileLink() throws Exception {
-        final String html = fileConverter.convertMarkdownToHtml("[link](image.jpg)");
-        assertEquals("<p><a href=\"image.jpg\">link</a></p>", html);
-    }
-
-    @Test
-    public void testExternalLink() throws Exception {
-        final String html = fileConverter.convertMarkdownToHtml("[link](http://www.github.com/voostindie/magisto)");
-        assertEquals("<p><a href=\"http://www.github.com/voostindie/magisto\">link</a></p>", html);
-    }
-
-    @Test
-    public void testMarkdownFileLink() throws Exception {
-        final String html = fileConverter.convertMarkdownToHtml("[link](file.md)");
-        assertEquals("<p><a href=\"file.html\">link</a></p>", html);
-    }
-
-    @Test
-    public void testExternalMarkdownLink() throws Exception {
-        final String html = fileConverter.convertMarkdownToHtml("[link](http://www.example.com/file.md)");
-        assertEquals("<p><a href=\"http://www.example.com/file.md\">link</a></p>", html);
-    }
-
-    @Test
-    public void testMarkdownFileReferenceLink() throws Exception {
-        final String html = fileConverter.convertMarkdownToHtml(String.format("[link][id]%n%n[id]: file.md"));
-        assertEquals("<p><a href=\"file.html\">link</a></p>", html);
     }
 
     @Test

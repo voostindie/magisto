@@ -14,13 +14,13 @@
  * limitations under the License
  */
 
-package nl.ulso.magisto.converter;
+package nl.ulso.magisto.converter.markdown;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import static nl.ulso.magisto.io.Paths.createPath;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class LocalLinkRewriteDirectiveTest {
 

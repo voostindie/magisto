@@ -14,43 +14,36 @@
  * limitations under the License
  */
 
-package nl.ulso.magisto.converter;
+package nl.ulso.magisto.converter.markdown;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import nl.ulso.magisto.converter.FileConverter;
 import nl.ulso.magisto.git.GitClient;
 import nl.ulso.magisto.io.FileSystemAccessor;
-import org.pegdown.Extensions;
-import org.pegdown.PegDownProcessor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static java.util.regex.Pattern.MULTILINE;
 
 /**
- * Converts Markdown files to HTML.
+ * Converts Markdown files to HTML using a FreeMarker template.
  */
 class MarkdownToHtmlFileConverter implements FileConverter {
 
     private static final String TEMPLATE_PATH = "/nl/ulso/magisto";
     private static final String DEFAULT_PAGE_TEMPLATE = "page_template.ftl";
     private static final String CUSTOM_PAGE_TEMPLATE = ".page.ftl";
-    private static final Pattern TITLE_PATTERN = Pattern.compile("^#+ (.*)$", MULTILINE);
-    static final Set<String> MARKDOWN_EXTENSIONS = new HashSet<>(Arrays.asList("md", "markdown", "mdown"));
 
     private final GitClient gitClient;
     private final Template template;
-    private final PegDownProcessor markdownProcessor;
-    private final CustomLinkRenderer linkRenderer;
 
     MarkdownToHtmlFileConverter(FileSystemAccessor fileSystemAccessor, Path sourceRoot, GitClient gitClient)
             throws IOException {
@@ -64,8 +57,6 @@ class MarkdownToHtmlFileConverter implements FileConverter {
         } catch (IOException e) {
             throw new RuntimeException("Could not load built-in template", e);
         }
-        markdownProcessor = new PegDownProcessor(Extensions.ALL - Extensions.HARDWRAPS);
-        linkRenderer = new CustomLinkRenderer();
     }
 
     boolean isCustomTemplateAvailable(FileSystemAccessor fileSystemAccessor, Path sourceRoot) {
@@ -107,7 +98,7 @@ class MarkdownToHtmlFileConverter implements FileConverter {
 
     @Override
     public boolean supports(Path path) {
-        return MARKDOWN_EXTENSIONS.contains(getFileExtension(path));
+        return MarkdownLinkResolver.MARKDOWN_EXTENSIONS.contains(getFileExtension(path));
     }
 
     private String getFileExtension(Path path) {
@@ -124,7 +115,7 @@ class MarkdownToHtmlFileConverter implements FileConverter {
 
     @Override
     public Path getConvertedFileName(Path path) {
-        return path.resolveSibling(linkRenderer.resolveLink(path.getFileName().toString()));
+        return path.resolveSibling(MarkdownLinkResolver.resolveLink(path.getFileName().toString()));
     }
 
     @Override
@@ -133,8 +124,8 @@ class MarkdownToHtmlFileConverter implements FileConverter {
         Logger.getGlobal().log(Level.FINE, String.format("Converting '%s' from Markdown to HTML.", path));
         final Path targetFile = targetRoot.resolve(getConvertedFileName(path));
         try (final Writer writer = fileSystemAccessor.newBufferedWriterForTextFile(targetFile)) {
-            final String markdownText = readTextFile(fileSystemAccessor, sourceRoot.resolve(path));
-            final Map<String, Object> model = createPageModel(path, markdownText);
+            final MarkdownDocument document = readMarkdownDocument(fileSystemAccessor, sourceRoot.resolve(path));
+            final Map<String, Object> model = createPageModel(path, document);
             template.process(model, writer);
         } catch (TemplateException e) {
             Logger.getGlobal().log(Level.SEVERE, String.format("There was a problem in your custom page template. " +
@@ -142,29 +133,17 @@ class MarkdownToHtmlFileConverter implements FileConverter {
         }
     }
 
-    Map<String, Object> createPageModel(Path path, String markdownText) throws IOException {
+    Map<String, Object> createPageModel(Path path, MarkdownDocument document) throws IOException {
         final Map<String, Object> model = new HashMap<>();
         model.put("timestamp", new Date());
         model.put("path", path);
-        model.put("title", extractTitleFromMarkdown(markdownText));
-        model.put("content", convertMarkdownToHtml(markdownText));
+        model.put("title", document.extractTitle());
+        model.put("content", document.toHtml());
         model.put("history", gitClient.getHistory(path));
         return model;
     }
 
-    String extractTitleFromMarkdown(String markdownText) {
-        final Matcher matcher = TITLE_PATTERN.matcher(markdownText);
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-        return "";
-    }
-
-    String convertMarkdownToHtml(String markdownText) {
-        return markdownProcessor.markdownToHtml(markdownText.toCharArray(), linkRenderer);
-    }
-
-    private String readTextFile(FileSystemAccessor fileSystemAccessor, Path path) throws IOException {
+    MarkdownDocument readMarkdownDocument(FileSystemAccessor fileSystemAccessor, Path path) throws IOException {
         try (final BufferedReader reader = fileSystemAccessor.newBufferedReaderForTextFile(path)) {
             final StringBuilder builder = new StringBuilder();
             while (reader.ready()) {
@@ -175,7 +154,7 @@ class MarkdownToHtmlFileConverter implements FileConverter {
                 builder.append(line);
                 builder.append(System.lineSeparator());
             }
-            return builder.toString();
+            return new MarkdownDocument(builder.toString().toCharArray());
         }
     }
 }

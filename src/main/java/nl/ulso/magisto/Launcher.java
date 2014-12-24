@@ -20,7 +20,7 @@ import com.lexicalscope.jewel.cli.ArgumentValidationException;
 import com.lexicalscope.jewel.cli.CliFactory;
 import com.lexicalscope.jewel.cli.ValidationFailure;
 import nl.ulso.magisto.action.RealActionFactory;
-import nl.ulso.magisto.converter.MarkdownToHtmlFileConverterFactory;
+import nl.ulso.magisto.converter.markdown.MarkdownToHtmlFileConverterFactory;
 import nl.ulso.magisto.git.DummyGitClient;
 import nl.ulso.magisto.git.GitClient;
 import nl.ulso.magisto.git.JGitClient;

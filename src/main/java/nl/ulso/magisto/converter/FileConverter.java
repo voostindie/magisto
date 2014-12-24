@@ -25,8 +25,8 @@ import java.nio.file.Path;
  * Converts files from one format to another.
  * <p>
  * <strong>Important!</strong>: The file name of the converted file must overlap with the original name as much as
- * possible, otherwise the lexicographical ordering will not match, and path comparison algorithm in the Magisto class
- * will go out of whack!
+ * possible, otherwise the lexicographical ordering will not match, and the path comparison algorithm in the Magisto
+ * class will go out of whack!
  * </p>
  */
 public interface FileConverter {

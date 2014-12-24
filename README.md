@@ -85,7 +85,7 @@ A template typically uses a *model* to base its output on. Magisto exposes the f
 
 * `timestamp` (`java.util.Date`): the time the Markdown file was converted to HTML.
 * `path` (`java.nio.file.Path`): the relative path to the source file.
-* `title` (`java.lang.String`): the title of the page. This is the text of the first header (atx-style).
+* `title` (`java.lang.String`): the title of the page. This is the text of the first header.
 * `content` (`java.lang.String`): the contents of the page. This is the converted Markdown content, already in HTML.
 * `history`: information on the history of the page. It is replaced with dummy (empty) information if the source directory is not a Git repository. It exposes the following data:
     * `commits`: all commits that contained the file, in reverse chronological order (newest first). Each commit contains:

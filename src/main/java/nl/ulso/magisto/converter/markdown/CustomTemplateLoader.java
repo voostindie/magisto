@@ -14,7 +14,7 @@
  * limitations under the License
  */
 
-package nl.ulso.magisto.converter;
+package nl.ulso.magisto.converter.markdown;
 
 import freemarker.cache.TemplateLoader;
 import nl.ulso.magisto.io.FileSystemAccessor;

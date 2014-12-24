@@ -17,7 +17,7 @@
 package nl.ulso.magisto;
 
 import nl.ulso.magisto.action.RealActionFactory;
-import nl.ulso.magisto.converter.MarkdownToHtmlFileConverterFactory;
+import nl.ulso.magisto.converter.markdown.MarkdownToHtmlFileConverterFactory;
 import nl.ulso.magisto.git.DummyGitClient;
 import nl.ulso.magisto.git.GitClient;
 import nl.ulso.magisto.git.JGitClient;
