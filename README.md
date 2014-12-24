@@ -1,5 +1,7 @@
 # Magisto
 
+[![Build Status](https://travis-ci.org/voostindie/magisto.svg?branch=master)](https://travis-ci.org/voostindie/magisto)
+
 ## Introduction
 
 Magisto is a *very* simple tool that runs against a Git clone and that exports all files in it to an HTML site. All Markdown files are converted to HTML using a single template in the process. All other files are kept intact.
