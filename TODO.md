@@ -4,7 +4,9 @@
 
 In arbitrary order, all not yet very clear:
 
-* More data in the model, e.g.
-    * Site structure: Links to siblings, parents and children
+* Custom templates on directory level by putting a .page.ftl in that directory
+* Custom templates for specific files by putting a <file>.ftl next to the file
+* Formally support including template files in the other templates.
+* Index pages: generate overview pages of all pages and directories in a directory, using a special index template
 * Built-in macro's and/or directives for the FreeMarker template
 * Configurable prefix for Magisto files (e.g. "_" instead of ".")
