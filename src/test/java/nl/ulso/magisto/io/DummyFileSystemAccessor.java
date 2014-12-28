@@ -68,7 +68,17 @@ public class DummyFileSystemAccessor implements FileSystemAccessor {
 
     @Override
     public SortedSet<Path> findAllPaths(Path root) throws IOException {
-        final SortedSet<Path> paths = new TreeSet<>();
+        return findAllPaths(root, new Comparator<Path>() {
+            @Override
+            public int compare(Path o1, Path o2) {
+                return o1.compareTo(o2);
+            }
+        });
+    }
+
+    @Override
+    public SortedSet<Path> findAllPaths(Path root, Comparator<? super Path> comparator) throws IOException {
+        final SortedSet<Path> paths = new TreeSet<>(comparator);
         if (root.equals(sourceRoot)) {
             addAllPaths(paths, sourcePaths);
         } else if (root.equals(staticRoot)) {

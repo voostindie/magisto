@@ -56,6 +56,6 @@ public class ConvertSourceActionTest {
         final Path targetRoot = accessor.prepareTargetDirectory("target");
         final DummyPathEntry entry = createPathEntry("file.convert");
         new ConvertSourceAction(entry.getPath(), fileConverter).perform(accessor, sourceRoot, targetRoot);
-        assertEquals("source:file.convert -> target:file.convert.converted", fileConverter.getLoggedConversions());
+        assertEquals("source:file.convert -> target:file.converted", fileConverter.getLoggedConversions());
     }
 }

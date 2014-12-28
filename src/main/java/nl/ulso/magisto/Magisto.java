@@ -96,8 +96,10 @@ class Magisto {
         final FileConverter fileConverter = fileConverterFactory.create(fileSystemAccessor, sourceRoot);
         final boolean forceConvert = forceOverwrite
                 || fileConverter.isCustomTemplateChanged(fileSystemAccessor, sourceRoot, targetRoot);
-        final Iterator<Path> sources = fileSystemAccessor.findAllPaths(sourceRoot).iterator();
-        final Iterator<Path> targets = fileSystemAccessor.findAllPaths(targetRoot).iterator();
+        final Iterator<Path> sources = fileSystemAccessor.findAllPaths(sourceRoot,
+                new SourcePathComparator(fileConverter.getSourceExtensions())).iterator();
+        final Iterator<Path> targets = fileSystemAccessor.findAllPaths(targetRoot,
+                new TargetPathComparator(fileConverter.getTargetExtension())).iterator();
 
         Path source = nullableNext(sources);
         Path target = nullableNext(targets);

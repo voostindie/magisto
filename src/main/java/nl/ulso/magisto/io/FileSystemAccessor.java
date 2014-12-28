@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.SortedSet;
 
 /**
@@ -113,6 +114,14 @@ public interface FileSystemAccessor {
      * @throws IOException If an exception occurs while finding all paths.
      */
     SortedSet<Path> findAllPaths(Path root) throws IOException;
+
+    /**
+     * @param root Directory to find all paths in.
+     * @param comparator Comparator to use for path comparisons.
+     * @return All paths in a directory, all relative to the directory itself.
+     * @throws IOException If an exception occurs while finding all paths.
+     */
+    SortedSet<Path> findAllPaths(Path root, Comparator<? super Path> comparator) throws IOException;
 
     /**
      * @param path Absolute path to get the last modified timestamp of.

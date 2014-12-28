@@ -44,4 +44,34 @@ public final class Paths {
     public static Path createPath(String first, String... more) {
         return FileSystems.getDefault().getPath(first, more);
     }
+
+    public static ExtensionLessPath splitOnExtension(Path path) {
+        return new ExtensionLessPath(path);
+    }
+
+    public static class ExtensionLessPath {
+
+        private Path pathWithoutExtension;
+        private String originalExtension;
+
+        private ExtensionLessPath(Path path) {
+            final String filename = path.getName(path.getNameCount() - 1).toString();
+            final int position = filename.lastIndexOf('.');
+            if (position < 1) {
+                pathWithoutExtension = path;
+                originalExtension = "";
+            } else {
+                pathWithoutExtension = path.resolveSibling(filename.substring(0, position));
+                originalExtension = filename.substring(position + 1);
+            }
+        }
+
+        public Path getPathWithoutExtension() {
+            return pathWithoutExtension;
+        }
+
+        public String getOriginalExtension() {
+            return originalExtension;
+        }
+    }
 }

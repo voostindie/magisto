@@ -143,7 +143,7 @@ public class MagistoTest {
                 sameSourceFile2,
                 sameStaticFile,
                 createPathEntry("baz.txt"),
-                createPathEntry("foo.convert.converted"),
+                createPathEntry("foo.converted"),
                 createPathEntry("delete.me")
         );
         TimeUnit.SECONDS.sleep(1);
@@ -159,6 +159,20 @@ public class MagistoTest {
                 createPathEntry("image.jpg")
         );
 
+    }
+
+    @Test
+    public void testSameFileNameDifferentExtensions() throws Exception {
+        accessor.addTargetPaths(
+                createPathEntry("test.convers"),
+                createPathEntry("test.converted")
+        );
+        TimeUnit.SECONDS.sleep(1);
+        accessor.addSourcePaths(
+                createPathEntry("test.convers"),
+                createPathEntry("test.convert")
+        );
+        runTest(0, 1, 1, 0, 0, 0);
     }
 
     private void runTest(int expectedSourceSkips, int expectedSourceCopies, int expectedSourceConversions,

@@ -23,6 +23,7 @@ import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -37,6 +38,12 @@ import static nl.ulso.magisto.io.Paths.*;
 public class RealFileSystemAccessor implements FileSystemAccessor {
 
     private static final Charset CHARSET_UTF8 = Charset.forName("UTF-8");
+    private static final Comparator<? super Path> DEFAULT_PATH_COMPARATOR = new Comparator<Path>() {
+        @Override
+        public int compare(Path path1, Path path2) {
+            return path1.compareTo(path2);
+        }
+    };
 
     @Override
     public Path resolveSourceDirectory(String directoryName) throws IOException {
@@ -114,8 +121,13 @@ public class RealFileSystemAccessor implements FileSystemAccessor {
     }
 
     @Override
-    public SortedSet<Path> findAllPaths(final Path root) throws IOException {
-        final SortedSet<Path> paths = new TreeSet<>();
+    public SortedSet<Path> findAllPaths(Path root) throws IOException {
+        return findAllPaths(root, DEFAULT_PATH_COMPARATOR);
+    }
+
+    @Override
+    public SortedSet<Path> findAllPaths(final Path root, Comparator<? super Path> comparator) throws IOException {
+        final SortedSet<Path> paths = new TreeSet<>(comparator);
         Files.walkFileTree(requireAbsolutePath(root), new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes attributes) throws IOException {

@@ -22,6 +22,7 @@ import freemarker.template.TemplateException;
 import nl.ulso.magisto.converter.FileConverter;
 import nl.ulso.magisto.git.GitClient;
 import nl.ulso.magisto.io.FileSystemAccessor;
+import nl.ulso.magisto.io.Paths;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,6 +31,7 @@ import java.nio.file.Path;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -97,20 +99,19 @@ class MarkdownToHtmlFileConverter implements FileConverter {
     }
 
     @Override
-    public boolean supports(Path path) {
-        return MarkdownLinkResolver.MARKDOWN_EXTENSIONS.contains(getFileExtension(path));
+    public Set<String> getSourceExtensions() {
+        return MarkdownLinkResolver.SOURCE_EXTENSIONS;
     }
 
-    private String getFileExtension(Path path) {
-        final String fileName = path.getFileName().toString();
-        final int position = fileName.lastIndexOf('.');
-        if (position < 1) {
-            return "";
-        }
-        if (position == fileName.length()) {
-            return "";
-        }
-        return fileName.substring(position + 1).toLowerCase();
+    @Override
+    public String getTargetExtension() {
+        return MarkdownLinkResolver.TARGET_EXTENSION;
+    }
+
+    @Override
+    public boolean supports(Path path) {
+        return MarkdownLinkResolver.SOURCE_EXTENSIONS.contains(
+                Paths.splitOnExtension(path).getOriginalExtension().toLowerCase());
     }
 
     @Override

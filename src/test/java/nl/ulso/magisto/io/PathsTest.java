@@ -18,7 +18,10 @@ package nl.ulso.magisto.io;
 
 import org.junit.Test;
 
+import java.nio.file.Path;
+
 import static nl.ulso.magisto.io.Paths.createPath;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class PathsTest {
@@ -41,5 +44,29 @@ public class PathsTest {
     @Test(expected = IllegalStateException.class)
     public void testRelativeNotOk() throws Exception {
         assertNotNull(Paths.requireRelativePath(createPath(System.getProperty("user.dir"))));
+    }
+
+    @Test
+    public void testExtensionLessPath() throws Exception {
+        final Path path = Paths.createPath("file.txt");
+        final Paths.ExtensionLessPath extensionLessPath = Paths.splitOnExtension(path);
+        assertEquals("file", extensionLessPath.getPathWithoutExtension().toString());
+        assertEquals("txt", extensionLessPath.getOriginalExtension());
+    }
+
+    @Test
+    public void testExtensionLessPathInSubdirectory() throws Exception {
+        final Path path = Paths.createPath("path/to/file.txt");
+        final Paths.ExtensionLessPath extensionLessPath = Paths.splitOnExtension(path);
+        assertEquals("path/to/file", extensionLessPath.getPathWithoutExtension().toString());
+        assertEquals("txt", extensionLessPath.getOriginalExtension());
+    }
+
+    @Test
+    public void testExtensionLessPathOnExtensionLessFile() throws Exception {
+        final Path path = Paths.createPath("file");
+        final Paths.ExtensionLessPath extensionLessPath = Paths.splitOnExtension(path);
+        assertEquals("file", extensionLessPath.getPathWithoutExtension().toString());
+        assertEquals("", extensionLessPath.getOriginalExtension());
     }
 }
