@@ -24,7 +24,7 @@ import nl.ulso.magisto.converter.markdown.MarkdownToHtmlFileConverterFactory;
 import nl.ulso.magisto.git.DummyGitClient;
 import nl.ulso.magisto.git.GitClient;
 import nl.ulso.magisto.git.JGitClient;
-import nl.ulso.magisto.io.RealFileSystemAccessor;
+import nl.ulso.magisto.io.RealFileSystem;
 
 import java.io.IOException;
 import java.util.logging.*;
@@ -99,7 +99,7 @@ public class Launcher {
         if (DUMMY_MAGISTO != null) {
             return DUMMY_MAGISTO;
         }
-        return new Magisto(forceOverwrite, new RealFileSystemAccessor(), new RealActionFactory(),
+        return new Magisto(forceOverwrite, new RealFileSystem(), new RealActionFactory(),
                 new MarkdownToHtmlFileConverterFactory(gitClient));
     }
 

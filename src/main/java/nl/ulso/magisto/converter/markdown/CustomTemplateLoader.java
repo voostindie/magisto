@@ -17,7 +17,7 @@
 package nl.ulso.magisto.converter.markdown;
 
 import freemarker.cache.TemplateLoader;
-import nl.ulso.magisto.io.FileSystemAccessor;
+import nl.ulso.magisto.io.FileSystem;
 import nl.ulso.magisto.io.Paths;
 
 import java.io.IOException;
@@ -25,15 +25,15 @@ import java.io.Reader;
 import java.nio.file.Path;
 
 /**
- * FreeMarker {@link TemplateLoader} that loads templates from the file system using the {@link FileSystemAccessor}.
+ * FreeMarker {@link TemplateLoader} that loads templates from the file system using the {@link nl.ulso.magisto.io.FileSystem}.
  */
 class CustomTemplateLoader implements TemplateLoader {
 
-    private final FileSystemAccessor fileSystemAccessor;
+    private final FileSystem fileSystem;
     private final Path root;
 
-    public CustomTemplateLoader(FileSystemAccessor fileSystemAccessor, Path rootPath) {
-        this.fileSystemAccessor = fileSystemAccessor;
+    public CustomTemplateLoader(FileSystem fileSystem, Path rootPath) {
+        this.fileSystem = fileSystem;
         this.root = rootPath;
     }
 
@@ -44,7 +44,7 @@ class CustomTemplateLoader implements TemplateLoader {
             throw new UnsupportedOperationException("Template sources in directories are not supported: " + name);
         }
         final Path path = root.resolve(Paths.createPath(parts[0]));
-        if (fileSystemAccessor.exists(path)) {
+        if (fileSystem.exists(path)) {
             return path;
         }
         return null;
@@ -54,7 +54,7 @@ class CustomTemplateLoader implements TemplateLoader {
     public long getLastModified(Object templateSource) {
         final Path path = (Path) templateSource;
         try {
-            return fileSystemAccessor.getLastModifiedInMillis(path);
+            return fileSystem.getLastModifiedInMillis(path);
         } catch (IOException e) {
             return -1;
         }
@@ -63,7 +63,7 @@ class CustomTemplateLoader implements TemplateLoader {
     @Override
     public Reader getReader(Object templateSource, String encoding) throws IOException {
         final Path path = (Path) templateSource;
-        return fileSystemAccessor.newBufferedReaderForTextFile(path);
+        return fileSystem.newBufferedReaderForTextFile(path);
     }
 
     @Override

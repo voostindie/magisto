@@ -17,7 +17,7 @@
 package nl.ulso.magisto.action;
 
 import nl.ulso.magisto.converter.FileConverter;
-import nl.ulso.magisto.io.FileSystemAccessor;
+import nl.ulso.magisto.io.FileSystem;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -34,7 +34,7 @@ import java.util.TreeSet;
  * </p>
  * <ol>
  * <li>Add actions to it, by calling the various {@code add...} methods.</li>
- * <li>Performing all actions in the set, by calling the {@link #performAll(FileSystemAccessor, Path, Path,
+ * <li>Performing all actions in the set, by calling the {@link #performAll(nl.ulso.magisto.io.FileSystem, Path, Path,
  * ActionCallback)} method.</li>
  * </ol>
  * <p>
@@ -82,12 +82,12 @@ public class ActionSet {
      * Afterwards all actions all cleared from the list, ensuring that the actions in a list can be performed only
      * once.
      */
-    public void performAll(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot,
+    public void performAll(FileSystem fileSystem, Path sourceRoot, Path targetRoot,
                            ActionCallback callback) throws IOException {
         final SortedSet<Action> actions = new TreeSet<>(ACTION_COMPARATOR);
         actions.addAll(actionMap.values());
         for (Action action : actions) {
-            action.perform(fileSystemAccessor, sourceRoot, targetRoot);
+            action.perform(fileSystem, sourceRoot, targetRoot);
             callback.actionPerformed(new BlockedActionWrapper(action));
         }
         actions.clear();
@@ -149,7 +149,7 @@ public class ActionSet {
         }
 
         @Override
-        public void perform(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot) throws IOException {
+        public void perform(FileSystem fileSystem, Path sourceRoot, Path targetRoot) throws IOException {
             throw new IllegalStateException("Cannot perform an action twice");
         }
 

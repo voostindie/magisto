@@ -16,7 +16,7 @@
 
 package nl.ulso.magisto.action;
 
-import nl.ulso.magisto.io.DummyFileSystemAccessor;
+import nl.ulso.magisto.io.DummyFileSystem;
 import nl.ulso.magisto.io.DummyPathEntry;
 import org.junit.Test;
 
@@ -40,11 +40,11 @@ public class CopySourceActionTest {
 
     @Test
     public void testCopySource() throws Exception {
-        final DummyFileSystemAccessor accessor = new DummyFileSystemAccessor();
-        final Path sourceRoot = accessor.resolveSourceDirectory("source");
-        final Path targetRoot = accessor.prepareTargetDirectory("target");
+        final DummyFileSystem fileSystem = new DummyFileSystem();
+        final Path sourceRoot = fileSystem.resolveSourceDirectory("source");
+        final Path targetRoot = fileSystem.prepareTargetDirectory("target");
         final DummyPathEntry entry = createPathEntry("file");
-        new CopySourceAction(entry.getPath()).perform(accessor, sourceRoot, targetRoot);
-        assertEquals("source:file -> target", accessor.getLoggedCopies());
+        new CopySourceAction(entry.getPath()).perform(fileSystem, sourceRoot, targetRoot);
+        assertEquals("source:file -> target", fileSystem.getLoggedCopies());
     }
 }

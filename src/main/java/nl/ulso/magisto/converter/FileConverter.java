@@ -16,7 +16,7 @@
 
 package nl.ulso.magisto.converter;
 
-import nl.ulso.magisto.io.FileSystemAccessor;
+import nl.ulso.magisto.io.FileSystem;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -40,7 +40,7 @@ public interface FileConverter {
 
     Path getConvertedFileName(Path path);
 
-    void convert(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot, Path path) throws IOException;
+    void convert(FileSystem fileSystem, Path sourceRoot, Path targetRoot, Path path) throws IOException;
 
-    boolean isCustomTemplateChanged(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot) throws IOException;
+    boolean isCustomTemplateChanged(FileSystem fileSystem, Path sourceRoot, Path targetRoot) throws IOException;
 }

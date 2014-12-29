@@ -23,7 +23,7 @@ import java.util.*;
 import static nl.ulso.magisto.io.DummyPathEntry.createPathEntry;
 import static nl.ulso.magisto.io.Paths.createPath;
 
-public class DummyFileSystemAccessor implements FileSystemAccessor {
+public class DummyFileSystem implements FileSystem {
 
     private final Path sourceRoot;
     private final Path staticRoot;
@@ -37,7 +37,7 @@ public class DummyFileSystemAccessor implements FileSystemAccessor {
     private String loggedDeletions = "";
     private long touchFileTimestamp = -1;
 
-    public DummyFileSystemAccessor() {
+    public DummyFileSystem() {
         this.sourceRoot = createPath("source").toAbsolutePath();
         this.staticRoot = this.sourceRoot.resolve(".static");
         this.targetRoot = createPath("target").toAbsolutePath();

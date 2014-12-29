@@ -33,9 +33,9 @@ import static java.nio.file.StandardOpenOption.*;
 import static nl.ulso.magisto.io.Paths.*;
 
 /**
- * Default implementation of the {@link nl.ulso.magisto.io.FileSystemAccessor} that actually accesses the file system.
+ * Default implementation of the {@link FileSystem} that actually accesses the file system.
  */
-public class RealFileSystemAccessor implements FileSystemAccessor {
+public class RealFileSystem implements FileSystem {
 
     private static final Charset CHARSET_UTF8 = Charset.forName("UTF-8");
     private static final Comparator<? super Path> DEFAULT_PATH_COMPARATOR = new Comparator<Path>() {

@@ -16,7 +16,7 @@
 
 package nl.ulso.magisto.action;
 
-import nl.ulso.magisto.io.DummyFileSystemAccessor;
+import nl.ulso.magisto.io.DummyFileSystem;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -87,7 +87,7 @@ public class ActionSetTest {
 
     private List<Action> performActions(ActionSet actions) throws IOException {
         final List<Action> performed = new ArrayList<>();
-        actions.performAll(new DummyFileSystemAccessor(), createPath("."), createPath("."), new ActionCallback() {
+        actions.performAll(new DummyFileSystem(), createPath("."), createPath("."), new ActionCallback() {
             @Override
             public void actionPerformed(Action action) {
                 performed.add(action);

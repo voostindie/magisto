@@ -18,7 +18,7 @@ package nl.ulso.magisto;
 
 import nl.ulso.magisto.action.DummyActionFactory;
 import nl.ulso.magisto.converter.DummyFileConverterFactory;
-import nl.ulso.magisto.io.DummyFileSystemAccessor;
+import nl.ulso.magisto.io.DummyFileSystem;
 import nl.ulso.magisto.io.DummyPathEntry;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,17 +31,17 @@ import static org.junit.Assert.assertEquals;
 
 public class MagistoTest {
 
-    private DummyFileSystemAccessor accessor;
+    private DummyFileSystem fileSystem;
     private DummyActionFactory actionFactory;
     private DummyFileConverterFactory fileConverterFactory;
     private Magisto magisto;
 
     @Before
     public void setUp() throws Exception {
-        accessor = new DummyFileSystemAccessor();
+        fileSystem = new DummyFileSystem();
         actionFactory = new DummyActionFactory();
         fileConverterFactory = new DummyFileConverterFactory();
-        magisto = new Magisto(false, accessor, actionFactory, fileConverterFactory);
+        magisto = new Magisto(false, fileSystem, actionFactory, fileConverterFactory);
     }
 
     @Test
@@ -51,25 +51,25 @@ public class MagistoTest {
 
     @Test
     public void testNormalFileEmptyTargetDirectory() throws Exception {
-        accessor.addSourcePaths(createPathEntry("file.jpg"));
+        fileSystem.addSourcePaths(createPathEntry("file.jpg"));
         runTest(0, 1, 0, 0, 0, 0);
     }
 
     @Test
     public void testConversionFileEmptyTargetDirectory() throws Exception {
-        accessor.addSourcePaths(createPathEntry("file.convert"));
+        fileSystem.addSourcePaths(createPathEntry("file.convert"));
         runTest(0, 0, 1, 0, 0, 0);
     }
 
     @Test
     public void testUnknownFileInTargetDirectory() throws Exception {
-        accessor.addTargetPaths(createPathEntry("file.jpg"));
+        fileSystem.addTargetPaths(createPathEntry("file.jpg"));
         runTest(0, 0, 0, 1, 0, 0);
     }
 
     @Test
     public void testStaticFileEmptyTargetDirectory() throws Exception {
-        accessor.addStaticPaths(createPathEntry("file.jpg"));
+        fileSystem.addStaticPaths(createPathEntry("file.jpg"));
         runTest(0, 0, 0, 0, 0, 1);
     }
 
@@ -77,8 +77,8 @@ public class MagistoTest {
     public void testNormalFilesExistNoChangesDetected() throws Exception {
         final DummyPathEntry file1 = createPathEntry("foo.txt");
         final DummyPathEntry file2 = createPathEntry("bar.jpg");
-        accessor.addSourcePaths(file1, file2);
-        accessor.addTargetPaths(file1, file2);
+        fileSystem.addSourcePaths(file1, file2);
+        fileSystem.addTargetPaths(file1, file2);
         runTest(2, 0, 0, 0, 0, 0);
     }
 
@@ -86,8 +86,8 @@ public class MagistoTest {
     public void testStaticFilesExistNoChangesDetected() throws Exception {
         final DummyPathEntry file1 = createPathEntry("foo.txt");
         final DummyPathEntry file2 = createPathEntry("bar.jpg");
-        accessor.addStaticPaths(file1, file2);
-        accessor.addTargetPaths(file1, file2);
+        fileSystem.addStaticPaths(file1, file2);
+        fileSystem.addTargetPaths(file1, file2);
         runTest(0, 0, 0, 0, 2, 0);
     }
 
@@ -108,7 +108,7 @@ public class MagistoTest {
     public void testMultipleSourceAndTargetFilesWithDetectedOverwrite() throws Exception {
         prepareMultipleSourceAndTargetFiles();
         fileConverterFactory.setCustomTemplateChanged();
-        magisto = new Magisto(false, accessor, actionFactory, fileConverterFactory);
+        magisto = new Magisto(false, fileSystem, actionFactory, fileConverterFactory);
         runTest(
                 2, // sameFile1, sameFile2
                 1, // baz.txt
@@ -121,7 +121,7 @@ public class MagistoTest {
 
     @Test
     public void testMultipleSourceAndTargetFilesWithForcedOverwrite() throws Exception {
-        magisto = new Magisto(true, accessor, actionFactory, fileConverterFactory);
+        magisto = new Magisto(true, fileSystem, actionFactory, fileConverterFactory);
         prepareMultipleSourceAndTargetFiles();
         runTest(
                 0, // no skips: forced overwrite
@@ -138,7 +138,7 @@ public class MagistoTest {
         final DummyPathEntry sameSourceFile2 = createPathEntry("bar.jpg");
         final DummyPathEntry sameStaticFile = createPathEntry("favicon.ico");
         final DummyPathEntry nonChangedConversionFile = createPathEntry("foo.convert");
-        accessor.addTargetPaths(
+        fileSystem.addTargetPaths(
                 sameSourceFile1,
                 sameSourceFile2,
                 sameStaticFile,
@@ -147,14 +147,14 @@ public class MagistoTest {
                 createPathEntry("delete.me")
         );
         TimeUnit.SECONDS.sleep(1);
-        accessor.addSourcePaths(
+        fileSystem.addSourcePaths(
                 sameSourceFile1,
                 sameSourceFile2,
                 createPathEntry("baz.txt"), // Same path, different timestamp: this one is newer
                 nonChangedConversionFile,
                 createPathEntry("bar.convert")
         );
-        accessor.addStaticPaths(
+        fileSystem.addStaticPaths(
                 sameStaticFile,
                 createPathEntry("image.jpg")
         );
@@ -163,12 +163,12 @@ public class MagistoTest {
 
     @Test
     public void testSameFileNameDifferentExtensions() throws Exception {
-        accessor.addTargetPaths(
+        fileSystem.addTargetPaths(
                 createPathEntry("test.convers"),
                 createPathEntry("test.converted")
         );
         TimeUnit.SECONDS.sleep(1);
-        accessor.addSourcePaths(
+        fileSystem.addSourcePaths(
                 createPathEntry("test.convers"),
                 createPathEntry("test.convert")
         );

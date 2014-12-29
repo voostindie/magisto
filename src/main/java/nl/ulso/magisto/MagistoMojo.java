@@ -21,7 +21,7 @@ import nl.ulso.magisto.converter.markdown.MarkdownToHtmlFileConverterFactory;
 import nl.ulso.magisto.git.DummyGitClient;
 import nl.ulso.magisto.git.GitClient;
 import nl.ulso.magisto.git.JGitClient;
-import nl.ulso.magisto.io.RealFileSystemAccessor;
+import nl.ulso.magisto.io.RealFileSystem;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -59,7 +59,7 @@ public class MagistoMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         final Handler consoleHandler = configureLogging(verbose);
         final GitClient gitClient = createGitClient(sourceDirectory);
-        final Magisto magisto = new Magisto(forceOverwrite, new RealFileSystemAccessor(), new RealActionFactory(),
+        final Magisto magisto = new Magisto(forceOverwrite, new RealFileSystem(), new RealActionFactory(),
                 new MarkdownToHtmlFileConverterFactory(gitClient));
         try {
             magisto.run(sourceDirectory, targetDirectory).log();

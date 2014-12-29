@@ -18,7 +18,7 @@ package nl.ulso.magisto.converter.markdown;
 
 import freemarker.template.Template;
 import nl.ulso.magisto.git.DummyGitClient;
-import nl.ulso.magisto.io.DummyFileSystemAccessor;
+import nl.ulso.magisto.io.DummyFileSystem;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -34,13 +34,13 @@ import static org.junit.Assert.*;
 public class MarkdownToHtmlFileConverterTest {
 
     private MarkdownToHtmlFileConverter fileConverter;
-    private DummyFileSystemAccessor fileSystemAccessor;
+    private DummyFileSystem fileSystemAccessor;
     private DummyGitClient gitClient;
     private Path sourcePath;
 
     @Before
     public void setUp() throws Exception {
-        this.fileSystemAccessor = new DummyFileSystemAccessor();
+        this.fileSystemAccessor = new DummyFileSystem();
         this.sourcePath = fileSystemAccessor.resolveSourceDirectory("source");
         fileSystemAccessor.prepareTargetDirectory("target");
         this.gitClient = new DummyGitClient();

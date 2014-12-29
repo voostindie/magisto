@@ -34,7 +34,7 @@ import java.util.SortedSet;
  * in unit tests.
  * </p>
  */
-public interface FileSystemAccessor {
+public interface FileSystem {
 
     /**
      * Name of the empty file to write after every export.

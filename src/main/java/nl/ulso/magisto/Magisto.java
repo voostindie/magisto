@@ -22,7 +22,7 @@ import nl.ulso.magisto.action.ActionFactory;
 import nl.ulso.magisto.action.ActionSet;
 import nl.ulso.magisto.converter.FileConverter;
 import nl.ulso.magisto.converter.FileConverterFactory;
-import nl.ulso.magisto.io.FileSystemAccessor;
+import nl.ulso.magisto.io.FileSystem;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -39,15 +39,15 @@ class Magisto {
 
     private final boolean forceOverwrite;
     private final boolean forceCopy;
-    private final FileSystemAccessor fileSystemAccessor;
+    private final FileSystem fileSystem;
     private final ActionFactory actionFactory;
     private final FileConverterFactory fileConverterFactory;
 
-    public Magisto(boolean forceOverwrite, FileSystemAccessor fileSystemAccessor, ActionFactory actionFactory,
+    public Magisto(boolean forceOverwrite, FileSystem fileSystem, ActionFactory actionFactory,
                    FileConverterFactory fileConverterFactory) {
         this.forceOverwrite = forceOverwrite;
         this.forceCopy = forceOverwrite;
-        this.fileSystemAccessor = fileSystemAccessor;
+        this.fileSystem = fileSystem;
         this.actionFactory = actionFactory;
         this.fileConverterFactory = fileConverterFactory;
     }
@@ -65,22 +65,22 @@ class Magisto {
         final Statistics statistics = new Statistics();
         try {
             statistics.begin();
-            final Path sourceRoot = fileSystemAccessor.resolveSourceDirectory(sourceDirectory);
-            final Path targetRoot = fileSystemAccessor.prepareTargetDirectory(targetDirectory);
-            fileSystemAccessor.requireDistinct(sourceRoot, targetRoot);
+            final Path sourceRoot = fileSystem.resolveSourceDirectory(sourceDirectory);
+            final Path targetRoot = fileSystem.prepareTargetDirectory(targetDirectory);
+            fileSystem.requireDistinct(sourceRoot, targetRoot);
 
             final ActionSet actions = new ActionSet(actionFactory);
             addSourceActions(actions, sourceRoot, targetRoot);
             addStaticActions(actions, sourceRoot, targetRoot);
 
-            actions.performAll(fileSystemAccessor, sourceRoot, targetRoot, new ActionCallback() {
+            actions.performAll(fileSystem, sourceRoot, targetRoot, new ActionCallback() {
                 @Override
                 public void actionPerformed(Action action) {
                     statistics.registerActionPerformed(action);
                 }
             });
 
-            fileSystemAccessor.writeTouchFile(targetRoot);
+            fileSystem.writeTouchFile(targetRoot);
         } finally {
             statistics.end();
         }
@@ -95,12 +95,12 @@ class Magisto {
     algorithm is simpler. It's a bit faster too.
      */
     private void addSourceActions(ActionSet actions, Path sourceRoot, Path targetRoot) throws IOException {
-        final FileConverter fileConverter = fileConverterFactory.create(fileSystemAccessor, sourceRoot);
+        final FileConverter fileConverter = fileConverterFactory.create(fileSystem, sourceRoot);
         final boolean forceConvert = forceOverwrite
-                || fileConverter.isCustomTemplateChanged(fileSystemAccessor, sourceRoot, targetRoot);
-        final Iterator<Path> sources = fileSystemAccessor.findAllPaths(sourceRoot,
+                || fileConverter.isCustomTemplateChanged(fileSystem, sourceRoot, targetRoot);
+        final Iterator<Path> sources = fileSystem.findAllPaths(sourceRoot,
                 prioritizeOnExtension(fileConverter.getSourceExtensions())).iterator();
-        final Iterator<Path> targets = fileSystemAccessor.findAllPaths(targetRoot,
+        final Iterator<Path> targets = fileSystem.findAllPaths(targetRoot,
                 prioritizeOnExtension(fileConverter.getTargetExtension())).iterator();
 
         Path source = nullableNext(sources);
@@ -142,13 +142,13 @@ class Magisto {
 
     private void addStaticActions(ActionSet actions, Path sourceRoot, Path targetRoot) throws IOException {
         final Path staticRoot = sourceRoot.resolve(STATIC_CONTENT_DIRECTORY);
-        if (fileSystemAccessor.notExists(staticRoot)) {
+        if (fileSystem.notExists(staticRoot)) {
             return;
         }
-        final SortedSet<Path> staticPaths = fileSystemAccessor.findAllPaths(staticRoot);
+        final SortedSet<Path> staticPaths = fileSystem.findAllPaths(staticRoot);
         for (Path staticPath : staticPaths) {
             final Path targetPath = targetRoot.resolve(staticPath);
-            if (forceCopy || fileSystemAccessor.notExists(targetPath)
+            if (forceCopy || fileSystem.notExists(targetPath)
                     || isSourceNewerThanTarget(staticRoot.resolve(staticPath), targetPath)) {
                 actions.addCopyStaticAction(staticPath, STATIC_CONTENT_DIRECTORY);
             } else {
@@ -175,8 +175,8 @@ class Magisto {
     }
 
     private boolean isSourceNewerThanTarget(Path sourcePath, Path targetPath) throws IOException {
-        final long sourceLastModified = fileSystemAccessor.getLastModifiedInMillis(sourcePath);
-        final long targetLastModified = fileSystemAccessor.getLastModifiedInMillis(targetPath);
+        final long sourceLastModified = fileSystem.getLastModifiedInMillis(sourcePath);
+        final long targetLastModified = fileSystem.getLastModifiedInMillis(targetPath);
         return sourceLastModified > targetLastModified;
     }
 }

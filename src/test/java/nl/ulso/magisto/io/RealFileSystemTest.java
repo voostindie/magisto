@@ -35,32 +35,32 @@ import static nl.ulso.magisto.io.FileSystemTestRunner.runFileSystemTest;
 import static nl.ulso.magisto.io.Paths.createPath;
 import static org.junit.Assert.*;
 
-public class RealFileSystemAccessorTest {
+public class RealFileSystemTest {
 
-    private final FileSystemAccessor accessor = new RealFileSystemAccessor();
+    private final FileSystem fileSystem = new RealFileSystem();
 
     @Test
     public void testSourceDirectoryWithJavaCurrentWorkingDirectory() throws Exception {
         final Path expected = WORKING_DIRECTORY;
-        final Path actual = accessor.resolveSourceDirectory(System.getProperty("user.dir"));
+        final Path actual = fileSystem.resolveSourceDirectory(System.getProperty("user.dir"));
         assertEquals(expected, actual);
     }
 
     @Test(expected = NoSuchFileException.class)
     public void testSourceDirectoryExceptionForNonExistingDirectory() throws Exception {
-        accessor.resolveSourceDirectory("foo");
+        fileSystem.resolveSourceDirectory("foo");
     }
 
     @Test
     public void testResolvedSourceDirectoryIsRealPath() throws Exception {
         final Path expected = WORKING_DIRECTORY.resolve("src");
-        final Path actual = accessor.resolveSourceDirectory("src");
+        final Path actual = fileSystem.resolveSourceDirectory("src");
         assertEquals(expected.toString(), actual.toString());
     }
 
     @Test(expected = IOException.class)
     public void testSourceDirectoryIsDirectory() throws Exception {
-        accessor.resolveSourceDirectory("pom.xml");
+        fileSystem.resolveSourceDirectory("pom.xml");
     }
 
     @Test(expected = IOException.class)
@@ -75,7 +75,7 @@ public class RealFileSystemAccessorTest {
             @Override
             public void runTest(Path path) throws IOException {
                 // IOException expected, since directory is not readable
-                accessor.resolveSourceDirectory(path.toString());
+                fileSystem.resolveSourceDirectory(path.toString());
             }
         });
     }
@@ -85,7 +85,7 @@ public class RealFileSystemAccessorTest {
         runFileSystemTest(new FileSystemTestWithoutTempDirectory() {
             @Override
             public void runTest(Path path) throws IOException {
-                final Path actual = accessor.prepareTargetDirectory(path.toString());
+                final Path actual = fileSystem.prepareTargetDirectory(path.toString());
                 assertEquals(path.toString(), actual.toString());
             }
         });
@@ -96,7 +96,7 @@ public class RealFileSystemAccessorTest {
         runFileSystemTest(new FileSystemTestWithEmptyTempDirectory() {
             @Override
             public void runTest(Path path) throws IOException {
-                final Path actual = accessor.prepareTargetDirectory(path.toString());
+                final Path actual = fileSystem.prepareTargetDirectory(path.toString());
                 assertEquals(path.toString(), actual.toString());
             }
         });
@@ -104,7 +104,7 @@ public class RealFileSystemAccessorTest {
 
     @Test(expected = IOException.class)
     public void testTargetDirectoryIsDirectory() throws Exception {
-        accessor.prepareTargetDirectory("pom.xml");
+        fileSystem.prepareTargetDirectory("pom.xml");
     }
 
     @Test(expected = IOException.class)
@@ -117,7 +117,7 @@ public class RealFileSystemAccessorTest {
 
             @Override
             public void runTest(Path path) throws IOException {
-                accessor.prepareTargetDirectory(path.toString());
+                fileSystem.prepareTargetDirectory(path.toString());
             }
         });
     }
@@ -132,7 +132,7 @@ public class RealFileSystemAccessorTest {
 
             @Override
             public void runTest(Path path) throws IOException {
-                accessor.prepareTargetDirectory(path.toString());
+                fileSystem.prepareTargetDirectory(path.toString());
             }
         });
     }
@@ -143,12 +143,12 @@ public class RealFileSystemAccessorTest {
             @Override
             public void prepareTempDirectory(Path path) throws IOException {
                 Files.createFile(path.resolve("foo"));
-                Files.createFile(path.resolve(FileSystemAccessor.MAGISTO_EXPORT_MARKER_FILE));
+                Files.createFile(path.resolve(FileSystem.MAGISTO_EXPORT_MARKER_FILE));
             }
 
             @Override
             public void runTest(Path path) throws IOException {
-                assertNotNull(accessor.prepareTargetDirectory(path.toString()));
+                assertNotNull(fileSystem.prepareTargetDirectory(path.toString()));
             }
         });
     }
@@ -163,7 +163,7 @@ public class RealFileSystemAccessorTest {
 
             @Override
             public void runTest(Path path) throws IOException {
-                assertNotNull(accessor.prepareTargetDirectory(path.toString()));
+                assertNotNull(fileSystem.prepareTargetDirectory(path.toString()));
             }
         });
     }
@@ -180,7 +180,7 @@ public class RealFileSystemAccessorTest {
 
             @Override
             public void runTest(Path path) throws IOException {
-                final SortedSet<Path> paths = accessor.findAllPaths(path);
+                final SortedSet<Path> paths = fileSystem.findAllPaths(path);
                 assertEquals(3, paths.size());
                 assertArrayEquals(new Path[]{
                         createPath("bar"),
@@ -194,21 +194,21 @@ public class RealFileSystemAccessorTest {
     public void testSourceAndTargetDoNotOverlap() throws Exception {
         final Path source = WORKING_DIRECTORY.resolve("foo");
         final Path target = WORKING_DIRECTORY.resolve("bar");
-        accessor.requireDistinct(source, target);
+        fileSystem.requireDistinct(source, target);
     }
 
     @Test(expected = IOException.class)
     public void testSourceInsideTarget() throws Exception {
         final Path source = WORKING_DIRECTORY.resolve("bar").resolve("foo");
         final Path target = WORKING_DIRECTORY.resolve("bar");
-        accessor.requireDistinct(source, target);
+        fileSystem.requireDistinct(source, target);
     }
 
     @Test(expected = IOException.class)
     public void testTargetInsideSource() throws Exception {
         final Path source = WORKING_DIRECTORY.resolve("foo");
         final Path target = WORKING_DIRECTORY.resolve("foo").resolve("bar");
-        accessor.requireDistinct(source, target);
+        fileSystem.requireDistinct(source, target);
     }
 
     @Test
@@ -216,7 +216,7 @@ public class RealFileSystemAccessorTest {
         runFileSystemTest(new FileSystemTestWithEmptyTempDirectory() {
             @Override
             public void runTest(Path path) throws IOException {
-                accessor.writeTouchFile(path);
+                fileSystem.writeTouchFile(path);
                 assertTrue(Files.exists(resolveTouchFile(path)));
             }
         });
@@ -232,7 +232,7 @@ public class RealFileSystemAccessorTest {
 
             @Override
             public void runTest(Path path) throws IOException {
-                accessor.writeTouchFile(path);
+                fileSystem.writeTouchFile(path);
                 assertTrue(Files.exists(resolveTouchFile(path)));
             }
         });
@@ -252,7 +252,7 @@ public class RealFileSystemAccessorTest {
 
             @Override
             public void runTest(Path path) throws IOException {
-                final long lastModifiedInMillis = accessor.getLastModifiedInMillis(path.resolve("target"));
+                final long lastModifiedInMillis = fileSystem.getLastModifiedInMillis(path.resolve("target"));
                 System.out.println("now = " + now);
                 System.out.println("lastModifiedInMillis = " + lastModifiedInMillis);
                 assertTrue(lastModifiedInMillis / 1000 >= now);
@@ -272,7 +272,7 @@ public class RealFileSystemAccessorTest {
 
             @Override
             public void runTest(Path path) throws IOException {
-                assertEquals(0, accessor.findAllPaths(path).size());
+                assertEquals(0, fileSystem.findAllPaths(path).size());
             }
         });
     }
@@ -297,11 +297,11 @@ public class RealFileSystemAccessorTest {
 
             @Override
             public void runTest(Path path) throws IOException {
-                accessor.copy(source, target, createPath("file"));
-                accessor.copy(source, target, createPath("directory"));
-                accessor.copy(source, target, createPath("directory").resolve("file"));
+                fileSystem.copy(source, target, createPath("file"));
+                fileSystem.copy(source, target, createPath("directory"));
+                fileSystem.copy(source, target, createPath("directory").resolve("file"));
                 // Bad test, it depends on code that's under test itself:
-                assertEquals(3, accessor.findAllPaths(path.resolve("target")).size());
+                assertEquals(3, fileSystem.findAllPaths(path.resolve("target")).size());
             }
         });
     }
@@ -317,10 +317,10 @@ public class RealFileSystemAccessorTest {
 
             @Override
             public void runTest(Path path) throws IOException {
-                accessor.delete(path, createPath("file"));
-                accessor.delete(path, createPath("directory"));
+                fileSystem.delete(path, createPath("file"));
+                fileSystem.delete(path, createPath("directory"));
                 // Bad test, it depends on code that's under test itself:
-                assertEquals(0, accessor.findAllPaths(path).size());
+                assertEquals(0, fileSystem.findAllPaths(path).size());
             }
         });
     }
@@ -329,7 +329,7 @@ public class RealFileSystemAccessorTest {
     public void testBufferedReaderForTextFile() throws Exception {
         final Path textFile = WORKING_DIRECTORY.resolve("README.md");
         final String line;
-        try (final BufferedReader bufferedReader = accessor.newBufferedReaderForTextFile(textFile)) {
+        try (final BufferedReader bufferedReader = fileSystem.newBufferedReaderForTextFile(textFile)) {
             line = bufferedReader.readLine();
         }
         assertEquals("# Magisto", line);
@@ -341,7 +341,7 @@ public class RealFileSystemAccessorTest {
             @Override
             public void runTest(Path path) throws IOException {
                 final Path textFile = path.resolve("test.md");
-                try (final BufferedWriter writer = accessor.newBufferedWriterForTextFile(textFile)) {
+                try (final BufferedWriter writer = fileSystem.newBufferedWriterForTextFile(textFile)) {
                     writer.write("# Test");
                 }
                 assertTrue(Files.exists(textFile));
@@ -353,6 +353,6 @@ public class RealFileSystemAccessorTest {
     }
 
     private Path resolveTouchFile(Path path) {
-        return path.resolve(FileSystemAccessor.MAGISTO_EXPORT_MARKER_FILE);
+        return path.resolve(FileSystem.MAGISTO_EXPORT_MARKER_FILE);
     }
 }

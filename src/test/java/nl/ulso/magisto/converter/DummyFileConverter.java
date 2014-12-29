@@ -16,7 +16,7 @@
 
 package nl.ulso.magisto.converter;
 
-import nl.ulso.magisto.io.FileSystemAccessor;
+import nl.ulso.magisto.io.FileSystem;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -59,14 +59,14 @@ public class DummyFileConverter implements FileConverter {
     }
 
     @Override
-    public void convert(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot, Path path)
+    public void convert(FileSystem fileSystem, Path sourceRoot, Path targetRoot, Path path)
             throws IOException {
         loggedConversions += String.format("%s:%s -> %s:%s", sourceRoot.getFileName(), path.getFileName(),
                 targetRoot.getFileName(), getConvertedFileName(path).getFileName());
     }
 
     @Override
-    public boolean isCustomTemplateChanged(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot)
+    public boolean isCustomTemplateChanged(FileSystem fileSystem, Path sourceRoot, Path targetRoot)
             throws IOException {
         return isCustomTemplateChanged;
     }

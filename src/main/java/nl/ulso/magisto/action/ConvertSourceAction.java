@@ -17,7 +17,7 @@
 package nl.ulso.magisto.action;
 
 import nl.ulso.magisto.converter.FileConverter;
-import nl.ulso.magisto.io.FileSystemAccessor;
+import nl.ulso.magisto.io.FileSystem;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -42,7 +42,7 @@ class ConvertSourceAction extends AbstractAction {
     }
 
     @Override
-    public void perform(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot) throws IOException {
-        fileConverter.convert(fileSystemAccessor, sourceRoot, targetRoot, getPath());
+    public void perform(FileSystem fileSystem, Path sourceRoot, Path targetRoot) throws IOException {
+        fileConverter.convert(fileSystem, sourceRoot, targetRoot, getPath());
     }
 }

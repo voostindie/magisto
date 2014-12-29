@@ -16,7 +16,7 @@
 
 package nl.ulso.magisto.action;
 
-import nl.ulso.magisto.io.FileSystemAccessor;
+import nl.ulso.magisto.io.FileSystem;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -40,8 +40,8 @@ class CopySourceAction extends AbstractAction {
     }
 
     @Override
-    public void perform(FileSystemAccessor fileSystemAccessor, Path sourceRoot, Path targetRoot) throws IOException {
-        fileSystemAccessor.copy(
+    public void perform(FileSystem fileSystem, Path sourceRoot, Path targetRoot) throws IOException {
+        fileSystem.copy(
                 requireAbsolutePath(sourceRoot),
                 requireAbsolutePath(targetRoot),
                 getPath()
