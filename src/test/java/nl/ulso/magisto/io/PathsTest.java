@@ -49,7 +49,7 @@ public class PathsTest {
     @Test
     public void testExtensionLessPath() throws Exception {
         final Path path = Paths.createPath("file.txt");
-        final Paths.ExtensionLessPath extensionLessPath = Paths.splitOnExtension(path);
+        final ExtensionLessPath extensionLessPath = Paths.splitOnExtension(path);
         assertEquals("file", extensionLessPath.getPathWithoutExtension().toString());
         assertEquals("txt", extensionLessPath.getOriginalExtension());
     }
@@ -57,7 +57,7 @@ public class PathsTest {
     @Test
     public void testExtensionLessPathInSubdirectory() throws Exception {
         final Path path = Paths.createPath("path/to/file.txt");
-        final Paths.ExtensionLessPath extensionLessPath = Paths.splitOnExtension(path);
+        final ExtensionLessPath extensionLessPath = Paths.splitOnExtension(path);
         assertEquals("path/to/file", extensionLessPath.getPathWithoutExtension().toString());
         assertEquals("txt", extensionLessPath.getOriginalExtension());
     }
@@ -65,7 +65,7 @@ public class PathsTest {
     @Test
     public void testExtensionLessPathOnExtensionLessFile() throws Exception {
         final Path path = Paths.createPath("file");
-        final Paths.ExtensionLessPath extensionLessPath = Paths.splitOnExtension(path);
+        final ExtensionLessPath extensionLessPath = Paths.splitOnExtension(path);
         assertEquals("file", extensionLessPath.getPathWithoutExtension().toString());
         assertEquals("", extensionLessPath.getOriginalExtension());
     }

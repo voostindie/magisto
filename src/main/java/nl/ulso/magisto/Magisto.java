@@ -29,6 +29,8 @@ import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.SortedSet;
 
+import static nl.ulso.magisto.io.Paths.prioritizeOnExtension;
+
 /**
  * Knits all the components in the Magisto system together (like a module) and runs it.
  */
@@ -97,9 +99,9 @@ class Magisto {
         final boolean forceConvert = forceOverwrite
                 || fileConverter.isCustomTemplateChanged(fileSystemAccessor, sourceRoot, targetRoot);
         final Iterator<Path> sources = fileSystemAccessor.findAllPaths(sourceRoot,
-                new SourcePathComparator(fileConverter.getSourceExtensions())).iterator();
+                prioritizeOnExtension(fileConverter.getSourceExtensions())).iterator();
         final Iterator<Path> targets = fileSystemAccessor.findAllPaths(targetRoot,
-                new TargetPathComparator(fileConverter.getTargetExtension())).iterator();
+                prioritizeOnExtension(fileConverter.getTargetExtension())).iterator();
 
         Path source = nullableNext(sources);
         Path target = nullableNext(targets);

@@ -14,7 +14,7 @@
  * limitations under the License
  */
 
-package nl.ulso.magisto;
+package nl.ulso.magisto.io;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -25,33 +25,27 @@ import java.util.Comparator;
 import static nl.ulso.magisto.io.Paths.createPath;
 import static org.junit.Assert.assertTrue;
 
-public class TargetPathComparatorTest {
+public class PrioritizedByExtensionPathComparatorTest {
 
     private Comparator<Path> comparator;
 
     @Before
     public void setUp() throws Exception {
-        comparator = new TargetPathComparator("html");
+        comparator = new PrioritizedByExtensionPathComparator(new String[]{"md", "markdown"});
     }
 
     @Test
-    public void testUnrelatedPathsAreSortedInOrder() throws Exception {
+    public void testNonPrioritizedPathsAreSortedInOrder() throws Exception {
         final Path path1 = createPath("src", "main", "java", "Main.java");
         final Path path2 = createPath("src", "test", "java", "MainTest.java");
         assertTrue(comparator.compare(path1, path2) < 0);
     }
 
     @Test
-    public void testConvertedPathBeforeOtherPaths1() throws Exception {
-        final Path path1 = createPath("file.html");
-        final Path path2 = createPath("file.exe");
-        assertTrue(comparator.compare(path1, path2) < 0);
-    }
-
-    @Test
-    public void testConvertedPathBeforeOtherPaths2() throws Exception {
-        final Path path1 = createPath("file.jpg");
-        final Path path2 = createPath("file.html");
+    public void testPrioritizedPathComesBeforeNormalPath() throws Exception {
+        final Path path1 = createPath("file.jpeg");
+        final Path path2 = createPath("file.md");
         assertTrue(comparator.compare(path1, path2) > 0);
+        assertTrue(comparator.compare(path2, path1) < 0);
     }
 }
