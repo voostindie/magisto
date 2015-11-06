@@ -1,6 +1,7 @@
 # Magisto
 
 [![Build Status](https://travis-ci.org/voostindie/magisto.svg?branch=master)](https://travis-ci.org/voostindie/magisto)
+[![Codacy Badge](https://api.codacy.com/project/badge/grade/960364d8c953408185251ec749de5b80)](https://www.codacy.com/app/voostindie/magisto)
 
 ## Introduction
 
