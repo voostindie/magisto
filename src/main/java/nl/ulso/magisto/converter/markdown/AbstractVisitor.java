@@ -32,6 +32,11 @@ abstract class AbstractVisitor implements Visitor {
     }
 
     @Override
+    public void visit(AnchorLinkNode node) {
+
+    }
+
+    @Override
     public void visit(AutoLinkNode node) {
 
     }

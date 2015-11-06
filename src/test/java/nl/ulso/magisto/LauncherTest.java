@@ -23,9 +23,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.contrib.java.lang.system.ExpectedSystemExit;
-import org.junit.contrib.java.lang.system.StandardErrorStreamLog;
-import org.junit.contrib.java.lang.system.StandardOutputStreamLog;
+import org.junit.contrib.java.lang.system.*;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -41,10 +39,10 @@ public class LauncherTest {
     public final ExpectedSystemExit systemExit = ExpectedSystemExit.none();
 
     @Rule
-    public final StandardErrorStreamLog errorLog = new StandardErrorStreamLog();
+    public final SystemErrRule errorLog = new SystemErrRule().enableLog();
 
     @Rule
-    public final StandardOutputStreamLog outputLog = new StandardOutputStreamLog();
+    public final SystemOutRule outputLog = new SystemOutRule().enableLog();
 
     @Before
     public void setUp() throws Exception {

@@ -28,19 +28,25 @@ public class MarkdownDocumentTest {
 
     @Test
     public void testTitleExtractionAtxHeader() throws Exception {
-        assertEquals("title", createMarkdownDocument(
-                "abstract\n\n# title\n\n## subtitle\n\nsome text").extractTitle());
+        assertEquals("Title", createMarkdownDocument(
+                "abstract\n\n# Title\n\n## subtitle\n\nsome text").extractTitle());
     }
 
     @Test
     public void testTitleExtractionSetextHeader() throws Exception {
-        assertEquals("title", createMarkdownDocument(
-                "abstract\n\ntitle\n=====\n\nsubtitle\n--------\n\nsome text").extractTitle());
+        assertEquals("Title", createMarkdownDocument(
+                "abstract\n\nTitle\n=====\n\nsubtitle\n--------\n\nsome text").extractTitle());
     }
 
     @Test
     public void testTitleExtractionNoTitlePresent() throws Exception {
         assertEquals("", createMarkdownDocument("some text").extractTitle());
+    }
+
+    @Test
+    public void testAnchorInHeader() throws Exception {
+        final String html = createMarkdownDocument("# A long \"title\"'s great!").toHtml();
+        assertEquals("<h1><a href=\"#a-long-titles-great-\" name=\"a-long-titles-great-\"></a>A long &ldquo;title&rdquo;&rsquo;s great!</h1>", html);
     }
 
     @Test

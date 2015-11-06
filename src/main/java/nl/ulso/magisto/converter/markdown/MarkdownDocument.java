@@ -29,7 +29,7 @@ public class MarkdownDocument {
     private static final ThreadLocal<PegDownProcessor> PROCESSOR = new ThreadLocal<PegDownProcessor>() {
         @Override
         protected PegDownProcessor initialValue() {
-            return new PegDownProcessor(Extensions.ALL - Extensions.HARDWRAPS);
+            return new PegDownProcessor(Extensions.ALL - Extensions.HARDWRAPS - Extensions.EXTANCHORLINKS);
         }
     };
 

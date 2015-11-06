@@ -58,6 +58,13 @@ class TitleFinder extends AbstractVisitor {
     }
 
     @Override
+    public void visit(AnchorLinkNode node) {
+        if (isBuffering) {
+            buffer.append(node.getText());
+        }
+    }
+
+    @Override
     public void visit(TextNode node) {
         if (isBuffering) {
             buffer.append(node.getText());
