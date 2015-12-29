@@ -50,6 +50,12 @@ public class MarkdownDocumentTest {
     }
 
     @Test
+    public void testAnchorInHeaderWithCode() throws Exception {
+        final String html = createMarkdownDocument("# Title with `code`").toHtml();
+        assertEquals("<h1><a href=\"#title-with-code\" name=\"title-with-code\"></a>Title with <code>code</code></h1>", html);
+    }
+
+    @Test
     public void testNormalFileLink() throws Exception {
         final String html = createMarkdownDocument("[link](image.jpg)").toHtml();
         assertEquals("<p><a href=\"image.jpg\">link</a></p>", html);

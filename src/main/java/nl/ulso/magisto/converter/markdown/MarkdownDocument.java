@@ -16,7 +16,8 @@
 
 package nl.ulso.magisto.converter.markdown;
 
-import org.pegdown.Extensions;
+import org.parboiled.Parboiled;
+import org.pegdown.CustomMarkdownParser;
 import org.pegdown.PegDownProcessor;
 import org.pegdown.ToHtmlSerializer;
 import org.pegdown.ast.RootNode;
@@ -29,7 +30,8 @@ public class MarkdownDocument {
     private static final ThreadLocal<PegDownProcessor> PROCESSOR = new ThreadLocal<PegDownProcessor>() {
         @Override
         protected PegDownProcessor initialValue() {
-            return new PegDownProcessor(Extensions.ALL - Extensions.HARDWRAPS - Extensions.EXTANCHORLINKS);
+            final CustomMarkdownParser parser = Parboiled.createParser(CustomMarkdownParser.class);
+            return new PegDownProcessor(parser);
         }
     };
 
@@ -46,4 +48,5 @@ public class MarkdownDocument {
     public String toHtml() {
         return new ToHtmlSerializer(new MarkdownLinkRenderer()).toHtml(rootNode);
     }
+
 }
