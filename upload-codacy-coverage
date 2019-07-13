@@ -16,4 +16,4 @@ if [[ ! $CODACY_PROJECT_TOKEN ]]; then
 fi
 
 mvn test jacoco:report
-codacy-coverage-reporter -l Java -r target/site/jacoco/jacoco.xml
+codacy-coverage-reporter report -l Java -r target/site/jacoco/jacoco.xml
