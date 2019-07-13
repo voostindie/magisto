@@ -17,13 +17,13 @@ import java.util.logging.*;
  * Launches the Magisto application.
  * <p>
  * This is the only place where:
+ * </p>
  * <ul>
  * <li>Program arguments are parsed</li>
  * <li>Output is generated directly to System.out</li>
  * <li>Output is generated directly to System.err</li>
  * <li>The {@link Magisto} class is instantiated/configured and run</li>
  * </ul>
- * </p>
  */
 public class Launcher {
 

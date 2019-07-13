@@ -34,7 +34,6 @@ public interface FileSystem {
      * <li>It must exist</li>
      * <li>It must be a directory</li>
      * <li>It must be readable</li>
-     * </li>
      * </ul>
      * <p>
      * The path returned is an absolute path.
@@ -82,12 +81,13 @@ public interface FileSystem {
      * Writes the {@value #MAGISTO_EXPORT_MARKER_FILE} to the directory.
      *
      * @param targetRoot Directory, must be a real path.
+     * @throws IOException If an exception occurred with accessing the touch file.
      */
     void writeTouchFile(Path targetRoot) throws IOException;
 
     /**
      * @param targetRoot Target directory, must be a real path;
-     * @return The last modified timestamp of the touch file, or {@value -1} if the file doesn't exist.
+     * @return The last modified timestamp of the touch file, or -1 if the file doesn't exist.
      * @throws IOException If an exception occurred with accessing the touch file.
      */
     long getTouchFileLastModifiedInMillis(Path targetRoot) throws IOException;
@@ -110,6 +110,7 @@ public interface FileSystem {
     /**
      * @param path Absolute path to get the last modified timestamp of.
      * @return Last modified timestamp of {@code path}
+     * @throws IOException If an exception occurs while getting the timestamp.
      */
     long getLastModifiedInMillis(Path path) throws IOException;
 
@@ -120,6 +121,7 @@ public interface FileSystem {
      * @param sourceRoot Absolute path to the source directory.
      * @param targetRoot Absolute path to the target directory.
      * @param path       Relative path to the file or directory to copy within the source directory.
+     * @throws IOException If an exception occurs while copying files.
      */
     void copy(Path sourceRoot, Path targetRoot, Path path) throws IOException;
 
@@ -128,16 +130,19 @@ public interface FileSystem {
      *
      * @param root Absolute path to the directory.
      * @param path Relative path to the file or directory to deleteTarget within the root directory.
+     * @throws IOException If an exception occurs while deleting a path.
      */
     void delete(Path root, Path path) throws IOException;
 
     /**
+     * @param path Path to the text file to get a buffered reader for.
      * @return A new reader for a text file in UTF-8.
      * @throws IOException If an exception accessing occurs while accessing the file system.
      */
     BufferedReader newBufferedReaderForTextFile(Path path) throws IOException;
 
     /**
+     * @param path Path to the text file to get a buffered writer for.
      * @return A new writer for a text file in UTF-8; if a file already exists it is overwritten.
      * @throws IOException If an exception accessing occurs while accessing the file system.
      */

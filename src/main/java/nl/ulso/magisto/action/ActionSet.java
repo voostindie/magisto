@@ -65,6 +65,12 @@ public class ActionSet {
      * Performs all actions in the list in the right order, calling the callback after each action is performed.
      * Afterwards all actions all cleared from the list, ensuring that the actions in a list can be performed only
      * once.
+     *
+     * @param fileSystem File system to perform actions in.
+     * @param sourceRoot Source root of all actions.
+     * @param targetRoot Target root of all actions.
+     * @param callback Callback to perform after every action.
+     * @throws IOException If anything goes wrong while accessing the file system.
      */
     public void performAll(FileSystem fileSystem, Path sourceRoot, Path targetRoot,
                            ActionCallback callback) throws IOException {
