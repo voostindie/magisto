@@ -14,13 +14,13 @@ If your ambitions reach beyond these plain goals, then Magisto is not the tool f
 
 ## Background
 
-At the company I work for there are a lot of Git repositories containing documentation in Markdown format. Although our Git repository manager ([Stash](http://www.atlassian.com/stash)) has a web-based viewer that nicely renders Markdown as HTML, that interface is too complex for most audiences. Most users want to view the documentation without distractions (files, directories, commits, branches, tags, diffs... WTF?!).
+At the company I work for there are a lot of Git repositories containing documentation in Markdown format. Although our Git repository manager ([BitBucket](https://www.atlassian.com/bitbucket)) has a web-based viewer that nicely renders Markdown as HTML, that interface is too complex for most audiences. Most users want to view the documentation without distractions (files, directories, commits, branches, tags, diffs... WTF?!).
 
 By running Magisto on those Git repositories and sticking the output on a web server, we get distraction-free documentation.
 
 ## Requirements
 
-Magisto requires Java 7 or later. That's it.
+Magisto requires Java 8 or later. That's it.
 
 ## Usage
 
