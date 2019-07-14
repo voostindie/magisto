@@ -116,20 +116,19 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.4</version>
                 <executions>
-                    <execution>
-                        <id>default-prepare-agent</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>default-report</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                </executions>
+    				<execution>
+    					<goals>
+    						<goal>prepare-agent</goal>
+    					</goals>
+    				</execution>
+    				<execution>
+    					<id>report</id>
+    					<phase>test</phase>
+    					<goals>
+    						<goal>report</goal>
+    					</goals>
+    				</execution>
+    			</executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -170,26 +169,26 @@
             </plugin>
             <!-- Enable the following part only when creating a release.
                  It's disabled now to prevent Travis CI from breaking. -->
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-gpg-plugin</artifactId>-->
-<!--                <version>1.6</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>sign-artifacts</id>-->
-<!--                        <phase>verify</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>sign</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <gpgArguments>-->
-<!--                                <arg>&#45;&#45;pinentry-mode</arg>-->
-<!--                                <arg>loopback</arg>-->
-<!--                            </gpgArguments>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
+           <!-- <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-gpg-plugin</artifactId>
+               <version>1.6</version>
+               <executions>
+                   <execution>
+                       <id>sign-artifacts</id>
+                       <phase>verify</phase>
+                       <goals>
+                           <goal>sign</goal>
+                       </goals>
+                       <configuration>
+                           <gpgArguments>
+                               <arg>&#45;&#45;pinentry-mode</arg>
+                               <arg>loopback</arg>
+                           </gpgArguments>
+                       </configuration>
+                   </execution>
+               </executions>
+           </plugin> -->
         </plugins>
     </build>
 </project>
