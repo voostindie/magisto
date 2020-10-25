@@ -10,7 +10,7 @@ Magisto is a *very* simple tool that runs against a Git clone and that exports a
 It's as simple as that. No more. No less.
 
 If your ambitions reach beyond these plain goals, then Magisto is not the tool for you.
-
+    
 ## Background
 
 At the company I work for there are a lot of Git repositories containing documentation in Markdown format. Although our Git repository manager ([BitBucket](https://www.atlassian.com/bitbucket)) has a web-based viewer that nicely renders Markdown as HTML, that interface is too complex for most audiences. Most users want to view the documentation without distractions (files, directories, commits, branches, tags, diffs... WTF?!).

@@ -66,7 +66,7 @@ public class MarkdownToHtmlFileConverterTest {
         final Date start = new Date();
         TimeUnit.SECONDS.sleep(1);
         final Map<String, Object> model = fileConverter.createPageModel(createPath("test.md"),
-                new MarkdownDocument("# Title\n\nParagraph".toCharArray()));
+                new MarkdownDocument("# Title\n\nParagraph"));
         TimeUnit.SECONDS.sleep(1);
         final Date end = new Date();
         final Date timestamp = (Date) model.get("timestamp");

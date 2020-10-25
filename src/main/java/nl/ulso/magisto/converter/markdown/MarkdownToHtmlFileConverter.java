@@ -139,7 +139,7 @@ class MarkdownToHtmlFileConverter implements FileConverter {
                 builder.append(line);
                 builder.append(System.lineSeparator());
             }
-            return new MarkdownDocument(builder.toString().toCharArray());
+            return new MarkdownDocument(builder.toString());
         }
     }
 }

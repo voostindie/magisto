@@ -7,7 +7,7 @@ import static org.junit.Assert.assertEquals;
 public class MarkdownDocumentTest {
 
     private MarkdownDocument createMarkdownDocument(String text) {
-        return new MarkdownDocument(text.toCharArray());
+        return new MarkdownDocument(text);
     }
 
     @Test

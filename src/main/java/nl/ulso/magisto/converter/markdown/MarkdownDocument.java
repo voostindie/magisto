@@ -1,28 +1,35 @@
 package nl.ulso.magisto.converter.markdown;
 
-import org.parboiled.Parboiled;
-import org.pegdown.CustomMarkdownParser;
-import org.pegdown.PegDownProcessor;
-import org.pegdown.ToHtmlSerializer;
-import org.pegdown.ast.RootNode;
+import com.vladsch.flexmark.html.HtmlRenderer;
+import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.util.ast.Node;
 
 /**
  * Represents a Markdown document.
+ *
+ * TODO: fix the URLs:
+ * https://github.com/vsch/flexmark-java/blob/master/flexmark-java-samples/src/com/vladsch/flexmark/java/samples/PegdownCustomLinkResolverOptions.java
  */
 public class MarkdownDocument {
 
-    private static final ThreadLocal<PegDownProcessor> PROCESSOR = new ThreadLocal<PegDownProcessor>() {
+    private static final ThreadLocal<Parser> PARSER = new ThreadLocal<Parser>() {
         @Override
-        protected PegDownProcessor initialValue() {
-            final CustomMarkdownParser parser = Parboiled.createParser(CustomMarkdownParser.class);
-            return new PegDownProcessor(parser);
+        protected Parser initialValue() {
+            return Parser.builder().build();
         }
     };
 
-    private final RootNode rootNode;
+    private static final ThreadLocal<HtmlRenderer> RENDERER = new ThreadLocal<HtmlRenderer>() {
+        @Override
+        protected HtmlRenderer initialValue() {
+            return HtmlRenderer.builder().build();
+        }
+    };
 
-    public MarkdownDocument(char[] markdownText) {
-        rootNode = PROCESSOR.get().parseMarkdown(markdownText);
+    private final Node rootNode;
+
+    public MarkdownDocument(String markdownText) {
+        rootNode = PARSER.get().parse(markdownText);
     }
 
     public String extractTitle() {
@@ -30,7 +37,8 @@ public class MarkdownDocument {
     }
 
     public String toHtml() {
-        return new ToHtmlSerializer(new MarkdownLinkRenderer()).toHtml(rootNode);
+        return RENDERER.get().render(rootNode).trim();
+//        return new ToHtmlSerializer(new MarkdownLinkRenderer()).toHtml(rootNode);
     }
 
 }

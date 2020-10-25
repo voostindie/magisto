@@ -1,62 +1,23 @@
 package nl.ulso.magisto.converter.markdown;
 
-import org.pegdown.ast.*;
+import com.vladsch.flexmark.ast.Heading;
+import com.vladsch.flexmark.util.ast.Node;
+import com.vladsch.flexmark.util.ast.NodeVisitor;
+import com.vladsch.flexmark.util.ast.VisitHandler;
 
-/**
- * Finds the first level 1 title in a Markdown document.
- */
-class TitleFinder extends AbstractVisitor {
+class TitleFinder {
 
-    private final StringBuilder buffer;
-    private boolean isFound;
-    private boolean isBuffering;
+  private String title = "";
 
-    public TitleFinder() {
-        buffer = new StringBuilder();
-        isFound = false;
-        isBuffering = false;
+  String extractTitle(Node rootNode) {
+    NodeVisitor visitor = new NodeVisitor(new VisitHandler<>(Heading.class, this::visit));
+    visitor.visit(rootNode);
+    return title;
+  }
+
+  public void visit(Heading heading) {
+    if (heading.getLevel() == 1) {
+      title = heading.getText().toString();
     }
-
-    @Override
-    public void visit(RootNode node) {
-        visitChildren(node);
-    }
-
-    private void visitChildren(SuperNode node) {
-        for (Node child : node.getChildren()) {
-            if (isFound) {
-                return;
-            }
-            child.accept(this);
-        }
-    }
-
-    @Override
-    public void visit(HeaderNode node) {
-        if (node.getLevel() == 1) {
-            isBuffering = true;
-            visitChildren(node);
-            isBuffering = false;
-            isFound = true;
-        }
-    }
-
-    @Override
-    public void visit(AnchorLinkNode node) {
-        if (isBuffering) {
-            buffer.append(node.getText());
-        }
-    }
-
-    @Override
-    public void visit(TextNode node) {
-        if (isBuffering) {
-            buffer.append(node.getText());
-        }
-    }
-
-    public String extractTitle(RootNode rootNode) {
-        rootNode.accept(this);
-        return buffer.toString();
-    }
+  }
 }
