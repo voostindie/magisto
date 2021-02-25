@@ -1,30 +1,45 @@
 package nl.ulso.magisto.converter.markdown;
 
+import com.vladsch.flexmark.ext.anchorlink.AnchorLinkExtension;
+import com.vladsch.flexmark.ext.typographic.TypographicExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.Node;
+import com.vladsch.flexmark.util.data.DataSet;
+import com.vladsch.flexmark.util.data.MutableDataSet;
+
+import java.util.List;
 
 /**
  * Represents a Markdown document.
- *
- * TODO: fix the URLs:
- * https://github.com/vsch/flexmark-java/blob/master/flexmark-java-samples/src/com/vladsch/flexmark/java/samples/PegdownCustomLinkResolverOptions.java
  */
 public class MarkdownDocument {
+
+    private static final DataSet OPTIONS = createOptions();
 
     private static final ThreadLocal<Parser> PARSER = new ThreadLocal<Parser>() {
         @Override
         protected Parser initialValue() {
-            return Parser.builder().build();
+            return Parser.builder(OPTIONS).build();
         }
     };
 
     private static final ThreadLocal<HtmlRenderer> RENDERER = new ThreadLocal<HtmlRenderer>() {
         @Override
         protected HtmlRenderer initialValue() {
-            return HtmlRenderer.builder().build();
+            return HtmlRenderer.builder(OPTIONS).build();
         }
     };
+
+    private static DataSet createOptions() {
+        return new MutableDataSet()
+                .set(Parser.EXTENSIONS, List.of(
+                        AnchorLinkExtension.create(),
+                        TypographicExtension.create(),
+                        MarkdownLinkRenderer.create()))
+                .set(AnchorLinkExtension.ANCHORLINKS_SET_NAME, true)
+                .set(AnchorLinkExtension.ANCHORLINKS_SET_ID, false);
+    }
 
     private final Node rootNode;
 
@@ -38,7 +53,5 @@ public class MarkdownDocument {
 
     public String toHtml() {
         return RENDERER.get().render(rootNode).trim();
-//        return new ToHtmlSerializer(new MarkdownLinkRenderer()).toHtml(rootNode);
     }
-
 }

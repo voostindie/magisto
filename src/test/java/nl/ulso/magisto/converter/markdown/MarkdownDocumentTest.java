@@ -30,13 +30,13 @@ public class MarkdownDocumentTest {
     @Test
     public void testAnchorInHeader() throws Exception {
         final String html = createMarkdownDocument("# A long \"title\"'s great!").toHtml();
-        assertEquals("<h1><a href=\"#a-long-titles-great-\" name=\"a-long-titles-great-\"></a>A long &ldquo;title&rdquo;&rsquo;s great!</h1>", html);
+        assertEquals("<h1><a href=\"#a-long-titles-great\" name=\"a-long-titles-great\">A long &ldquo;title&rdquo;&rsquo;s great!</a></h1>", html);
     }
 
     @Test
     public void testAnchorInHeaderWithCode() throws Exception {
         final String html = createMarkdownDocument("# Title with `code`").toHtml();
-        assertEquals("<h1><a href=\"#title-with-code\" name=\"title-with-code\"></a>Title with <code>code</code></h1>", html);
+        assertEquals("<h1><a href=\"#title-with-code\" name=\"title-with-code\">Title with <code>code</code></a></h1>", html);
     }
 
     @Test
@@ -68,6 +68,4 @@ public class MarkdownDocumentTest {
         final String html = createMarkdownDocument(String.format("[link][id]%n%n[id]: file.md")).toHtml();
         assertEquals("<p><a href=\"file.html\">link</a></p>", html);
     }
-
-
 }

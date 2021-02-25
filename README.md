@@ -19,7 +19,7 @@ By running Magisto on those Git repositories and sticking the output on a web se
 
 ## Requirements
 
-Magisto requires Java 8 or later. That's it.
+Magisto requires Java 11 or later. That's it.
 
 ## Usage
 
