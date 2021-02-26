@@ -72,5 +72,4 @@ class JGitHistory implements History {
                 revCommit.getShortMessage(),
                 revCommit.getFullMessage());
     }
-
 }
