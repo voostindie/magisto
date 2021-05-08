@@ -1,6 +1,6 @@
 # Magisto
 
-[![Build Status](https://travis-ci.org/voostindie/magisto.svg?branch=master)](https://travis-ci.org/voostindie/magisto)
+[![Build Status](https://travis-ci.com/voostindie/magisto.svg?branch=master)](https://travis-ci.com/voostindie/magisto)
 [![Code Coverage](https://codecov.io/gh/voostindie/magisto/branch/master/graph/badge.svg)](https://codecov.io/gh/voostindie/magisto)
 [![Known Vulnerabilities](https://snyk.io/test/github/voostindie/magisto/badge.svg)](https://snyk.io/test/github/voostindie/magisto)
 
