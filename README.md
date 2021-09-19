@@ -11,6 +11,10 @@ Magisto is a *very* simple tool that runs against a Git clone and that exports a
 It's as simple as that. No more. No less.
 
 If your ambitions reach beyond these plain goals, then Magisto is not the tool for you.
+
+## Product archived!
+
+**Update September 2021**: as I'm not using this tool anymore, I'm archiving it. Right now it's working well with modern JDKs, so it's still usable. But I'm not planning on maintaining it any longer. Who knows though?
     
 ## Background
 
